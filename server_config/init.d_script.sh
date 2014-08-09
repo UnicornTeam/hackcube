@@ -5,13 +5,13 @@
 # description: Use uwsgi to run python and wsgi web apps.
 # processname: uwsgi
 
-CONF=/opt/mirror.downloadnulledscript.com/server_config/uwsgi.ini
+CONF=/opt/yourwebsite.com/server_config/uwsgi.ini
 PATH=/opt/uwsgi:/sbin:/bin:/usr/sbin:/usr/bin
 DAEMON=/usr/bin/uwsgi
 
 OWNER=root
-NAME=uwsgi_mirror.downloadnulledscript.com
-DESC=uwsgi_mirror.downloadnulledscript.com
+NAME=uwsgi_yourwebsite.com
+DESC=uwsgi_yourwebsite.com
 
 pidfile=/var/run/${NAME}.pid
 
