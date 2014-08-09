@@ -1,0 +1,7 @@
+# system package requirements
+
+# ubuntu / debian
+sudo apt-get install libjpeg-dev
+
+# centos
+sudo yum install -y libjpeg-devel
