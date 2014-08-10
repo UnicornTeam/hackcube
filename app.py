@@ -133,7 +133,7 @@ def delete(filename):
 # serve static files
 @app.route("/thumbnail/<string:filename>", methods=['GET'])
 def get_thumbnail(filename):
-    return send_from_directory(os.path.join(app.config['THUMBNAIL_FOLDER']), filename=filename)
+    return send_from_directory(app.config['THUMBNAIL_FOLDER'], filename=filename)
 
 
 @app.route("/data/<string:filename>", methods=['GET'])
