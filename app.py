@@ -53,9 +53,9 @@ def create_thumbnail(image):
     try:
         base_width = 80
         img = Image.open(os.path.join(app.config['UPLOAD_FOLDER'], image))
-        w_percent = (base_width/float(img.size[0]))
-        h_size = int((float(img.size[1])*float(w_percent)))
-        img = img.resize((base_width,h_size), PIL.Image.ANTIALIAS)
+        w_percent = (base_width / float(img.size[0]))
+        h_size = int((float(img.size[1]) * float(w_percent)))
+        img = img.resize((base_width, h_size), PIL.Image.ANTIALIAS)
         img.save(os.path.join(app.config['THUMBNAIL_FOLDER'], image))
 
         return True
