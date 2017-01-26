@@ -11,8 +11,8 @@ from PIL import Image
 import simplejson
 import traceback
 
-from flask import Flask, request, render_template, session, redirect, url_for, flash, send_from_directory
-from flask.ext.bootstrap import Bootstrap
+from flask import Flask, request, render_template, redirect, url_for, send_from_directory
+from flask_bootstrap import Bootstrap
 from werkzeug import secure_filename
 
 from lib.upload_file import uploadfile
@@ -44,22 +44,22 @@ def gen_file_name(filename):
     while os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], filename)):
         name, extension = os.path.splitext(filename)
         filename = '%s_%s%s' % (name, str(i), extension)
-        i = i + 1
+        i += 1
 
     return filename
 
 
-def create_thumbnai(image):
+def create_thumbnail(image):
     try:
-        basewidth = 80
+        base_width = 80
         img = Image.open(os.path.join(app.config['UPLOAD_FOLDER'], image))
-        wpercent = (basewidth/float(img.size[0]))
-        hsize = int((float(img.size[1])*float(wpercent)))
-        img = img.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
+        w_percent = (base_width / float(img.size[0]))
+        h_size = int((float(img.size[1]) * float(w_percent)))
+        img = img.resize((base_width, h_size), PIL.Image.ANTIALIAS)
         img.save(os.path.join(app.config['THUMBNAIL_FOLDER'], image))
 
         return True
-    
+
     except:
         print traceback.format_exc()
         return False
@@ -68,38 +68,36 @@ def create_thumbnai(image):
 @app.route("/upload", methods=['GET', 'POST'])
 def upload():
     if request.method == 'POST':
-        file = request.files['file']
-        #pprint (vars(objectvalue))
+        files = request.files['file']
 
-        if file:
-            filename = secure_filename(file.filename)
+        if files:
+            filename = secure_filename(files.filename)
             filename = gen_file_name(filename)
-            mimetype = file.content_type
+            mime_type = files.content_type
 
-
-            if not allowed_file(file.filename):
-                result = uploadfile(name=filename, type=mimetype, size=0, not_allowed_msg="Filetype not allowed")
+            if not allowed_file(files.filename):
+                result = uploadfile(name=filename, type=mime_type, size=0, not_allowed_msg="File type not allowed")
 
             else:
                 # save file to disk
                 uploaded_file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                file.save(uploaded_file_path)
+                files.save(uploaded_file_path)
 
                 # create thumbnail after saving
-                if mimetype.startswith('image'):
-                    create_thumbnai(filename)
+                if mime_type.startswith('image'):
+                    create_thumbnail(filename)
                 
                 # get file size after saving
                 size = os.path.getsize(uploaded_file_path)
 
                 # return json for js call back
-                result = uploadfile(name=filename, type=mimetype, size=size)
+                result = uploadfile(name=filename, type=mime_type, size=size)
             
             return simplejson.dumps({"files": [result.get_file()]})
 
     if request.method == 'GET':
         # get all file in ./data directory
-        files = [ f for f in os.listdir(app.config['UPLOAD_FOLDER']) if os.path.isfile(os.path.join(app.config['UPLOAD_FOLDER'],f)) and f not in IGNORED_FILES ]
+        files = [f for f in os.listdir(app.config['UPLOAD_FOLDER']) if os.path.isfile(os.path.join(app.config['UPLOAD_FOLDER'],f)) and f not in IGNORED_FILES ]
         
         file_display = []
 
@@ -147,4 +145,4 @@ def index():
 
 
 if __name__ == '__main__':
-    app.run(debug = True, port=9191)
+    app.run(debug=True)
