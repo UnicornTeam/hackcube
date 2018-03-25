@@ -2,16 +2,6 @@
   <div>
     <cube-nav/>
 
-    <div>
-      <b-alert variant="warning"
-               dismissible
-               :show="showDismissibleAlert"
-               @dismissed="showDismissibleAlert=false">
-        <h4>Warning!</h4>
-        <p>本设备仅限风险演示,请您注意自觉遵守相关法律法规.</p>
-      </b-alert>
-    </div>
-
     <h1 class="text-center">Cube Wifi Manage</h1>
     <h3 class="text-center">对工作在2.4Ghz 5Ghz设备进行安全风险检测</h3>
 
@@ -61,8 +51,6 @@
     },
     data() {
       return {
-        showDismissibleAlert: true,
-        test: [true],
         fields: ['SSID', 'BSSID', 'RSSI', 'JAM'],
         items: [
         { Index: 0, SSID: '360WIFI-XX', BSSID: '11:22:33:44:55:66', RSSI: '-80', JAM: false },
