@@ -17,9 +17,9 @@
     <br/><br/>
 
     <!-- TODO: 上传预览，上传进度 -->
-    <h5">上传arduino固件</h5>
+    <h5>上传arduino固件</h5>
     <Upload
-      multiple
+      :data="extraData"
       :before-upload="beforeUpload"
       action="//localhost:5000/upload">
       <Button type="ghost" icon="ios-cloud-upload-outline">Upload files</Button>
@@ -27,9 +27,9 @@
 
     <br/><br/>
 
-    <h5">上传树莓派固件</h5>
+    <h5>上传树莓派固件</h5>
     <Upload
-      multiple
+      :data="extraData"
       :before-upload="beforeUpload"
       action="//localhost:5000/upload">
       <Button type="ghost" icon="ios-cloud-upload-outline">Upload files</Button>
@@ -69,6 +69,7 @@
       return {
         energyPercent: 68,
         storePercent: 83,
+        extraData: { foo: 'bar' },
       };
     },
     created() {

@@ -14,7 +14,7 @@
 
     <h5>上传攻击脚本</h5>
     <Upload
-      multiple
+      :data="extraData"
       :before-upload="beforeUpload"
       action="//localhost:5000/upload">
       <Button type="ghost" icon="ios-cloud-upload-outline">Upload files</Button>
@@ -44,6 +44,7 @@
       data() {
         return {
           Key: null,
+          extraData: { foo: 'bar' },
           fields: ['Info', 'Size', 'Run'],
           items: [
             { Index: 0, Info: '539fsdf', Size: '522', Run: false },
