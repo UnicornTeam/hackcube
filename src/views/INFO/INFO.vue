@@ -13,6 +13,7 @@
     <b-progress :value="storePercent"
                 :variant="info"
     ></b-progress>
+    <br/><br/>
 
     <!-- TODO: 上传预览，上传进度 -->
     <h5>上传arduino固件</h5>
@@ -36,7 +37,7 @@
   import CubeNav from '@/components/CubeNav';
 
   export default {
-    name: 'Info',
+    name: 'INFO',
     components: {
       CubeNav,
     },

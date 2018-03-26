@@ -4,6 +4,7 @@ import Wifi from '@/views/Wifi/Wifi';
 import NFC from '@/views/NFC/NFC';
 import RF from '@/views/RF/RF';
 import HID from '@/views/HID/HID';
+import INFO from '@/views/INFO/INFO';
 
 Vue.use(Router);
 
@@ -28,6 +29,11 @@ export default new Router({
       path: '/hid',
       name: 'HID',
       component: HID,
+    },
+    {
+      path: '/info',
+      name: 'INFO',
+      component: INFO,
     },
   ],
 });
