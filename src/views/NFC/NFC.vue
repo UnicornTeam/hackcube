@@ -4,7 +4,7 @@
 
     <h1 class="text-center">Cube NFC Manage</h1>
     <h3 class="text-center">对工作在125Khz, 13.5Mhz的卡片进行安全风险检测</h3>
-
+    <br/>
     <!-- Read List -->
     <b-container>
       <b-row align-h="between">
@@ -12,20 +12,20 @@
           <h4>Read</h4>
         </b-col>
         <b-col cols="3">
-          <van-switch v-model="readSwitch" @change="onSwitch" />
+          <van-switch v-model="readSwitch" @change="onSwitch" size="25px"/>
         </b-col>
       </b-row>
     </b-container>
 
     <b-table :items="items" :fields="fields">
       <div slot="WRITE" slot-scope="data">
-        <van-switch v-model="items[data.index].WRITE" @change="onSwitch" />
+        <van-switch v-model="items[data.index].WRITE" @change="onSwitch" size="25px"/>
       </div>
       <div slot="BLAST" slot-scope="data">
-        <van-switch v-model="items[data.index].BLAST" @change="onSwitch" />
+        <van-switch v-model="items[data.index].BLAST" @change="onSwitch" size="25px"/>
       </div>
       <div slot="SIMULATE" slot-scope="data">
-        <van-switch v-model="items[data.index].SIMULATE" @change="onSwitch" />
+        <van-switch v-model="items[data.index].SIMULATE" @change="onSwitch" size="25px"/>
       </div>
     </b-table>
 
@@ -36,7 +36,7 @@
           <h4>Write</h4>
         </b-col>
         <b-col cols="3">
-          <van-switch v-model="writeSwitch" @change="onSwitch" />
+          <van-switch v-model="writeSwitch" @change="onSwitch" size="25px"/>
         </b-col>
       </b-row>
     </b-container>
@@ -66,7 +66,7 @@
           <h4>Simulate</h4>
         </b-col>
         <b-col cols="3">
-          <van-switch v-model="simulateSwitch" @change="onSwitch" />
+          <van-switch v-model="simulateSwitch" @change="onSwitch" size="25px"/>
         </b-col>
       </b-row>
     </b-container>
@@ -104,6 +104,7 @@
     },
     data() {
       return {
+        switchSize: '25px',
         readSwitch: false,
         // TODO: Confirm if necessary to disable input when false
         writeSwitch: false,

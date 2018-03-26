@@ -7,18 +7,19 @@
     <br/>
     <h4 class="text-center">电量</h4>
     <b-progress :value="energyPercent"
-                :variant="info"
+                variant="dark"
     ></b-progress>
+    <br/>
     <h4 class="text-center">硬盘</h4>
     <b-progress :value="storePercent"
-                :variant="info"
+                variant="dark"
     ></b-progress>
     <br/><br/>
 
     <!-- TODO: 上传预览，上传进度 -->
     <h5>上传arduino固件</h5>
     <van-uploader :after-read="onRead" multiple>
-      <b-button :size="sm" :variant="outline-success">
+      <b-button size="sm" variant="outline-secondary">
         Choose File
       </b-button>
     </van-uploader>
@@ -26,7 +27,7 @@
 
     <h5>上传树莓派固件</h5>
     <van-uploader :after-read="onRead" multiple>
-      <b-button :size="sm" :variant="outline-success">
+      <b-button size="sm" variant="outline-secondary">
         Choose File
       </b-button>
     </van-uploader>

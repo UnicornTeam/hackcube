@@ -4,23 +4,23 @@
 
     <h1 class="text-center">Cube HID Manage</h1>
     <h3 class="text-center">用Cube模拟成键盘、鼠标、HID等设备</h3>
-
-    <h4>要输出的键值</h4>
+    <br/>
+    <h5>要输出的键值</h5>
     <b-form-input v-model="Key"
                   type="text"
                   placeholder="Key">
     </b-form-input>
     <br/>
 
-    <h4>上传攻击脚本</h4>
+    <h5>上传攻击脚本</h5>
     <van-uploader :after-read="onRead" multiple>
-      <b-button :size="sm" :variant="outline-success">
+      <b-button size="sm" variant="outline-secondary">
         上传
       </b-button>
     </van-uploader>
     <br/><br/>
 
-    <h4>Script</h4>
+    <h5>Script</h5>
     <b-table :items="items" :fields="fields">
       <div slot="Run" slot-scope="data">
         <b-button size="sm" variant="success" @click="onClick(data.index)">Run</b-button>

@@ -3,7 +3,7 @@
     <nav class="bg-transparent">
       <b-nav tabs>
         <b-nav-item to="/">WIFI</b-nav-item>
-        <b-nav-item to="bt">BT</b-nav-item>
+        <!--<b-nav-item to="bt">BT</b-nav-item>-->
         <b-nav-item to="nfc">NFC</b-nav-item>
         <b-nav-item to="rf">RF</b-nav-item>
         <b-nav-item to="hid">HID</b-nav-item>

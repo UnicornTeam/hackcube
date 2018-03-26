@@ -4,14 +4,14 @@
 
     <h1 class="text-center">Cube RF Manage</h1>
     <h3 class="text-center">对工作在433Mhz,315Mhz的设备进行安全风险检测</h3>
-
+    <br/><br/>
     <b-container>
       <b-row align-h="between">
         <b-col cols="4">
           <h4>Sniffer</h4>
         </b-col>
         <b-col cols="3">
-          <van-switch v-model="snifferSwitch" @change="onSwitch" />
+          <van-switch v-model="snifferSwitch" @change="onSwitch" size="25px" />
         </b-col>
       </b-row>
     </b-container>
@@ -29,7 +29,7 @@
           <h4>Attack</h4>
         </b-col>
         <b-col cols="3">
-          <van-switch v-model="attackSwitch" @change="onSwitch" />
+          <van-switch v-model="attackSwitch" @change="onSwitch" size="25px" />
         </b-col>
       </b-row>
     </b-container>
