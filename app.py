@@ -10,8 +10,9 @@ import PIL
 from PIL import Image
 import simplejson
 import traceback
+from flask_cors import CORS
 
-from flask import Flask, request, render_template, redirect, url_for, send_from_directory
+from flask import Flask, request, render_template, redirect, url_for, send_from_directory, make_response
 from flask_bootstrap import Bootstrap
 from werkzeug import secure_filename
 
@@ -19,6 +20,7 @@ from lib.upload_file import uploadfile
 
 
 app = Flask(__name__)
+CORS(app, supports_credentials=True)
 app.config['SECRET_KEY'] = 'hard to guess string'
 app.config['UPLOAD_FOLDER'] = 'data/'
 app.config['THUMBNAIL_FOLDER'] = 'data/thumbnail/'
@@ -61,7 +63,7 @@ def create_thumbnail(image):
         return True
 
     except:
-        print traceback.format_exc()
+        print(traceback.format_exc())
         return False
 
 
@@ -92,8 +94,12 @@ def upload():
 
                 # return json for js call back
                 result = uploadfile(name=filename, type=mime_type, size=size)
-            
-            return simplejson.dumps({"files": [result.get_file()]})
+
+            response = make_response(simplejson.dumps({"files": [result.get_file()]}))
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            response.headers['Access-Control-Allow-Methods'] = 'OPTIONS,HEAD,GET,POST'
+            response.headers['Access-Control-Allow-Headers'] = 'x-requested-with'
+            return response
 
     if request.method == 'GET':
         # get all file in ./data directory
