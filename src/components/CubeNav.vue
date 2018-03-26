@@ -11,7 +11,7 @@
       </b-nav>
     </nav>
 
-    <div>
+    <div style="margin-top: 10px">
       <b-alert variant="warning"
                dismissible
                :show="showDismissibleAlert"
@@ -31,6 +31,7 @@
     data() {
       return {
         showDismissibleAlert: true,
+        isActive: false,
       };
     },
   };

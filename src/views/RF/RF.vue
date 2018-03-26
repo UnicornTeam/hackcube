@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="margin: 10px">
     <cube-nav/>
 
     <h1 class="text-center">Cube RF Manage</h1>
@@ -61,12 +61,6 @@
           { Index: 1, 数据: 'f1a2a2682', 频率: '433.92Mhz', 协议: 'Keeloq', 调制: 'ASK', 重放: false },
           { Index: 2, 数据: 'f1jgf92f3', 频率: '433.92Mhz', 协议: 'PT224X', 调制: 'FSK', 重放: false },
         ],
-        fields2: ['NAME', 'MAC', 'Data', 'JAM'],
-        items2: [
-          { Index: 0, NAME: 'iPhone', MAC: '11:22:33:44:55:66', Data: '522', JAM: false },
-          { Index: 1, NAME: 'Android', MAC: '11:22:33:44:55:66', Data: '94', JAM: false },
-          { Index: 2, NAME: 'iPhone', MAC: '11:22:33:44:55:66', Data: '101', JAM: false },
-        ],
       };
     },
     methods: {
@@ -74,9 +68,7 @@
         // TODO: Check which item's JAM is true and do more thing.
         // TODO: Check is wifi list or client list's item
         for (const item of this.items) {
-          if (item.JAM === true) {
-            console.log(item.Index);
-          }
+          console.log(item.Index);
         }
       },
       // TODO: Deal with onClick logic.

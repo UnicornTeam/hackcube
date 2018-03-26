@@ -1,11 +1,67 @@
 <template>
+  <div style="margin: 10px">
+    <cube-nav/>
 
+    <h1 class="text-center">Cube HID Manage</h1>
+    <h3 class="text-center">用Cube模拟成键盘、鼠标、HID等设备</h3>
+
+    <h4>要输出的键值</h4>
+    <b-form-input v-model="Key"
+                  type="text"
+                  placeholder="Key">
+    </b-form-input>
+    <br/>
+
+    <h4>上传攻击脚本</h4>
+    <van-uploader :after-read="onRead" multiple>
+      <b-button :size="sm" :variant="outline-success">
+        上传
+      </b-button>
+    </van-uploader>
+    <br/><br/>
+
+    <h4>Script</h4>
+    <b-table :items="items" :fields="fields">
+      <div slot="Run" slot-scope="data">
+        <b-button size="sm" variant="success" @click="onClick(data.index)">Run</b-button>
+      </div>
+    </b-table>
+  </div>
 </template>
 
 <script>
+    import CubeNav from '@/components/CubeNav';
+
     export default {
-        name: "HID"
-    }
+      name: 'HID',
+      components: {
+        CubeNav,
+      },
+      data() {
+        return {
+          Key: null,
+          fields: ['Info', 'Size', 'Run'],
+          items: [
+            { Index: 0, Info: '539fsdf', Size: '522', Run: false },
+            { Index: 1, Info: '54j3n4j', Size: '94', Run: false },
+            { Index: 2, Info: 'ipfd93v', Size: '101', Run: false },
+          ],
+        };
+      },
+      methods: {
+        onRead(file, content) {
+          console.log(file);
+          console.log(content);
+          console.log(Buffer.from(file.content, 'base64').toString('utf-8'));
+          // TODO: Send result to backend
+          // TODO: Add upload success prompt
+        },
+        // TODO: Deal with onClick logic.
+        onClick(index) {
+          console.log(index);
+        },
+      },
+    };
 </script>
 
 <style scoped>
