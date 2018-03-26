@@ -132,6 +132,10 @@
         }
       },
     },
+    created() {
+      // TODO: 初始化数据
+      console.log(`items is: ${this.items}`);
+    },
   };
 </script>
 

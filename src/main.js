@@ -6,8 +6,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import Vant from 'vant';
 import 'vant/lib/vant-css/index.css';
+import 'iview/dist/styles/iview.css';
 import App from './App';
 import router from './router';
+
 
 Vue.use(Vant);
 Vue.use(BootstrapVue);

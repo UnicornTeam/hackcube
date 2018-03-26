@@ -1,7 +1,7 @@
 <template>
   <div>
-    <nav class="bg-transparent">
-      <b-nav tabs>
+    <nav>
+      <b-nav full tabs>
         <b-nav-item to="/">WIFI</b-nav-item>
         <!--<b-nav-item to="bt">BT</b-nav-item>-->
         <b-nav-item to="nfc">NFC</b-nav-item>

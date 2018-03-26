@@ -17,30 +17,36 @@
     <br/><br/>
 
     <!-- TODO: 上传预览，上传进度 -->
-    <h5>上传arduino固件</h5>
-    <van-uploader :after-read="onRead" multiple>
-      <b-button size="sm" variant="outline-secondary">
-        Choose File
-      </b-button>
-    </van-uploader>
+    <h5 style="margin-bottom: 10px">上传arduino固件</h5>
+    <Upload
+      multiple
+      :before-upload="beforeUpload"
+      action="//localhost:5000/upload">
+      <Button type="ghost" icon="ios-cloud-upload-outline">Upload files</Button>
+    </Upload>
+
     <br/><br/>
 
-    <h5>上传树莓派固件</h5>
-    <van-uploader :after-read="onRead" multiple>
-      <b-button size="sm" variant="outline-secondary">
-        Choose File
-      </b-button>
-    </van-uploader>
+    <h5 style="margin-bottom: 10px">上传树莓派固件</h5>
+    <Upload
+      multiple
+      :before-upload="beforeUpload"
+      action="//localhost:5000/upload">
+      <Button type="ghost" icon="ios-cloud-upload-outline">Upload files</Button>
+    </Upload>
   </div>
 </template>
 
 <script>
   import CubeNav from '@/components/CubeNav';
+  import { Upload, Button } from 'iview';
 
   export default {
     name: 'INFO',
     components: {
       CubeNav,
+      Upload,
+      Button,
     },
     methods: {
       onRead(file, content) {
@@ -54,12 +60,19 @@
       onClick(index) {
         console.log(index);
       },
+      beforeUpload(file) {
+        console.log(file);
+      },
     },
     data() {
       return {
         energyPercent: 68,
         storePercent: 83,
       };
+    },
+    created() {
+      // TODO: 初始化数据
+      console.log(`items is: ${this.items}`);
     },
   };
 </script>
