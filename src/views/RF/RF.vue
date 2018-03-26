@@ -8,10 +8,10 @@
     <b-container>
       <b-row align-h="between">
         <b-col cols="4">
-          <h4>Sniffer</h4>
+          <h5>Sniffer</h5>
         </b-col>
         <b-col cols="3">
-          <van-switch v-model="snifferSwitch" @change="onSwitch" size="25px" />
+          <van-switch v-model="snifferSwitch" @change="onSwitch" />
         </b-col>
       </b-row>
     </b-container>
@@ -26,10 +26,10 @@
     <b-container>
       <b-row align-h="between">
         <b-col cols="4">
-          <h4>Attack</h4>
+          <h5>Attack</h5>
         </b-col>
         <b-col cols="3">
-          <van-switch v-model="attackSwitch" @change="onSwitch" size="25px" />
+          <van-switch v-model="attackSwitch" @change="onSwitch" />
         </b-col>
       </b-row>
     </b-container>

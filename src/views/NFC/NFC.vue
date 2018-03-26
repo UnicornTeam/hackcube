@@ -9,7 +9,7 @@
     <b-container>
       <b-row align-h="between">
         <b-col cols="4">
-          <h4>Read</h4>
+          <h5>Read</h5>
         </b-col>
         <b-col cols="3">
           <van-switch v-model="readSwitch" @change="onSwitch" size="25px"/>
@@ -33,7 +33,7 @@
     <b-container style="margin-top: 15px">
       <b-row align-h="between">
         <b-col cols="4">
-          <h4>Write</h4>
+          <h5>Write</h5>
         </b-col>
         <b-col cols="3">
           <van-switch v-model="writeSwitch" @change="onSwitch" size="25px"/>
@@ -63,7 +63,7 @@
     <b-container style="margin-top: 15px">
       <b-row align-h="between">
         <b-col cols="4">
-          <h4>Simulate</h4>
+          <h5>Simulate</h5>
         </b-col>
         <b-col cols="3">
           <van-switch v-model="simulateSwitch" @change="onSwitch" size="25px"/>

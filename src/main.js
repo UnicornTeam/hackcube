@@ -9,6 +9,7 @@ import 'vant/lib/vant-css/index.css';
 import 'iview/dist/styles/iview.css';
 import App from './App';
 import router from './router';
+import '../static/global.css';
 
 
 Vue.use(Vant);

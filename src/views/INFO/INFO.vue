@@ -5,19 +5,19 @@
     <h1 class="text-center">Cube Status Manage</h1>
     <h3 class="text-center">显示Cube设备状态</h3>
     <br/>
-    <h4 class="text-center">电量</h4>
+    <h5 class="text-center">电量</h5>
     <b-progress :value="energyPercent"
                 variant="dark"
     ></b-progress>
     <br/>
-    <h4 class="text-center">硬盘</h4>
+    <h5 class="text-center">硬盘</h5>
     <b-progress :value="storePercent"
                 variant="dark"
     ></b-progress>
     <br/><br/>
 
     <!-- TODO: 上传预览，上传进度 -->
-    <h5 style="margin-bottom: 10px">上传arduino固件</h5>
+    <h5">上传arduino固件</h5>
     <Upload
       multiple
       :before-upload="beforeUpload"
@@ -27,7 +27,7 @@
 
     <br/><br/>
 
-    <h5 style="margin-bottom: 10px">上传树莓派固件</h5>
+    <h5">上传树莓派固件</h5>
     <Upload
       multiple
       :before-upload="beforeUpload"
@@ -61,6 +61,7 @@
         console.log(index);
       },
       beforeUpload(file) {
+        // TODO: Add more feature argument
         console.log(file);
       },
     },

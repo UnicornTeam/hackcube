@@ -13,11 +13,12 @@
     <br/>
 
     <h5>上传攻击脚本</h5>
-    <van-uploader :after-read="onRead" multiple>
-      <b-button size="sm" variant="outline-secondary">
-        上传
-      </b-button>
-    </van-uploader>
+    <Upload
+      multiple
+      :before-upload="beforeUpload"
+      action="//localhost:5000/upload">
+      <Button type="ghost" icon="ios-cloud-upload-outline">Upload files</Button>
+    </Upload>
     <br/><br/>
 
     <h5>Script</h5>
@@ -31,11 +32,14 @@
 
 <script>
     import CubeNav from '@/components/CubeNav';
+    import { Upload, Button } from 'iview';
 
     export default {
       name: 'HID',
       components: {
         CubeNav,
+        Upload,
+        Button,
       },
       data() {
         return {
@@ -59,6 +63,10 @@
         // TODO: Deal with onClick logic.
         onClick(index) {
           console.log(index);
+        },
+        beforeUpload(file) {
+          // TODO: Add more feature argument
+          console.log(file);
         },
       },
       created() {

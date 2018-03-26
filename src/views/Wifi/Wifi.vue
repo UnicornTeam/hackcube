@@ -8,7 +8,7 @@
     <b-container>
       <b-row align-h="between">
         <b-col cols="4">
-          <h4>WiFi List</h4>
+          <h5>WiFi List</h5>
         </b-col>
         <b-col cols="2">
           <b-button size="sm" variant="success">Scan</b-button>
@@ -18,16 +18,16 @@
 
     <b-table :items="items" :fields="fields">
       <div slot="JAM" slot-scope="data">
-        <van-switch v-model="items[data.index].JAM" @change="onSwitch" size="25px" />
+        <van-switch v-model="items[data.index].JAM" @change="onSwitch" />
       </div>
     </b-table>
 
 
     <!-- Client list -->
-    <h4>Client List</h4>
+    <h5>Client List</h5>
     <b-table :items="items2" :fields="fields2">
       <div slot="JAM" slot-scope="data">
-        <van-switch v-model="items2[data.index].JAM" @change="onSwitch" size="25px" />
+        <van-switch v-model="items2[data.index].JAM" @change="onSwitch" />
       </div>
     </b-table>
 
