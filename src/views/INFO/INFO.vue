@@ -21,7 +21,7 @@
     <Upload
       :data="extraData"
       :before-upload="beforeUpload"
-      action="//localhost:5000/upload">
+      action="//localhost/upload">
       <Button type="ghost" icon="ios-cloud-upload-outline">Upload files</Button>
     </Upload>
 
@@ -31,7 +31,7 @@
     <Upload
       :data="extraData"
       :before-upload="beforeUpload"
-      action="//localhost:5000/upload">
+      action="//localhost/upload">
       <Button type="ghost" icon="ios-cloud-upload-outline">Upload files</Button>
     </Upload>
   </div>

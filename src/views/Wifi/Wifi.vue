@@ -11,14 +11,15 @@
           <h5>WiFi List</h5>
         </b-col>
         <b-col cols="2">
-          <b-button size="sm" variant="success">Scan</b-button>
+          <b-button size="sm" variant="success" @click="onClickScan">Scan</b-button>
         </b-col>
       </b-row>
     </b-container>
 
     <b-table :items="items" :fields="fields">
       <div slot="JAM" slot-scope="data">
-        <van-switch v-model="items[data.index].JAM" @change="onSwitch" />
+        <van-switch v-model="items[data.index].JAM"
+                    @change="onSwitch('ap_block', items[data.index].BSSID, data.index, items[data.index].JAM)" />
       </div>
     </b-table>
 
@@ -27,10 +28,10 @@
     <h5>Client List</h5>
     <b-table :items="items2" :fields="fields2">
       <div slot="JAM" slot-scope="data">
-        <van-switch v-model="items2[data.index].JAM" @change="onSwitch" />
+        <van-switch v-model="items2[data.index].JAM"
+                    @change="onSwitch('sta_block', items2[data.index].MAC, data.index, items2[data.index].JAM)" />
       </div>
     </b-table>
-
   </div>
 </template>
 
@@ -38,6 +39,7 @@
   /* eslint-disable no-restricted-syntax */
 
   import CubeNav from '@/components/CubeNav';
+  import axios from 'axios';
 
   export default {
     name: 'Wifi',
@@ -46,6 +48,7 @@
     },
     data() {
       return {
+        scanStatus: 'off',
         fields: ['SSID', 'BSSID', 'RSSI', 'JAM'],
         items: [
         { Index: 0, SSID: '360WIFI-XX', BSSID: '11:22:33:44:55:66', RSSI: '-80', JAM: false },
@@ -61,14 +64,43 @@
       };
     },
     methods: {
-      onSwitch() {
-        // TODO: Check which item's JAM is true and do more thing.
-        // TODO: Check is wifi list or client list's item
-        for (const item of this.items) {
-          if (item.JAM === true) {
-            console.log(item.Index);
-          }
-        }
+      onSwitch(api, value, index, isOpen) {
+        console.log(api, index);
+        const action = isOpen ? 'on' : 'off';
+        axios.get(`${process.env.BACKEND_HOST}/${api}/${value}/${action}`)
+          .then((response) => {
+            console.log(response.data);
+            const result = response.data;
+            if (result.status === 'fail') {
+              this.$Message.error(result.message);
+            } else {
+              this.$Message.success(result.message);
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      },
+      error() {
+        this.$Message.error('This is an error tip');
+      },
+      onClickScan() {
+        // send request with action to backend
+        this.scanStatus = this.scanStatus === 'on' ? 'off' : 'on';
+        axios.get(`${process.env.BACKEND_HOST}/wifi_scan/${this.scanStatus}`)
+          .then((response) => {
+            console.log(response.data);
+            const result = response.data;
+            if (result.status === 'fail') {
+              // TODO: show prompt when fail or success
+              this.$Message.error(result.message);
+            } else {
+              this.$Message.success(result.message);
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       },
     },
     created() {
