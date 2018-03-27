@@ -111,11 +111,15 @@ def get_sta_list():
 def ap_block(bssid, action):
     if action not in ['on', 'off']:
         return simplejson.dumps({'status': 'fail',
+                                 'action': action,
+                                 'api': 'ap_block',
                                  'message': 'Parameter error'})
     try:
         subprocess.check_call(["/root/monitor_file/AP_block.sh", bssid, action], shell=True)
     except CalledProcessError:
         return simplejson.dumps({'status': 'fail',
+                                 'action': action,
+                                 'api': 'ap_block',
                                  'message': 'Call AP_block process error.'})
     return simplejson.dumps({'status': 'success'})
 
@@ -124,11 +128,15 @@ def ap_block(bssid, action):
 def sta_block(mac, action):
     if action not in ['on', 'off']:
         return simplejson.dumps({'status': 'fail',
+                                 'action': action,
+                                 'api': 'sta_block',
                                  'message': 'Parameter error'})
     try:
         subprocess.check_call(["/root/monitor_file/STA_block.sh", mac, action], shell=True)
     except CalledProcessError:
         return simplejson.dumps({'status': 'fail',
+                                 'action': action,
+                                 'api': 'sta_block',
                                  'message': 'Call STA_block process error.'})
     return simplejson.dumps({'status': 'success'})
 
