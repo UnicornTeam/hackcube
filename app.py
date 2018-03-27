@@ -6,6 +6,7 @@
 # This work based on jQuery-File-Upload which can be found at https://github.com/blueimp/jQuery-File-Upload/
 
 import os
+import subprocess
 from subprocess import CalledProcessError
 
 import PIL
@@ -112,7 +113,7 @@ def ap_block(bssid, action):
         return simplejson.dumps({'status': 'fail',
                                  'message': 'Parameter error'})
     try:
-        os.subprocess.check_call("/root/monitor_file/AP_block.sh", bssid, action, shell=True)
+        subprocess.check_call(["/root/monitor_file/AP_block.sh", bssid, action], shell=True)
     except CalledProcessError:
         return simplejson.dumps({'status': 'fail',
                                  'message': 'Call AP_block process error.'})
@@ -125,7 +126,7 @@ def sta_block(mac, action):
         return simplejson.dumps({'status': 'fail',
                                  'message': 'Parameter error'})
     try:
-        os.subprocess.check_call("/root/monitor_file/STA_block.sh", mac, action, shell=True)
+        subprocess.check_call(["/root/monitor_file/STA_block.sh", mac, action], shell=True)
     except CalledProcessError:
         return simplejson.dumps({'status': 'fail',
                                  'message': 'Call STA_block process error.'})
@@ -138,7 +139,7 @@ def wifi_scan(action):
         return simplejson.dumps({'status': 'fail',
                                  'message': 'Parameter error'})
     try:
-        os.subprocess.check_call("/root/monitor_file/wifi_scan.sh", action, shell=True)
+        subprocess.check_call(["/root/monitor_file/wifi_scan.sh", action], shell=True)
     except CalledProcessError:
         return simplejson.dumps({'status': 'fail',
                                  'message': 'Call wifi_scan process error.'})
