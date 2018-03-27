@@ -30,6 +30,10 @@ app.config['THUMBNAIL_FOLDER'] = 'data/thumbnail/'
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
 app.config['AP_LIST_FILE'] = 'data/source/AP_list_tmp'
 app.config['STA_LIST_FILE'] = 'data/source/STA_list_tmp'
+app.config['STA_BLOCK_SHELL'] = "/root/monitor_file/STA_block.sh"
+app.config['WIFI_SCAN_SHELL'] = "/root/monitor_file/wifi_scan.sh"
+app.config['AP_BLOCK_SHELL'] = "/root/monitor_file/AP_block.sh"
+# app.config['AP_BLOCK_SHELL'] = "data/example-bash/test.sh"
 
 ALLOWED_EXTENSIONS = set(['txt', 'gif', 'png', 'jpg', 'jpeg', 'bmp', 'rar', 'zip', '7zip', 'doc', 'docx'])
 IGNORED_FILES = set(['.gitignore'])
@@ -42,6 +46,8 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+# TODO: Check whether need change this rule.
+# TODO: Decide where the uploaded file should be store.
 def gen_file_name(filename):
     """
     If file was exist already, rename it and return a new name
@@ -72,6 +78,7 @@ def create_thumbnail(image):
         return False
 
 
+# TODO: Fetch ap_list
 @app.route("/ap_list", methods=['GET'])
 def get_ap_list():
     ap_list = []
@@ -109,19 +116,24 @@ def get_sta_list():
 
 @app.route("/ap_block/<string:bssid>/<string:action>", methods=['GET'])
 def ap_block(bssid, action):
+    print("[ap_block] Receive parameter: ", bssid, action)
     if action not in ['on', 'off']:
         return simplejson.dumps({'status': 'fail',
                                  'action': action,
                                  'api': 'ap_block',
                                  'message': 'Parameter error'})
     try:
-        subprocess.check_call(["/root/monitor_file/AP_block.sh", bssid, action], shell=True)
+        subprocess.call("{} {} {}".format(app.config['AP_BLOCK_SHELL'], bssid, action), shell=True)
     except CalledProcessError:
         return simplejson.dumps({'status': 'fail',
                                  'action': action,
                                  'api': 'ap_block',
                                  'message': 'Call AP_block process error.'})
-    return simplejson.dumps({'status': 'success'})
+    return simplejson.dumps({'status': 'success',
+                             'action': action,
+                             'api': 'ap_block',
+                             'message': 'Call AP_block process success.'
+                             })
 
 
 @app.route("/sta_block/<string:mac>/<string:action>")
@@ -132,13 +144,17 @@ def sta_block(mac, action):
                                  'api': 'sta_block',
                                  'message': 'Parameter error'})
     try:
-        subprocess.check_call(["/root/monitor_file/STA_block.sh", mac, action], shell=True)
+        subprocess.call("{} {} {}".format(app.config['STA_BLOCK_SHELL'], mac, action), shell=True)
     except CalledProcessError:
         return simplejson.dumps({'status': 'fail',
                                  'action': action,
                                  'api': 'sta_block',
                                  'message': 'Call STA_block process error.'})
-    return simplejson.dumps({'status': 'success'})
+    return simplejson.dumps({'status': 'success',
+                             'action': action,
+                             'api': 'sta_block',
+                             'message': 'Call STA_block process success.'
+                             })
 
 
 @app.route("/wifi_scan/<string:action>", methods=['GET'])
@@ -147,11 +163,13 @@ def wifi_scan(action):
         return simplejson.dumps({'status': 'fail',
                                  'message': 'Parameter error'})
     try:
-        subprocess.check_call(["/root/monitor_file/wifi_scan.sh", action], shell=True)
+        subprocess.call("{} {}".format(app.config['WIFI_SCAN_SHELL'], action), shell=True)
     except CalledProcessError:
         return simplejson.dumps({'status': 'fail',
                                  'message': 'Call wifi_scan process error.'})
-    return simplejson.dumps({'status': 'success'})
+    return simplejson.dumps({'status': 'success',
+                             'message': 'Call wifi_scan process success.'
+                             })
 
 
 # TODO: Receive more parameter to do more action

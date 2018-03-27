@@ -1,0 +1,13 @@
+[2018-03-27 16:29:16 +0800] [85114] [INFO] Starting gunicorn 19.7.1
+[2018-03-27 16:29:16 +0800] [85114] [INFO] Listening at: http://127.0.0.1:8000 (85114)
+[2018-03-27 16:29:16 +0800] [85114] [INFO] Using worker: sync
+[2018-03-27 16:29:16 +0800] [85158] [INFO] Booting worker with pid: 85158
+[2018-03-27 16:29:16 +0800] [85159] [INFO] Booting worker with pid: 85159
+[2018-03-27 16:29:16 +0800] [85160] [INFO] Booting worker with pid: 85160
+[2018-03-27 16:29:17 +0800] [85161] [INFO] Booting worker with pid: 85161
+[2018-03-27 16:30:24 +0800] [85114] [INFO] Handling signal: int
+[2018-03-27 16:30:24 +0800] [85159] [INFO] Worker exiting (pid: 85159)
+[2018-03-27 16:30:24 +0800] [85158] [INFO] Worker exiting (pid: 85158)
+[2018-03-27 16:30:24 +0800] [85160] [INFO] Worker exiting (pid: 85160)
+[2018-03-27 16:30:24 +0800] [85161] [INFO] Worker exiting (pid: 85161)
+[2018-03-27 16:30:24 +0800] [85114] [INFO] Shutting down: Master

@@ -26,9 +26,9 @@ $ python app.py
 
 Use gunicorn:
 ```
-sudo gunicorn -w 4 -b 127.0.0.1:5000 app:app
+gunicorn --reload -w 4 -b 127.0.0.1:8000 app:app --access-logfile log/access.log --error-logfile log/error.log
 ```
 or
 ```
-DEBUG=0 authbind gunicorn -b 0.0.0.0:80 backend:app --access-logfile .log/access.log --error-logfile .log/general.log
+DEBUG=0 authbind gunicorn -b 0.0.0.0:8000 app:app --access-logfile log/access.log --error-logfile log/error.log
 ```
