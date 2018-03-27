@@ -23,3 +23,5 @@ nosetests.xml
 logfile.log
 
 flask
+
+venv
