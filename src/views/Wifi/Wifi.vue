@@ -65,7 +65,7 @@
     },
     methods: {
       onSwitch(api, value, index, isOpen) {
-        console.log(api, index);
+        console.log(api, value, index, isOpen);
         const action = isOpen ? 'on' : 'off';
         axios.get(`${process.env.BACKEND_HOST}/${api}/${value}/${action}`)
           .then((response) => {

@@ -19,7 +19,7 @@
     <!-- TODO: 上传预览，上传进度 -->
     <h5>上传arduino固件</h5>
     <Upload
-      :data="extraData"
+      :data="extraDataArdu"
       :before-upload="beforeUpload"
       action="//localhost/upload">
       <Button type="ghost" icon="ios-cloud-upload-outline">Upload files</Button>
@@ -29,7 +29,7 @@
 
     <h5>上传树莓派固件</h5>
     <Upload
-      :data="extraData"
+      :data="extraDataPie"
       :before-upload="beforeUpload"
       action="//localhost/upload">
       <Button type="ghost" icon="ios-cloud-upload-outline">Upload files</Button>
@@ -69,7 +69,8 @@
       return {
         energyPercent: 68,
         storePercent: 83,
-        extraData: { foo: 'bar' },
+        extraDataPie: { type: 'INFO-Pie' },
+        extraDataArdu: { type: 'INFO-Ardu' },
       };
     },
     created() {

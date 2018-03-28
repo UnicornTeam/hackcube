@@ -44,7 +44,7 @@
       data() {
         return {
           Key: null,
-          extraData: { foo: 'bar' },
+          extraData: { type: 'HID-Script' },
           fields: ['Info', 'Size', 'Run'],
           items: [
             { Index: 0, Info: '539fsdf', Size: '522', Run: false },

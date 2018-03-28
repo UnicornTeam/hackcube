@@ -25,7 +25,6 @@
 
 <script>
   // TODO: Dynamic change active status
-  // Should it?
   export default {
     name: 'cube-nav',
     data() {
