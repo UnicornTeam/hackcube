@@ -27,6 +27,7 @@ app.config['SECRET_KEY'] = 'h\xcb\x81\xaf%\x81\xd5\x02\xc4L\xad,r\x04\xa4*\x8a\x
 
 app.config['THUMBNAIL_FOLDER'] = 'data/thumbnail/'
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
+# TODO: Change this to actual path when release production version
 app.config['AP_LIST_FILE'] = 'data/source/AP_list_tmp'
 app.config['STA_LIST_FILE'] = 'data/source/STA_list_tmp'
 app.config['STA_BLOCK_SHELL'] = "/root/monitor_file/STA_block.sh"
@@ -81,15 +82,19 @@ def create_thumbnail(image):
 @app.route("/ap_list", methods=['GET'])
 def get_ap_list():
     ap_list = []
-    f = open(app.config['AP_LIST_FILE'])
+    try:
+        f = open(app.config['AP_LIST_FILE'])
+    except:
+        return simplejson.dumps({"ap_list": ap_list}), status.HTTP_500_INTERNAL_SERVER_ERROR
     for line in f.readlines():
         l = line.split()
         if len(l) < 5:
             continue
         i = {
-            'bssid': l[0],
-            'rssi': l[2],
-            'ssid': l[3]
+            'BSSID': l[0],
+            'RSSI': l[2],
+            'SSID': l[3],
+            'JAM': False
         }
         ap_list.append(i)
     return simplejson.dumps({"ap_list": ap_list})
@@ -105,9 +110,9 @@ def get_sta_list():
             print("Too short: ", l)
             continue
         i = {
-            'mac': l[0],
-            'rssi': l[1],
-            'bssid': l[3]
+            'MAC': l[0],
+            'RSSI': l[1],
+            'BSSID': l[3]
         }
         sta_list.append(i)
     return simplejson.dumps({"sta_list": sta_list})
