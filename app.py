@@ -8,6 +8,7 @@
 import os
 import subprocess
 from subprocess import CalledProcessError
+from flask_api import status
 
 import PIL
 from PIL import Image
@@ -33,11 +34,6 @@ app.config['STA_LIST_FILE'] = 'data/source/STA_list_tmp'
 app.config['STA_BLOCK_SHELL'] = "/root/monitor_file/STA_block.sh"
 app.config['WIFI_SCAN_SHELL'] = "/root/monitor_file/wifi_scan.sh"
 app.config['AP_BLOCK_SHELL'] = "/root/monitor_file/AP_block.sh"
-# default upload folder
-app.config['UPLOAD_FOLDER'] = 'data/'
-app.config['UPLOAD_HID_SCRIPT_FOLDER'] = "/root/user_file/HID/"
-app.config['UPLOAD_INFO_PIE_FOLDER'] = "/root/user_file/raspberrypi"
-app.config['UPLOAD_INFO_ARDU_FOLDER'] = "/root/user_file/arduino/"
 
 # app.config['AP_BLOCK_SHELL'] = "data/example-bash/test.sh"
 
@@ -127,14 +123,14 @@ def ap_block(bssid, action):
         return simplejson.dumps({'status': 'fail',
                                  'action': action,
                                  'api': 'ap_block',
-                                 'message': 'Parameter error'})
+                                 'message': 'Parameter error'}), status.HTTP_400_BAD_REQUEST
     try:
         subprocess.call("{} {} {}".format(app.config['AP_BLOCK_SHELL'], bssid, action), shell=True)
     except CalledProcessError:
         return simplejson.dumps({'status': 'fail',
                                  'action': action,
                                  'api': 'ap_block',
-                                 'message': 'Call AP_block process error.'})
+                                 'message': 'Call AP_block process error.'}), status.HTTP_500_INTERNAL_SERVER_ERROR
     return simplejson.dumps({'status': 'success',
                              'action': action,
                              'api': 'ap_block',
@@ -148,14 +144,14 @@ def sta_block(mac, action):
         return simplejson.dumps({'status': 'fail',
                                  'action': action,
                                  'api': 'sta_block',
-                                 'message': 'Parameter error'})
+                                 'message': 'Parameter error'}), status.HTTP_400_BAD_REQUEST
     try:
         subprocess.call("{} {} {}".format(app.config['STA_BLOCK_SHELL'], mac, action), shell=True)
     except CalledProcessError:
         return simplejson.dumps({'status': 'fail',
                                  'action': action,
                                  'api': 'sta_block',
-                                 'message': 'Call STA_block process error.'})
+                                 'message': 'Call STA_block process error.'}), status.HTTP_500_INTERNAL_SERVER_ERROR
     return simplejson.dumps({'status': 'success',
                              'action': action,
                              'api': 'sta_block',
@@ -167,12 +163,12 @@ def sta_block(mac, action):
 def wifi_scan(action):
     if action not in ['on', 'off']:
         return simplejson.dumps({'status': 'fail',
-                                 'message': 'Parameter error'})
+                                 'message': 'Parameter error'}), status.HTTP_400_BAD_REQUEST
     try:
         subprocess.call("{} {}".format(app.config['WIFI_SCAN_SHELL'], action), shell=True)
     except CalledProcessError:
         return simplejson.dumps({'status': 'fail',
-                                 'message': 'Call wifi_scan process error.'})
+                                 'message': 'Call wifi_scan process error.'}), status.HTTP_500_INTERNAL_SERVER_ERROR
     return simplejson.dumps({'status': 'success',
                              'message': 'Call wifi_scan process success.'
                              })
@@ -191,30 +187,34 @@ def upload():
         except:
             pass
         if files:
-            filename = secure_filename(files.filename)
-            filename = gen_file_name(filename)
-            mime_type = files.content_type
-
-            # if not allowed_file(files.filename):
-            #     result = uploadfile(name=filename, type=mime_type, size=0, not_allowed_msg="File type not allowed")
-
-            # else:
-            # save file to disk
             # TODO: Add test code
             if extra:
                 if extra == 'HID-Script':
-                    uploaded_file_path = os.path.join(app.config['UPLOAD_HID_SCRIPT_FOLDER'], filename)
+                    app.config['UPLOAD_FOLDER'] = "/root/user_file/HID/"
                 elif extra == 'INFO-Pie':
-                    uploaded_file_path = os.path.join(app.config['UPLOAD_INFO_PIE_FOLDER'], filename)
+                    app.config['UPLOAD_FOLDER'] = "/root/user_file/raspberrypi"
                 elif extra == 'INFO-Ardu':
-                    uploaded_file_path = os.path.join(app.config['UPLOAD_INFO_ARDU_FOLDER'], filename)
+                    app.config['UPLOAD_FOLDER'] = "/root/user_file/arduino/"
                 else:
-                    uploaded_file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    app.config['UPLOAD_FOLDER'] = 'data/'
             else:
-                uploaded_file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                app.config['UPLOAD_FOLDER'] = 'data/'
 
-            files.save(uploaded_file_path)
+            filename = secure_filename(files.filename)
+            filename = gen_file_name(filename)
+            uploaded_file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            try:
+                files.save(uploaded_file_path)
+            except IOError:
+                data = simplejson.dumps({'status': 'fail',
+                                         'file': filename,
+                                         'save_path': uploaded_file_path,
+                                         'api': 'upload',
+                                         'message': 'Upload file fail.'
+                                         })
+                return data, status.HTTP_500_INTERNAL_SERVER_ERROR
 
+            mime_type = files.content_type
             # create thumbnail after saving
             if mime_type.startswith('image'):
                 create_thumbnail(filename)
@@ -229,6 +229,7 @@ def upload():
             response.headers['Access-Control-Allow-Origin'] = '*'
             response.headers['Access-Control-Allow-Methods'] = 'OPTIONS,HEAD,GET,POST'
             response.headers['Access-Control-Allow-Headers'] = 'x-requested-with'
+            response['status'] = 'success'
             return response
 
     if request.method == 'GET':
