@@ -116,7 +116,7 @@ def get_sta_list():
 
 @app.route("/ap_block/<string:bssid>/<string:action>", methods=['GET'])
 def ap_block(bssid, action):
-    print("[ap_block] Receive parameter: ", bssid, action)
+    # print("[ap_block] Receive parameter: ", bssid, action)
     if action not in ['on', 'off']:
         return simplejson.dumps({'status': 'fail',
                                  'action': action,
