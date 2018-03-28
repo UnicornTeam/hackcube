@@ -25,7 +25,7 @@ from lib.upload_file import uploadfile
 app = Flask('foo')
 CORS(app, supports_credentials=True)
 app.config['SECRET_KEY'] = 'h\xcb\x81\xaf%\x81\xd5\x02\xc4L\xad,r\x04\xa4*\x8a\xfd\xb6m\\#<\xed'
-app.config['UPLOAD_FOLDER'] = 'data/'
+
 app.config['THUMBNAIL_FOLDER'] = 'data/thumbnail/'
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
 app.config['AP_LIST_FILE'] = 'data/source/AP_list_tmp'
@@ -33,10 +33,16 @@ app.config['STA_LIST_FILE'] = 'data/source/STA_list_tmp'
 app.config['STA_BLOCK_SHELL'] = "/root/monitor_file/STA_block.sh"
 app.config['WIFI_SCAN_SHELL'] = "/root/monitor_file/wifi_scan.sh"
 app.config['AP_BLOCK_SHELL'] = "/root/monitor_file/AP_block.sh"
+# default upload folder
+app.config['UPLOAD_FOLDER'] = 'data/'
+app.config['UPLOAD_HID_SCRIPT_FOLDER'] = "/root/user_file/HID/"
+app.config['UPLOAD_INFO_PIE_FOLDER'] = "/root/user_file/raspberrypi"
+app.config['UPLOAD_INFO_ARDU_FOLDER'] = "/root/user_file/arduino/"
+
 # app.config['AP_BLOCK_SHELL'] = "data/example-bash/test.sh"
 
-ALLOWED_EXTENSIONS = set(['txt', 'gif', 'png', 'jpg', 'jpeg', 'bmp', 'rar', 'zip', '7zip', 'doc', 'docx'])
-IGNORED_FILES = set(['.gitignore'])
+ALLOWED_EXTENSIONS = {'txt', 'gif', 'png', 'jpg', 'jpeg', 'bmp', 'rar', 'zip', '7zip', 'doc', 'docx'}
+IGNORED_FILES = {'.gitignore'}
 
 bootstrap = Bootstrap(app)
 
@@ -178,8 +184,12 @@ def wifi_scan(action):
 def upload():
     if request.method == 'POST':
         files = request.files['file']
-        extra = request.form['foo']
-        print('Extra parameter: ', extra)
+        extra = None
+        try:
+            extra = request.form['type']
+            print('Extra parameter: ', extra)
+        except:
+            pass
         if files:
             filename = secure_filename(files.filename)
             filename = gen_file_name(filename)
@@ -190,7 +200,19 @@ def upload():
 
             # else:
             # save file to disk
-            uploaded_file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            # TODO: Add test code
+            if extra:
+                if extra == 'HID-Script':
+                    uploaded_file_path = os.path.join(app.config['UPLOAD_HID_SCRIPT_FOLDER'], filename)
+                elif extra == 'INFO-Pie':
+                    uploaded_file_path = os.path.join(app.config['UPLOAD_INFO_PIE_FOLDER'], filename)
+                elif extra == 'INFO-Ardu':
+                    uploaded_file_path = os.path.join(app.config['UPLOAD_INFO_ARDU_FOLDER'], filename)
+                else:
+                    uploaded_file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            else:
+                uploaded_file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
             files.save(uploaded_file_path)
 
             # create thumbnail after saving
