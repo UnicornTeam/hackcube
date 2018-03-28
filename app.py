@@ -7,18 +7,16 @@
 
 import os
 import subprocess
+import traceback
 from subprocess import CalledProcessError
-from flask_api import status
 
 import PIL
-from PIL import Image
 import simplejson
-import traceback
-from flask_cors import CORS
-
-from flask import Flask, request, render_template, redirect, url_for, send_from_directory, make_response
+from PIL import Image
+from flask import Flask, request, render_template, redirect, url_for, send_from_directory
+from flask_api import status
 from flask_bootstrap import Bootstrap
-from werkzeug import secure_filename
+from flask_cors import CORS
 
 from lib.upload_file import uploadfile
 
@@ -34,7 +32,7 @@ app.config['STA_LIST_FILE'] = 'data/source/STA_list_tmp'
 app.config['STA_BLOCK_SHELL'] = "/root/monitor_file/STA_block.sh"
 app.config['WIFI_SCAN_SHELL'] = "/root/monitor_file/wifi_scan.sh"
 app.config['AP_BLOCK_SHELL'] = "/root/monitor_file/AP_block.sh"
-
+app.config['DEBUG'] = False
 # app.config['AP_BLOCK_SHELL'] = "data/example-bash/test.sh"
 
 ALLOWED_EXTENSIONS = {'txt', 'gif', 'png', 'jpg', 'jpeg', 'bmp', 'rar', 'zip', '7zip', 'doc', 'docx'}
@@ -54,7 +52,6 @@ def gen_file_name(filename):
     """
     If file was exist already, rename it and return a new name
     """
-
     i = 1
     while os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], filename)):
         name, extension = os.path.splitext(filename)
@@ -188,10 +185,11 @@ def upload():
             pass
         if files:
             # TODO: Add test code
-            if extra:
+            if app.config['DEBUG']:
+                app.config['UPLOAD_FOLDER'] = "../data/"
+            elif extra:
                 if extra == 'HID-Script':
-                    # app.config['UPLOAD_FOLDER'] = "/root/user_file/HID/"
-                    app.config['UPLOAD_FOLDER'] = "data/"
+                    app.config['UPLOAD_FOLDER'] = "/root/user_file/HID/"
                 elif extra == 'INFO-Pie':
                     app.config['UPLOAD_FOLDER'] = "/root/user_file/raspberrypi"
                 elif extra == 'INFO-Ardu':
@@ -201,14 +199,16 @@ def upload():
             else:
                 app.config['UPLOAD_FOLDER'] = 'data/'
 
-            filename = secure_filename(files.filename)
+            # filename = secure_filename(files.filename)
             # filename = gen_file_name(filename)
+            filename = files.filename
             uploaded_file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             try:
                 if os.path.exists(uploaded_file_path):
                     os.remove(uploaded_file_path)
                 files.save(uploaded_file_path)
-            except IOError:
+            except IOError as e:
+                print(e)
                 data = simplejson.dumps({'status': 'fail',
                                          'file': filename,
                                          'save_path': uploaded_file_path,
