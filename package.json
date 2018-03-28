@@ -23,7 +23,8 @@
     "popper.js": "^1.12.9",
     "vant": "^1.0.2",
     "vue": "^2.5.2",
-    "vue-router": "^3.0.1"
+    "vue-router": "^3.0.1",
+    "vue-timers": "^1.2.0"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

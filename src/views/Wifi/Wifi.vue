@@ -55,11 +55,11 @@
         { Index: 1, SSID: '360WIFI-X2', BSSID: '11:22:33:44:55:66', RSSI: '-94', JAM: false },
         { Index: 2, SSID: '360WIFI-X3', BSSID: '11:22:33:44:55:66', RSSI: '-81', JAM: false },
         ],
-        fields2: ['NAME', 'MAC', 'Data', 'JAM'],
+        fields2: ['NAME', 'MAC', 'RSSI', 'JAM'],
         items2: [
-          { Index: 0, NAME: 'iPhone', MAC: '11:22:33:44:55:66', Data: '522', JAM: false },
-          { Index: 1, NAME: 'Android', MAC: '11:22:33:44:55:66', Data: '94', JAM: false },
-          { Index: 2, NAME: 'iPhone', MAC: '11:22:33:44:55:66', Data: '101', JAM: false },
+          { Index: 0, NAME: 'iPhone', MAC: '11:22:33:44:55:66', RSSI: '522', JAM: false },
+          { Index: 1, NAME: 'Android', MAC: '11:22:33:44:55:66', RSSI: '94', JAM: false },
+          { Index: 2, NAME: 'iPhone', MAC: '11:22:33:44:55:66', RSSI: '101', JAM: false },
         ],
       };
     },
@@ -86,16 +86,41 @@
             const result = response.data;
             console.log(result);
             this.$Message.success(result.message);
+            if (this.scanStatus === 'on') {
+              this.$timer.start('fetchWifiList');
+            } else if (this.scanStatus === 'off') {
+              this.$timer.stop('fetchWifiList');
+            }
           })
           .catch((err) => {
             console.log(err);
             this.$Message.error(err);
           });
       },
+      fetchWifiList() {
+        if (this.scanStatus === 'on') {
+          axios.get(`${process.env.BACKEND_HOST}/ap_list`)
+            .then((response) => {
+              const result = response.data;
+              console.log(result);
+              // this.$Message.success('Fetch wifi list success.');
+              this.items = result.ap_list;
+            })
+            .catch((err) => {
+              console.log(err);
+              this.$Message.error('Fetch wifi list fail.');
+            });
+        }
+      },
     },
     created() {
       // TODO: 初始化数据
+      // TODO: Save the final fresh wifi list when leave page
+      // TODO: And restore it when back to this page.
       console.log(`items is: ${this.items}`);
+    },
+    timers: {
+      fetchWifiList: { time: 3000, autostart: false, repeat: true },
     },
   };
 </script>

@@ -8,6 +8,7 @@ import Vant from 'vant';
 import 'vant/lib/vant-css/index.css';
 import 'iview/dist/styles/iview.css';
 import iView from 'iview';
+import VueTimers from 'vue-timers';
 import App from './App';
 import router from './router';
 import '../static/global.css';
@@ -16,6 +17,7 @@ import '../static/global.css';
 Vue.use(Vant);
 Vue.use(BootstrapVue);
 Vue.use(iView);
+Vue.use(VueTimers);
 Vue.config.productionTip = false;
 
 /* eslint-disable no-new */
