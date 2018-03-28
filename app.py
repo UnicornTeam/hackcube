@@ -190,7 +190,8 @@ def upload():
             # TODO: Add test code
             if extra:
                 if extra == 'HID-Script':
-                    app.config['UPLOAD_FOLDER'] = "/root/user_file/HID/"
+                    # app.config['UPLOAD_FOLDER'] = "/root/user_file/HID/"
+                    app.config['UPLOAD_FOLDER'] = "data/"
                 elif extra == 'INFO-Pie':
                     app.config['UPLOAD_FOLDER'] = "/root/user_file/raspberrypi"
                 elif extra == 'INFO-Ardu':
@@ -201,9 +202,11 @@ def upload():
                 app.config['UPLOAD_FOLDER'] = 'data/'
 
             filename = secure_filename(files.filename)
-            filename = gen_file_name(filename)
+            # filename = gen_file_name(filename)
             uploaded_file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             try:
+                if os.path.exists(uploaded_file_path):
+                    os.remove(uploaded_file_path)
                 files.save(uploaded_file_path)
             except IOError:
                 data = simplejson.dumps({'status': 'fail',
@@ -225,12 +228,7 @@ def upload():
             # return json for js call back
             result = uploadfile(name=filename, type=mime_type, size=size)
 
-            response = make_response(simplejson.dumps({"files": [result.get_file()]}))
-            response.headers['Access-Control-Allow-Origin'] = '*'
-            response.headers['Access-Control-Allow-Methods'] = 'OPTIONS,HEAD,GET,POST'
-            response.headers['Access-Control-Allow-Headers'] = 'x-requested-with'
-            response['status'] = 'success'
-            return response
+            return simplejson.dumps({"files": [result.get_file()]})
 
     if request.method == 'GET':
         # get all file in ./data directory
