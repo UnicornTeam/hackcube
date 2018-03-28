@@ -71,35 +71,25 @@
           .then((response) => {
             console.log(response.data);
             const result = response.data;
-            if (result.status === 'fail') {
-              this.$Message.error(result.message);
-            } else {
-              this.$Message.success(result.message);
-            }
+            this.$Message.success(result.message);
           })
           .catch((err) => {
             console.log(err);
+            this.$Message.error('Call process fail');
           });
-      },
-      error() {
-        this.$Message.error('This is an error tip');
       },
       onClickScan() {
         // send request with action to backend
         this.scanStatus = this.scanStatus === 'on' ? 'off' : 'on';
         axios.get(`${process.env.BACKEND_HOST}/wifi_scan/${this.scanStatus}`)
           .then((response) => {
-            console.log(response.data);
             const result = response.data;
-            if (result.status === 'fail') {
-              // TODO: show prompt when fail or success
-              this.$Message.error(result.message);
-            } else {
-              this.$Message.success(result.message);
-            }
+            console.log(result);
+            this.$Message.success(result.message);
           })
           .catch((err) => {
             console.log(err);
+            this.$Message.error(err);
           });
       },
     },

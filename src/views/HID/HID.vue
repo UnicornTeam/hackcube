@@ -16,7 +16,9 @@
     <Upload
       :data="extraData"
       :before-upload="beforeUpload"
-      action="//localhost/upload">
+      :action="uploadHost"
+      :on-success="onUploadSuccess"
+      :on-error="onUploadFail">
       <Button type="ghost" icon="ios-cloud-upload-outline">Upload files</Button>
     </Upload>
     <br/><br/>
@@ -44,6 +46,7 @@
       data() {
         return {
           Key: null,
+          uploadHost: process.env.UPLOAD_API,
           extraData: { type: 'HID-Script' },
           fields: ['Info', 'Size', 'Run'],
           items: [
@@ -68,6 +71,15 @@
         beforeUpload(file) {
           // TODO: Add more feature argument
           console.log(file);
+        },
+        onUploadSuccess(response, file, fileList) {
+          console.log(response);
+          this.$Message.success('Upload success');
+          fileList.remove(file);
+        },
+        onUploadFail(err) {
+          console.log(err);
+          this.$Message.error('Upload fail');
         },
       },
       created() {
