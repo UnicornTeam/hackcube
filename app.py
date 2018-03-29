@@ -33,6 +33,7 @@ app.config['STA_LIST_FILE'] = 'data/source/STA_list_tmp'
 app.config['STA_BLOCK_SHELL'] = "/root/monitor_file/STA_block.sh"
 app.config['WIFI_SCAN_SHELL'] = "/root/monitor_file/wifi_scan.sh"
 app.config['AP_BLOCK_SHELL'] = "/root/monitor_file/AP_block.sh"
+app.config['SERIAL_SEND_SHELL'] = "/root/serial_files/serial_send.sh"
 app.config['DEBUG'] = False
 # app.config['AP_BLOCK_SHELL'] = "data/example-bash/test.sh"
 
@@ -174,6 +175,25 @@ def wifi_scan(action, channel):
     return simplejson.dumps({'status': 'success',
                              'message': 'Call wifi_scan process success.'
                              })
+
+
+@app.route("/serial_send/<string:parameter>", methods=['GET'])
+def serial_send(parameter):
+    if parameter[:2] not in ['ns', 'nw']:
+        return simplejson.dumps({'status': 'fail',
+                                 'parameter': parameter,
+                                 'message': 'Parameter error'}), status.HTTP_400_BAD_REQUEST
+    try:
+        subprocess.call("{} {}".format(app.config['SERIAL_SEND_SHELL'], parameter), shell=True)
+    except CalledProcessError:
+        return simplejson.dumps({'status': 'fail',
+                                 'parameter': parameter,
+                                 'message': 'Call serial_send process error.'}), status.HTTP_500_INTERNAL_SERVER_ERROR
+    return simplejson.dumps({'status': 'success',
+                             'parameter': parameter,
+                             'message': 'Call serial_send process success.'
+                             })
+
 
 
 # TODO: Receive more parameter to do more action
