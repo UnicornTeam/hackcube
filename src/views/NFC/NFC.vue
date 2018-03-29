@@ -12,17 +12,17 @@
           <h5>Read</h5>
         </b-col>
         <b-col cols="3">
-          <van-switch v-model="readSwitch" @change="onSwitch" size="25px"/>
+          <van-switch v-model="readSwitch" @change="onSwitchRead" size="25px"/>
         </b-col>
       </b-row>
     </b-container>
 
     <b-table :items="items" :fields="fields">
       <div slot="WRITE" slot-scope="data">
-        <van-switch v-model="items[data.index].WRITE" @change="onSwitch('write', items[data.index].VID, items[data.index].ID)" size="25px"/>
+        <van-switch v-model="items[data.index].WRITE" @change="onSwitchAction('write', items[data.index].VID, items[data.index].ID)" size="25px"/>
       </div>
       <div slot="SIMULATE" slot-scope="data">
-        <van-switch v-model="items[data.index].SIMULATE" @change="onSwitch('simulate', items[data.index].VID, items[data.index].ID)" size="25px"/>
+        <van-switch v-model="items[data.index].SIMULATE" @change="onSwitchAction('simulate', items[data.index].VID, items[data.index].ID)" size="25px"/>
       </div>
     </b-table>
 
@@ -33,7 +33,7 @@
           <h5>Write</h5>
         </b-col>
         <b-col cols="3">
-          <van-switch v-model="writeSwitch" @change="onSwitch('nw')" size="25px"/>
+          <van-switch v-model="writeSwitch" @change="onSwitchAction('nw')" size="25px"/>
         </b-col>
       </b-row>
     </b-container>
@@ -63,7 +63,7 @@
           <h5>Simulate</h5>
         </b-col>
         <b-col cols="3">
-          <van-switch v-model="simulateSwitch" @change="onSwitch('ns')" size="25px"/>
+          <van-switch v-model="simulateSwitch" @change="onSwitchAction('ns')" size="25px"/>
         </b-col>
       </b-row>
     </b-container>
@@ -119,6 +119,20 @@
       };
     },
     methods: {
+      fetchNFCData() {
+        axios
+          .get(`${process.env.BACKEND_HOST}/nfc_item`)
+          .then((response) => {
+            const result = response.data;
+            // todo: check if nothing change
+            console.log(result);
+            this.items = [result.nfc_item];
+          })
+          .catch((err) => {
+            console.log(err);
+            this.$Message.error('Fetch nfc data fail.');
+          });
+      },
       serialSend(parameter) {
         axios
           .get(`${process.env.BACKEND_HOST}/serial_send/${parameter}`)
@@ -132,7 +146,14 @@
             this.$Message.error('Execute fail.');
           });
       },
-      onSwitch(actionType, VID, ID) {
+      onSwitchRead(checked) {
+        if (checked) {
+          this.$timer.start('fetchNFCData');
+        } else {
+          this.$timer.stop('fetchNFCData');
+        }
+      },
+      onSwitchAction(actionType, VID, ID) {
         if (VID && ID) {
           const parameter = `${actionType}${VID}${ID}`;
           this.serialSend(parameter);
@@ -171,7 +192,14 @@
     },
     created() {
       // TODO: 初始化数据
-      console.log(`items is: ${this.items}`);
+      if (this.readSwitch) {
+        this.$timer.start('fetchNFCData');
+      } else {
+        this.$timer.stop('fetchNFCData');
+      }
+    },
+    timers: {
+      fetchNFCData: { time: 3000, autostart: false, repeat: true },
     },
   };
 </script>

@@ -109,7 +109,7 @@ export default {
     };
   },
   methods: {
-    onSwitch(api, value, index, isOpen) {
+    onSwitchAction(api, value, index, isOpen) {
       console.log(api, value, index, isOpen);
       const action = isOpen ? 'on' : 'off';
       axios
