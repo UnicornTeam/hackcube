@@ -98,6 +98,7 @@
   import CubeNav from '@/components/CubeNav';
   import axios from 'axios';
 
+  function isValidIds(Vid, Id) { return /^\w+$/.test(Vid) && /^\w+$/.test(Id); }
   export default {
     name: 'NFC',
     components: {
@@ -124,8 +125,12 @@
       onSwitch(switchType) {
         switch (switchType) {
           case 'write':
-            if (this.writeVid == null || this.writeId == null) {
+            if (!(this.writeVid && this.writeId)) {
               this.$Message.error('请输入ID和VID');
+              this.writeSwitch = !this.writeSwitch;
+            } else if (!(isValidIds(this.writeVid, this.writeId))) {
+              this.$Message.error('请输入规范的ID和VID');
+              this.writeSwitch = !this.writeSwitch;
             } else {
               const parameter = `nw${this.writeVid}${this.writeId}`;
               axios
@@ -142,8 +147,12 @@
             }
             break;
           case 'simulate':
-            if (this.simulateVid == null || this.simulateId == null) {
+            if (!(this.simulateVid && this.simulateId)) {
               this.$Message.error('请输入ID和VID');
+              this.simulateSwitch = !this.simulateSwitch;
+            } else if ((isValidIds(this.simulateVid, this.simulateId))) {
+              this.$Message.error('请输入规范的ID和VID');
+              this.writeSwitch = !this.simulateSwitch;
             } else {
               const parameter = `ns${this.simulateVid}${this.simulateId}`;
               axios
