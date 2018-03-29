@@ -36,7 +36,7 @@
           <h5>Write</h5>
         </b-col>
         <b-col cols="3">
-          <van-switch v-model="writeSwitch" @change="onSwitch" size="25px"/>
+          <van-switch v-model="writeSwitch" @change="onSwitch('write')" size="25px"/>
         </b-col>
       </b-row>
     </b-container>
@@ -66,7 +66,7 @@
           <h5>Simulate</h5>
         </b-col>
         <b-col cols="3">
-          <van-switch v-model="simulateSwitch" @change="onSwitch" size="25px"/>
+          <van-switch v-model="simulateSwitch" @change="onSwitch('simulate')" size="25px"/>
         </b-col>
       </b-row>
     </b-container>
@@ -96,6 +96,7 @@
   /* eslint-disable no-restricted-syntax */
 
   import CubeNav from '@/components/CubeNav';
+  import axios from 'axios';
 
   export default {
     name: 'NFC',
@@ -120,15 +121,46 @@
       };
     },
     methods: {
-      onSwitch() {
-        // TODO: Check which item's JAM is true and do more thing.
-        // TODO: Check is wifi list or client list's item
-        // TODO: Check if read switch
-        // TODO: Add more check
-        for (const item of this.items) {
-          if (item.JAM === true) {
-            console.log(item.Index);
-          }
+      onSwitch(switchType) {
+        switch (switchType) {
+          case 'write':
+            if (this.writeVid == null || this.writeId == null) {
+              this.$Message.error('请输入ID和VID');
+            } else {
+              const parameter = `nw${this.writeVid}${this.writeId}`;
+              axios
+                .get(`${process.env.BACKEND_HOST}/serial_send/${parameter}`)
+                .then((response) => {
+                  const result = response.data;
+                  console.log(result);
+                  this.$Message.success('Execute success.');
+                })
+                .catch((err) => {
+                  console.log(err);
+                  this.$Message.error('Execute fail.');
+                });
+            }
+            break;
+          case 'simulate':
+            if (this.simulateVid == null || this.simulateId == null) {
+              this.$Message.error('请输入ID和VID');
+            } else {
+              const parameter = `ns${this.simulateVid}${this.simulateId}`;
+              axios
+                .get(`${process.env.BACKEND_HOST}/serial_send/${parameter}`)
+                .then((response) => {
+                  const result = response.data;
+                  console.log(result);
+                  this.$Message.success('Execute success.');
+                })
+                .catch((err) => {
+                  console.log(err);
+                  this.$Message.error('Execute fail.');
+                });
+            }
+            break;
+          default:
+            break;
         }
       },
     },
