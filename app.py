@@ -1,4 +1,5 @@
 #!flask/bin/python
+# coding=utf-8
 
 # Author: Ngo Duy Khanh
 # Email: ngokhanhit@gmail.com
@@ -6,6 +7,7 @@
 # This work based on jQuery-File-Upload which can be found at https://github.com/blueimp/jQuery-File-Upload/
 
 import os
+import hashlib
 import subprocess
 import traceback
 from subprocess import CalledProcessError
@@ -30,17 +32,29 @@ app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
 # TODO: Change this to actual path when release production version
 app.config['AP_LIST_FILE'] = 'data/source/AP_list_tmp'
 app.config['STA_LIST_FILE'] = 'data/source/STA_list_tmp'
+app.config['NFC_DATA_FILE'] = '/root/serial_file/data/bNFC_data'
+app.config['RF_DATA_FILE'] = '/root/serial_file/data/aRF_Keeploq_data'
+
 app.config['STA_BLOCK_SHELL'] = "/root/monitor_file/STA_block.sh"
 app.config['WIFI_SCAN_SHELL'] = "/root/monitor_file/wifi_scan.sh"
 app.config['AP_BLOCK_SHELL'] = "/root/monitor_file/AP_block.sh"
 app.config['SERIAL_SEND_SHELL'] = "/root/serial_files/serial_send.sh"
 app.config['DEBUG'] = False
+
 # app.config['AP_BLOCK_SHELL'] = "data/example-bash/test.sh"
 
 ALLOWED_EXTENSIONS = {'txt', 'gif', 'png', 'jpg', 'jpeg', 'bmp', 'rar', 'zip', '7zip', 'doc', 'docx'}
 IGNORED_FILES = {'.gitignore'}
 
 bootstrap = Bootstrap(app)
+
+
+def file_as_bytes(f):
+    with f:
+        return f.read()
+
+
+app.config['MD5'] = hashlib.md5(file_as_bytes(open(app.config['NFC_DATA_FILE'], 'rb'))).hexdigest()
 
 
 def allowed_file(filename):
@@ -79,7 +93,59 @@ def create_thumbnail(image):
         return False
 
 
-# TODO: Fetch ap_list
+@app.route("/nfc_item", methods=['GET'])
+def get_nfc_item():
+    now_md5 = hashlib.md5(file_as_bytes(open(app.config['NFC_DATA_FILE'], 'rb'))).hexdigest()
+    if now_md5 != app.config['MD5']:
+        app.config['MD5'] = now_md5
+        f = open(app.config['NFC_DATA_FILE'])
+        lines = f.readlines()
+        while lines[-1].strip() == '':
+            del lines[-1]
+        if not lines:
+            return simplejson.dumps({"nfc_item": None}), status.HTTP_404_NOT_FOUND
+        else:
+            id = lines[-1]
+            vid = '050'
+            # todo: 和前端[RF]data的items不匹配
+            item = {
+                'ID': id,
+                'VID': vid
+            }
+            return simplejson.dumps({"nfc_item": item})
+    else:
+        return simplejson.dumps({"nfc_item": None}), status.HTTP_304_NOT_MODIFIED
+
+
+@app.route("/rf_item", methods=['GET'])
+def get_rf_item():
+    now_md5 = hashlib.md5(file_as_bytes(open(app.config['RF_DATA_FILE'], 'rb'))).hexdigest()
+    if now_md5 != app.config['MD5']:
+        app.config['MD5'] = now_md5
+        f = open(app.config['RF_DATA_FILE'])
+        lines = f.readlines()
+        while lines[-1].strip() == '':
+            del lines[-1]
+        if not lines:
+            return simplejson.dumps({"rf_item": None}), status.HTTP_404_NOT_FOUND
+        else:
+            # TODO: Get Vid and ID from file then response it
+            # todo: 和前端[RF]data的items不匹配
+            s = lines[-1].split(';')
+            if len(s) != 4:
+                return simplejson.dumps({"rf_item": None}), status.HTTP_404_NOT_FOUND
+            item = {
+                u'频率': s[0].split(':')[-1],
+                u'协议': s[1].split(':')[-1],
+                u'调制': s[2].split(':')[-1],
+                u'数据': s[3].split(':')[-1],
+            }
+            return simplejson.dumps({"rf_item": item})
+        # TODO: READ files lastline and return
+    else:
+        return simplejson.dumps({"rf_item": None}), status.HTTP_304_NOT_MODIFIED
+
+
 @app.route("/ap_list", methods=['GET'])
 def get_ap_list():
     ap_list = []
@@ -193,7 +259,6 @@ def serial_send(parameter):
                              'parameter': parameter,
                              'message': 'Call serial_send process success.'
                              })
-
 
 
 # TODO: Receive more parameter to do more action
