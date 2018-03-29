@@ -5,3 +5,8 @@ h5 {
 div.van-switch {
   font-size: 25px!important;
 }
+
+.ivu-select-selection{
+  height: 27px!important;
+  padding-top: 2px!important;
+}
