@@ -12,7 +12,7 @@
         </b-col>
         <b-col cols="1"></b-col>
         <b-col cols="4" style="padding-right: 4px;">
-          <Select v-model="channel" size="small" placeholder="Channel" filterable>
+          <Select v-model="channel" size="small" placeholder="Channel" :on-change="onChangeChannel" filterable>
             <Option v-for="item in channelList" :value="item.value" :key="item.value">{{ item.label }}</Option>
           </Select>
         </b-col>
@@ -103,7 +103,7 @@ export default {
           JAM: false,
         },
       ],
-      channel: '',
+      channel: null,
       channelList: [],
     };
   },
@@ -126,8 +126,9 @@ export default {
     onClickScan() {
       // send request with action to backend
       this.scanStatus = this.scanStatus === 'on' ? 'off' : 'on';
+      const channel = this.channel === null ? 6 : this.channel;
       axios
-        .get(`${process.env.BACKEND_HOST}/wifi_scan/${this.scanStatus}`)
+        .get(`${process.env.BACKEND_HOST}/wifi_scan/${this.scanStatus}/${channel}`)
         .then((response) => {
           const result = response.data;
           console.log(result);
