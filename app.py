@@ -161,13 +161,13 @@ def sta_block(mac, action):
                              })
 
 
-@app.route("/wifi_scan/<string:action>", methods=['GET'])
-def wifi_scan(action):
+@app.route("/wifi_scan/<string:action>/<string:channel>", methods=['GET'])
+def wifi_scan(action, channel):
     if action not in ['on', 'off']:
         return simplejson.dumps({'status': 'fail',
                                  'message': 'Parameter error'}), status.HTTP_400_BAD_REQUEST
     try:
-        subprocess.call("{} {}".format(app.config['WIFI_SCAN_SHELL'], action), shell=True)
+        subprocess.call("{} {} {}".format(app.config['WIFI_SCAN_SHELL'], action, channel), shell=True)
     except CalledProcessError:
         return simplejson.dumps({'status': 'fail',
                                  'message': 'Call wifi_scan process error.'}), status.HTTP_500_INTERNAL_SERVER_ERROR
