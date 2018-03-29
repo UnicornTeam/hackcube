@@ -51,7 +51,7 @@
     },
     data() {
       return {
-        snifferSwitch: false,
+        snifferSwitch: true,
         attackSwitch: false,
         // if continue animate
         animate: true,

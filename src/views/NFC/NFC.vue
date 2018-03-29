@@ -19,13 +19,10 @@
 
     <b-table :items="items" :fields="fields">
       <div slot="WRITE" slot-scope="data">
-        <van-switch v-model="items[data.index].WRITE" @change="onSwitch" size="25px"/>
-      </div>
-      <div slot="BLAST" slot-scope="data">
-        <van-switch v-model="items[data.index].BLAST" @change="onSwitch" size="25px"/>
+        <van-switch v-model="items[data.index].WRITE" @change="onSwitch('write', items[data.index].VID, items[data.index].ID)" size="25px"/>
       </div>
       <div slot="SIMULATE" slot-scope="data">
-        <van-switch v-model="items[data.index].SIMULATE" @change="onSwitch" size="25px"/>
+        <van-switch v-model="items[data.index].SIMULATE" @change="onSwitch('simulate', items[data.index].VID, items[data.index].ID)" size="25px"/>
       </div>
     </b-table>
 
@@ -36,7 +33,7 @@
           <h5>Write</h5>
         </b-col>
         <b-col cols="3">
-          <van-switch v-model="writeSwitch" @change="onSwitch('write')" size="25px"/>
+          <van-switch v-model="writeSwitch" @change="onSwitch('nw')" size="25px"/>
         </b-col>
       </b-row>
     </b-container>
@@ -66,7 +63,7 @@
           <h5>Simulate</h5>
         </b-col>
         <b-col cols="3">
-          <van-switch v-model="simulateSwitch" @change="onSwitch('simulate')" size="25px"/>
+          <van-switch v-model="simulateSwitch" @change="onSwitch('ns')" size="25px"/>
         </b-col>
       </b-row>
     </b-container>
@@ -107,7 +104,7 @@
     data() {
       return {
         switchSize: '25px',
-        readSwitch: false,
+        readSwitch: true,
         // TODO: Confirm if necessary to disable input when false
         writeSwitch: false,
         simulateSwitch: false,
@@ -115,16 +112,34 @@
         writeId: null,
         simulateVid: null,
         simulateId: null,
-        fields: ['VID', 'ID', 'WRITE', 'BLAST', 'SIMULATE'],
+        fields: ['VID', 'ID', 'WRITE', 'SIMULATE'],
         items: [
-          { Index: 0, VID: '050', ID: '000279080', WRITE: false, BLAST: false, SIMULATE: false },
+          { Index: 0, VID: '050', ID: '000279080', WRITE: false, SIMULATE: false },
         ],
       };
     },
     methods: {
-      onSwitch(switchType) {
-        switch (switchType) {
-          case 'write':
+      serialSend(parameter) {
+        axios
+          .get(`${process.env.BACKEND_HOST}/serial_send/${parameter}`)
+          .then((response) => {
+            const result = response.data;
+            console.log(result);
+            this.$Message.success('Execute success.');
+          })
+          .catch((err) => {
+            console.log(err);
+            this.$Message.error('Execute fail.');
+          });
+      },
+      onSwitch(actionType, VID, ID) {
+        if (VID && ID) {
+          const parameter = `${actionType}${VID}${ID}`;
+          this.serialSend(parameter);
+          return;
+        }
+        switch (actionType) {
+          case 'nw':
             if (!(this.writeVid && this.writeId)) {
               this.$Message.error('请输入ID和VID');
               this.writeSwitch = !this.writeSwitch;
@@ -132,21 +147,11 @@
               this.$Message.error('请输入规范的ID和VID');
               this.writeSwitch = !this.writeSwitch;
             } else {
-              const parameter = `nw${this.writeVid}${this.writeId}`;
-              axios
-                .get(`${process.env.BACKEND_HOST}/serial_send/${parameter}`)
-                .then((response) => {
-                  const result = response.data;
-                  console.log(result);
-                  this.$Message.success('Execute success.');
-                })
-                .catch((err) => {
-                  console.log(err);
-                  this.$Message.error('Execute fail.');
-                });
+              const parameter = `${actionType}${this.writeVid}${this.writeId}`;
+              this.serialSend(actionType, parameter);
             }
             break;
-          case 'simulate':
+          case 'ns':
             if (!(this.simulateVid && this.simulateId)) {
               this.$Message.error('请输入ID和VID');
               this.simulateSwitch = !this.simulateSwitch;
@@ -154,21 +159,12 @@
               this.$Message.error('请输入规范的ID和VID');
               this.writeSwitch = !this.simulateSwitch;
             } else {
-              const parameter = `ns${this.simulateVid}${this.simulateId}`;
-              axios
-                .get(`${process.env.BACKEND_HOST}/serial_send/${parameter}`)
-                .then((response) => {
-                  const result = response.data;
-                  console.log(result);
-                  this.$Message.success('Execute success.');
-                })
-                .catch((err) => {
-                  console.log(err);
-                  this.$Message.error('Execute fail.');
-                });
+              const parameter = `${actionType}${this.simulateVid}${this.simulateId}`;
+              this.serialSend(actionType, parameter);
             }
             break;
           default:
+            this.$Message.error('请输入正确的API');
             break;
         }
       },
