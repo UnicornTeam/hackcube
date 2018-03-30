@@ -4,7 +4,7 @@
     <b-alert :show="showRFAlert" variant="primary">
       <h4 class="alert-heading">RF</h4>
       <p>
-        频率{{latest_rf_item.频率}}发现协议为{{latest_rf_item.协议}}.数据内容为{{latest_rf_item.数据}}信号.
+        频率{{latest_arf_item.频率}}发现协议为{{latest_arf_item.协议}}.数据内容为{{latest_arf_item.数据}}信号.
       </p>
     </b-alert>
 
@@ -29,7 +29,7 @@
       </b-row>
     </b-container>
 
-    <b-table :items="items" :fields="fields_show">
+    <b-table :items="rfItems" :fields="fields_show">
       <div slot="重放" slot-scope="data">
         <b-button size="sm" variant="success" @click="onClick(data.index)">Run</b-button>
       </div>
@@ -47,7 +47,7 @@
       </b-row>
     </b-container>
 
-    <b-table :items="items" :fields="fields_input">
+    <b-table :items="tpmsItems" :fields="fields_input">
       <div slot="电压" slot-scope="data">
         <b-form-input v-model="items[data.index].电压" type="text"></b-form-input>
       </div>
@@ -94,10 +94,11 @@
     },
     data() {
       return {
-        latest_nfc_item: {},
-        latest_rf_item: {},
+        // todo: set latest_nfc_item and showNFCAlert from NFC page
+        latest_nfc_item: '',
         showNFCAlert: false,
-        showRFAlert: false,
+        latest_arf_item: '',
+        showARFAlert: false,
         snifferSwitch: true,
         tpmsSwitch: false,
         attackSwitch: false,
@@ -105,10 +106,16 @@
         animate: true,
         fields_show: ['数据', '频率', '协议', '调制', '重放'],
         fields_input: ['ID', '电压', '压力', '湿度', '气阀'],
-        items: [
-          { Index: 0, ID: 'f1a2a2f23', 频率: '315.00Mhz', 协议: 'PT226X', 调制: 'ASK', 重放: false, 电压: '', 压力: '', 湿度: '', 气阀: '', 数据: 'hfgh34h' },
-          { Index: 1, ID: 'f1a2a2682', 频率: '433.92Mhz', 协议: 'Keeloq', 调制: 'ASK', 重放: false, 电压: '', 压力: '', 湿度: '', 气阀: '', 数据: 'hfgd3fd' },
-          { Index: 2, ID: 'f1jgf92f3', 频率: '433.92Mhz', 协议: 'PT224X', 调制: 'FSK', 重放: false, 电压: '', 压力: '', 湿度: '', 气阀: '', 数据: 'sa29f9w' },
+        rfItems: [
+          { 频率: '315.00Mhz', 协议: 'PT226X', 调制: 'ASK', 重放: false, 数据: 'hfgh34h' },
+          { 频率: '433.92Mhz', 协议: 'Keeloq', 调制: 'ASK', 重放: false, 数据: 'hfgd3fd' },
+          { 频率: '433.92Mhz', 协议: 'PT224X', 调制: 'FSK', 重放: false, 数据: 'sa29f9w' },
+        ],
+        tpmsItems: [
+          { ID: '20959185', 电压: '', 压力: '', 湿度: '', 气阀: '' },
+          { ID: 'eb107f85', 电压: '', 压力: '', 湿度: '', 气阀: '' },
+          { ID: 'F0FB2385', 电压: '', 压力: '', 湿度: '', 气阀: '' },
+          { ID: '2093ef85', 电压: '', 压力: '', 湿度: '', 气阀: '' },
         ],
       };
     },
@@ -116,37 +123,32 @@
       clickNFC() {
         router.push('/nfc');
       },
-      fetchData(dataApi) {
-        axios
-          .get(`${process.env.BACKEND_HOST}/${dataApi}`)
-          .then((response) => {
-            const result = response.data;
-            // todo: check what 304 not modify will do
-            console.log(result);
-            const isExist = this.items.indexOf(result[dataApi]) !== -1;
-            if (isExist) {
-              return;
-            }
-            // TODO: 1. NFC是否也放进去items？
-            // TODO: 2. 服务器端和前端字段不一致怎么解决
-            this.items.unshift(result[dataApi]);
-            switch (dataApi) {
-              case 'nfc_item':
-                this.latest_nfc_item = result[dataApi];
-                this.showNFCAlert = true;
-                break;
-              case 'rf_item':
-                this.latest_rf_item = result[dataApi];
-                this.showRFAlert = true;
-                break;
-              default:
-                break;
-            }
-          })
-          .catch((err) => {
-            console.log(err);
-            this.$Message.error('Fetch nfc data fail.');
-          });
+      fetchData() {
+        const dataAPIs = ['arf', 'crf'];
+        for (const api of dataAPIs) {
+          axios
+            .get(`${process.env.BACKEND_HOST}/rf_item/${api}`)
+            .then((response) => {
+              const result = response.data;
+              // todo: check what 304 not modify will do
+              // todo: write test code
+              console.log(result);
+              const dataKey = result.key;
+              const isExist = this.rfItems.indexOf(result[dataKey]) !== -1;
+              if (isExist) {
+                return;
+              }
+              this.rfItems.unshift(result[dataKey]);
+              if (dataKey === 'arf_item') {
+                this.latest_arf_item = result[dataKey];
+                this.showARFAlert = true;
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+              this.$Message.error('Fetch RF data fail.');
+            });
+        }
       },
       onSwitch(switchType) {
         console.log(switchType);
