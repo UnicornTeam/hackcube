@@ -199,6 +199,9 @@
       // TODO: Deal with onClick logic.
       onClick(index) {
         console.log(index);
+        const item = this.rfItems[index];
+        const parameter = `rfreq:${item.频率};protocol:${item.协议};modulation:${item.调制};data:${item.数据}`;
+        this.serialSend(parameter);
       },
     },
     created() {
