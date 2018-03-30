@@ -9,7 +9,7 @@ class UploadTestCase(unittest.TestCase):
     def setUp(self):
         self.type_list = ['HID-Script', 'INFO-Pie', 'INFO-Ardu']
         self.app = instance.app.test_client()
-        instance.app.config['DEBUG'] = True
+        instance.app.config['TEST'] = True
 
     def test_upload(self):
         for file_type in self.type_list:
