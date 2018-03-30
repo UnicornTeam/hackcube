@@ -24,16 +24,10 @@
       action="//localhost/upload">
       <Button type="ghost" icon="ios-cloud-upload-outline">Upload files</Button>
     </Upload>
-
     <br/><br/>
-
-    <h5>上传树莓派固件</h5>
-    <Upload
-      :data="extraDataPie"
-      :before-upload="beforeUpload"
-      action="//localhost/upload">
-      <Button type="ghost" icon="ios-cloud-upload-outline">Upload files</Button>
-    </Upload>
+    <div style="margin-right: 10px">
+      <Input v-model="updateLog" type="textarea" :autosize="{minRows: 2,maxRows: 10}" placeholder="Enter something..."></Input>
+    </div>
   </div>
 </template>
 
@@ -67,6 +61,7 @@
     },
     data() {
       return {
+        updateLog: '',
         energyPercent: 68,
         storePercent: 83,
         extraDataPie: { type: 'INFO-Pie' },
