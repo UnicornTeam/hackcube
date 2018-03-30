@@ -20,10 +20,17 @@
     <h5>上传arduino固件</h5>
     <Upload
       :data="extraDataArdu"
-      :before-upload="beforeUpload"
-      action="//localhost/upload">
-      <Button type="ghost" icon="ios-cloud-upload-outline">Upload files</Button>
+      :on-success="onUploadSuccess"
+      :on-error="onUploadError"
+      :action="uploadHost">
+      <Button type="ghost" icon="ios-cloud-upload-outline">Upload</Button>
     </Upload>
+
+    <div class="text-center">
+      <Button type="ghost" @click="onClick">Submit</Button>
+    </div>
+
+    <br/>
 
     <Input v-model="updateLog" type="textarea" :autosize="{minRows: 4,maxRows: 10}" placeholder="Upload log..." disabled></Input>
 
@@ -32,14 +39,23 @@
 
 <script>
   import CubeNav from '@/components/CubeNav';
-  import { Upload, Button } from 'iview';
+  import axios from 'axios';
 
   export default {
     name: 'INFO',
     components: {
       CubeNav,
-      Upload,
-      Button,
+    },
+    data() {
+      return {
+        uploadHost: process.env.UPLOAD_API,
+        updateLog: '',
+        energyPercent: 78,
+        storePercent: 30,
+        extraDataPie: { type: 'INFO-Pie' },
+        extraDataArdu: { type: 'INFO-Ardu' },
+        uploadedFilePath: '',
+      };
     },
     methods: {
       onRead(file, content) {
@@ -50,22 +66,36 @@
         // TODO: Add upload success prompt
       },
       // TODO: Deal with onClick logic.
-      onClick(index) {
-        console.log(index);
+      onClick() {
+        if (this.uploadedFilePath) {
+          axios
+            .get(`${process.env.BACKEND_HOST}/update_firmware/${this.uploadedFilePath}`)
+            .then((response) => {
+              console.log(response.data);
+              const result = response.data;
+              this.$Message.success(result.message);
+              // TODO: Continuing set $updateLog to display update log
+              // TODO: If update finish, can I detect 304 NOT MODIFIED and stop internal request?
+            })
+            .catch((err) => {
+              console.log(err.response);
+              this.$Message.error('Call process fail');
+            });
+        } else {
+          this.$Message.error('Please upload file before submit!');
+        }
       },
-      beforeUpload(file) {
-        // TODO: Add more feature argument
-        console.log(file);
+      onUploadSuccess(response, file, fileList) {
+        // todo: how to get file name of file, then set uploadedFilePath
+        // todo: send command with uploadedFilePath
+        this.uploadedFilePath = `/root/user_file/arduino/${fileList.name}`;
+        this.$Message.success(`Upload ${fileList.name} success`);
       },
-    },
-    data() {
-      return {
-        updateLog: '',
-        energyPercent: 68,
-        storePercent: 83,
-        extraDataPie: { type: 'INFO-Pie' },
-        extraDataArdu: { type: 'INFO-Ardu' },
-      };
+      onUploadError(error, file, fileList) {
+        console.error(error, file, fileList);
+        console.log(fileList.name);
+        this.$Message.error(`Upload ${fileList.name} fail`);
+      },
     },
     created() {
       // TODO: 初始化数据

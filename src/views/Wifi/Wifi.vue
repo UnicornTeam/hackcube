@@ -120,7 +120,7 @@ export default {
           this.$Message.success(result.message);
         })
         .catch((err) => {
-          console.log(err);
+          console.log(err.response);
           this.$Message.error('Call process fail');
         });
     },
@@ -141,7 +141,7 @@ export default {
           }
         })
         .catch((err) => {
-          console.log(err);
+          console.log(err.response);
           this.$Message.error(err);
         });
     },
@@ -156,7 +156,7 @@ export default {
             this.items = result.ap_list;
           })
           .catch((err) => {
-            console.log(err);
+            console.log(err.response);
             this.$Message.error('Fetch wifi list fail.');
           });
       }

@@ -129,7 +129,7 @@
             this.items = [result.nfc_item];
           })
           .catch((err) => {
-            console.log(err);
+            console.log(err.response);
             this.$Message.error('Fetch nfc data fail.');
           });
       },
@@ -142,7 +142,7 @@
             this.$Message.success('Execute success.');
           })
           .catch((err) => {
-            console.log(err);
+            console.log(err.response);
             this.$Message.error('Execute fail.');
           });
       },

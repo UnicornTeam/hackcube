@@ -27,14 +27,11 @@
 
 <script>
     import CubeNav from '@/components/CubeNav';
-    import { Upload, Button } from 'iview';
 
     export default {
       name: 'HID',
       components: {
         CubeNav,
-        Upload,
-        Button,
       },
       data() {
         return {
@@ -65,10 +62,9 @@
           // TODO: Add more feature argument
           console.log(file);
         },
-        onUploadSuccess(response, file, fileList) {
+        onUploadSuccess(response) {
           console.log(response);
           this.$Message.success('Upload success');
-          fileList.remove(file);
         },
         onUploadFail(err) {
           console.log(err);

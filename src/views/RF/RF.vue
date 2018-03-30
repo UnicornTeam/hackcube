@@ -132,7 +132,7 @@
             this.$Message.success('Execute success.');
           })
           .catch((err) => {
-            console.log(err);
+            console.log(err.response);
             this.$Message.error('Execute fail.');
           });
       },
@@ -158,7 +158,7 @@
               }
             })
             .catch((err) => {
-              console.log(err);
+              console.log(err.response);
               this.$Message.error(`Fetch ${api} data fail.`);
             });
         }
