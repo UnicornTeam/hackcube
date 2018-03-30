@@ -12,6 +12,8 @@
 
 - WIFI List 分页
 
+- Change all response parser correspond backend response api.NOTE: Use data-key to get data.
+
 - Improve axios resp handler of above's http status:
 - Handle 304 NOT MODIFIED in INFO page.
 
@@ -45,3 +47,5 @@ axios.get('/user/12345', {
   }
 })
 ```
+
+

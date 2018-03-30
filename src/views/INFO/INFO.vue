@@ -65,6 +65,28 @@
         // TODO: Send result to backend
         // TODO: Add upload success prompt
       },
+      fetchUpdateLog() {
+        axios
+          .get(`${process.env.BACKEND_HOST}/update_firmware_log`, {
+            validateStatus(status) {
+              return status < 400; // Reject only if the status code is greater than or equal to 400
+            },
+          })
+          .then((response) => {
+            console.log(response.data);
+            const result = response.data;
+            // TODO: Continuing set $updateLog to display update log
+            // TODO: If update finish, can I detect 304 NOT MODIFIED and stop internal request?
+            this.updateLog = result;
+            if (response.status === 304) {
+              this.$timer.stop('fetchUpdateLog');
+            }
+          })
+          .catch((err) => {
+            console.log(err.response);
+            this.$Message.error('Call process fail');
+          });
+      },
       // TODO: Deal with onClick logic.
       onClick() {
         if (this.uploadedFilePath) {
@@ -74,8 +96,8 @@
               console.log(response.data);
               const result = response.data;
               this.$Message.success(result.message);
-              // TODO: Continuing set $updateLog to display update log
-              // TODO: If update finish, can I detect 304 NOT MODIFIED and stop internal request?
+              // todo: start interval to fetch log
+              this.$timer.start('fetchUpdateLog');
             })
             .catch((err) => {
               console.log(err.response);
@@ -100,6 +122,9 @@
     created() {
       // TODO: 初始化数据
       console.log(`items is: ${this.items}`);
+    },
+    timers: {
+      fetchUpdateLog: { time: 3000, autostart: false, repeat: true },
     },
   };
 </script>
