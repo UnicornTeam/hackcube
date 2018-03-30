@@ -5,3 +5,5 @@ TODO: Change response parser in Front-End
 TODO: Use class to Standardized all response format
 TODO: Remove create_thumbnail.Remove gen_file_name.
 TODO: Add document, include receive and return parameter
+TODO: Add get update_firmware_log api, after finish, return 304
+TODO: Add HD_INFO api

@@ -125,8 +125,8 @@ def get_nfc_item():
                                  'data_key': 'nfc_item'
                                  }), status.HTTP_304_NOT_MODIFIED
     app.config['MD5'] = now_md5
-    f = open(app.config['NFC_DATA_FILE'])
-    lines = f.readlines()
+    with open(app.config['NFC_DATA_FILE'], 'r') as f:
+        lines = f.readlines()
     while lines[-1].strip() == '':
         del lines[-1]
     if not lines:
@@ -155,12 +155,12 @@ def get_rf_item(msg_type):
         new_MD5 = hashlib.md5(file_as_bytes(open(app.config['ARF_DATA_FILE'], 'rb'))).hexdigest()
         is_change = new_MD5 != app.config['ARF_MD5']
         app.config['ARF_MD5'] = new_MD5 if is_change else app.config['ARF_MD5']
-        f = open(app.config['ARF_DATA_FILE'])
+        file_path = app.config['ARF_DATA_FILE']
     elif msg_type == 'crf':
         new_MD5 = hashlib.md5(file_as_bytes(open(app.config['CRF_DATA_FILE'], 'rb'))).hexdigest()
         is_change = new_MD5 != app.config['CRF_MD5']
         app.config['CRF_MD5'] = new_MD5 if is_change else app.config['CRF_MD5']
-        f = open(app.config['CRF_DATA_FILE'])
+        file_path = app.config['CRF_DATA_FILE']
     else:
         return simplejson.dumps({'status': 'fail',
                                  'api': 'get_rf_item',
@@ -173,8 +173,8 @@ def get_rf_item(msg_type):
     key = msg_type + "_item"
     if not is_change:
         return simplejson.dumps({key: None, 'key': key}), status.HTTP_304_NOT_MODIFIED
-
-    lines = f.readlines()
+    with open(file_path, 'r') as f:
+        lines = f.readlines()
     while lines[-1].strip() == '':
         del lines[-1]
     if not lines:
@@ -211,17 +211,17 @@ def get_rf_item(msg_type):
 @app.route("/ap_list", methods=['GET'])
 def get_ap_list():
     ap_list = []
-    try:
-        f = open(app.config['AP_LIST_FILE'])
-    except IOError as e:
+    if not os.path.exists(app.config['AP_LIST_FILE']):
         return simplejson.dumps({'status': 'fail',
                                  'api': 'ap_list',
                                  'parameter': None,
-                                 'message': 'Call ap_list fail.',
+                                 'message': 'Call ap_list fail.File not found.',
                                  'ap_list': ap_list,
                                  'data_key': 'ap_list'
-                                 }), status.HTTP_500_INTERNAL_SERVER_ERROR
-    for line in f.readlines():
+                                 }), status.HTTP_404_NOT_FOUND
+    with open(app.config['AP_LIST_FILE'], 'r') as f:
+        lines = f.readlines()
+    for line in lines:
         l = line.split()
         if len(l) < 5:
             continue
@@ -244,19 +244,18 @@ def get_ap_list():
 @app.route("/sta_list", methods=['GET'])
 def get_sta_list():
     sta_list = []
-    try:
-        f = open(app.config['STA_LIST_FILE'])
-    except IOError as e:
-        print(e)
+    if not os.path.exists(app.config['STA_LIST_FILE']):
         return simplejson.dumps({'status': 'fail',
                                  'api': 'sta_list',
                                  'parameter': app.config['STA_LIST_FILE'],
                                  'message': 'Call sta_list error.File not found.',
                                  'sta_list': sta_list,
                                  'data_key': 'sta_list'
-                                 }), status.HTTP_500_INTERNAL_SERVER_ERROR
+                                 }), status.HTTP_404_NOT_FOUND
 
-    for line in f.readlines():
+    with open(app.config['STA_LIST_FILE'], 'r') as f:
+        lines = f.readlines()
+    for line in lines:
         l = line.split()
         if len(l) < 4:
             print("Too short: ", l)
@@ -378,6 +377,29 @@ def serial_send(parameter):
                              'message': 'Call serial_send success.',
                              'data_key': None
                              })
+
+
+@app.route("update_firmware_log", methods=['GET'])
+def update_firmware_log():
+    update_log = None
+    file_path = app.config['FIRMWARE_UPDATE_LOG']
+    if not os.path.exists(file_path):
+        return simplejson.dumps({'status': 'fail',
+                                 'api': 'update_firmware_log',
+                                 'parameter': None,
+                                 'message': 'Call update_firmware_log fail, file not found.',
+                                 'data_key': 'update_log',
+                                 'update_log': update_log
+                                 }), status.HTTP_404_NOT_FOUND
+    with open(file_path, 'r') as f:
+        update_log = f.read()
+        return simplejson.dumps({'status': 'success',
+                                 'api': 'update_firmware_log',
+                                 'parameter': None,
+                                 'message': 'Call update_firmware_log success.',
+                                 'data_key': 'update_log',
+                                 'update_log': update_log
+                                 })
 
 
 @app.route("update_firmware/<string:uploaded_file_path>", methods=['GET'])
