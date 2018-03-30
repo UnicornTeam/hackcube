@@ -1,7 +1,7 @@
 <template>
-  <div style="margin: 10px">
+  <div class="board">
     <cube-nav/>
-    <b-alert :show="showRFAlert" variant="primary">
+    <b-alert :show="showARFAlert" variant="primary">
       <h4 class="alert-heading">RF</h4>
       <p>
         频率{{latest_arf_item.频率}}发现协议为{{latest_arf_item.协议}}.数据内容为{{latest_arf_item.数据}}信号.

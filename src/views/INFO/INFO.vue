@@ -1,5 +1,5 @@
 <template>
-  <div style="margin: 10px">
+  <div class="board">
     <cube-nav/>
 
     <h1 class="text-center">Cube Status Manage</h1>
@@ -24,10 +24,9 @@
       action="//localhost/upload">
       <Button type="ghost" icon="ios-cloud-upload-outline">Upload files</Button>
     </Upload>
-    <br/><br/>
-    <div style="margin-right: 10px">
-      <Input v-model="updateLog" type="textarea" :autosize="{minRows: 2,maxRows: 10}" placeholder="Enter something..."></Input>
-    </div>
+
+    <Input v-model="updateLog" type="textarea" :autosize="{minRows: 4,maxRows: 10}" placeholder="Upload log..." disabled></Input>
+
   </div>
 </template>
 

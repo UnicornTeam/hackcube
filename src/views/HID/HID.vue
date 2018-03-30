@@ -1,5 +1,5 @@
 <template>
-  <div style="margin: 10px">
+  <div class="board">
     <cube-nav/>
 
     <h1 class="text-center">Cube HID Manage</h1>
@@ -11,17 +11,10 @@
                   placeholder="Key">
     </b-form-input>
     <br/>
+    <div class="text-center">
+      <Button type="ghost" icon="ios-cloud-upload-outline">Submit</Button>
+    </div>
 
-    <h5>上传攻击脚本</h5>
-    <Upload
-      :data="extraData"
-      :before-upload="beforeUpload"
-      :action="uploadHost"
-      :on-success="onUploadSuccess"
-      :on-error="onUploadFail">
-      <Button type="ghost" icon="ios-cloud-upload-outline">Upload files</Button>
-    </Upload>
-    <br/><br/>
 
     <h5>Script</h5>
     <b-table :items="items" :fields="fields">

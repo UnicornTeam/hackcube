@@ -1,5 +1,5 @@
 <template>
-  <div style="margin: 10px">
+  <div class="board">
     <cube-nav/>
 
     <h1 class="text-center">Cube NFC Manage</h1>
