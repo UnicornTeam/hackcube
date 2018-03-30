@@ -159,7 +159,7 @@
             })
             .catch((err) => {
               console.log(err);
-              this.$Message.error('Fetch RF data fail.');
+              this.$Message.error(`Fetch ${api} data fail.`);
             });
         }
       },
