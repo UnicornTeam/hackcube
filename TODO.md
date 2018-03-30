@@ -2,8 +2,12 @@
   - NFC获取到数据后，通知RF界面展示通知
   - NFC页面生命周期会不会被destroy?
   - 返回后如何展示最新数据？
+
 - How axios deal with:
   - 400 BAD Request
   - 404 NOT FOUND
   - 304 NOT MODIFIED
   - 500 INTERNAL SERVER ERROR
+
+
+- WIFI List 分页
