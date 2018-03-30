@@ -117,33 +117,46 @@ def get_nfc_item():
         return simplejson.dumps({"nfc_item": None}), status.HTTP_304_NOT_MODIFIED
 
 
-@app.route("/rf_item", methods=['GET'])
-def get_rf_item():
-    now_md5 = hashlib.md5(file_as_bytes(open(app.config['RF_DATA_FILE'], 'rb'))).hexdigest()
-    if now_md5 != app.config['MD5']:
-        app.config['MD5'] = now_md5
-        f = open(app.config['RF_DATA_FILE'])
-        lines = f.readlines()
-        while lines[-1].strip() == '':
-            del lines[-1]
-        if not lines:
-            return simplejson.dumps({"rf_item": None}), status.HTTP_404_NOT_FOUND
-        else:
-            # TODO: Get Vid and ID from file then response it
-            # todo: 和前端[RF]data的items不匹配
-            s = lines[-1].split(';')
-            if len(s) != 4:
-                return simplejson.dumps({"rf_item": None}), status.HTTP_404_NOT_FOUND
-            item = {
-                u'频率': s[0].split(':')[-1],
-                u'协议': s[1].split(':')[-1],
-                u'调制': s[2].split(':')[-1],
-                u'数据': s[3].split(':')[-1],
-            }
-            return simplejson.dumps({"rf_item": item})
-        # TODO: READ files lastline and return
+@app.route("/rf_item/<string:msg_type>", methods=['GET'])
+def get_rf_item(msg_type):
+    if msg_type == 'arf':
+        new_MD5 = hashlib.md5(file_as_bytes(open(app.config['ARF_DATA_FILE'], 'rb'))).hexdigest()
+        is_change = new_MD5 != app.config['ARF_MD5']
+        app.config['ARF_MD5'] = new_MD5 if is_change else app.config['ARF_MD5']
+        f = open(app.config['ARF_DATA_FILE'])
+    elif msg_type == 'crf':
+        new_MD5 = hashlib.md5(file_as_bytes(open(app.config['CRF_DATA_FILE'], 'rb'))).hexdigest()
+        is_change = new_MD5 != app.config['CRF_MD5']
+        app.config['CRF_MD5'] = new_MD5 if is_change else app.config['CRF_MD5']
+        f = open(app.config['CRF_DATA_FILE'])
     else:
-        return simplejson.dumps({"rf_item": None}), status.HTTP_304_NOT_MODIFIED
+        return status.HTTP_400_BAD_REQUEST
+
+    key = msg_type + "_item"
+    if not is_change:
+        return simplejson.dumps({key: None, 'key': key}), status.HTTP_304_NOT_MODIFIED
+
+    lines = f.readlines()
+    while lines[-1].strip() == '':
+        del lines[-1]
+    if not lines:
+        return simplejson.dumps({key: None, 'key': key}), status.HTTP_404_NOT_FOUND
+
+    # TODO: Get Vid and ID from file then response it
+    # todo: 和前端[RF]data的items不匹配
+    s = lines[-1].split(';')
+    if len(s) != 4:
+        return simplejson.dumps({key: None, 'key': key}), status.HTTP_404_NOT_FOUND
+    item = {
+        u'频率': s[0].split(':')[-1],
+        u'协议': s[1].split(':')[-1],
+        u'调制': s[2].split(':')[-1],
+        u'数据': s[3].split(':')[-1],
+        u'重放': False,
+        u'msg_type': msg_type
+    }
+    return simplejson.dumps({key: item,
+                             'key': key})
 
 
 @app.route("/ap_list", methods=['GET'])
