@@ -433,13 +433,24 @@ def update_firmware_log():
                                  }), status.HTTP_404_NOT_FOUND
     with open(file_path, 'r') as f:
         update_log = f.read()
-        return simplejson.dumps({'status': 'success',
-                                 'api': 'update_firmware_log',
-                                 'parameter': None,
-                                 'message': 'Call update_firmware_log success.',
-                                 'data_key': 'update_log',
-                                 'update_log': update_log
-                                 })
+        # Check if update log is NOT MODIFIED
+        if update_log == app.config['FIRMWARE_UPDATE_LOG_CONTENT']:
+            return simplejson.dumps({'status': 'success',
+                                     'api': 'update_firmware_log',
+                                     'parameter': None,
+                                     'message': 'Call update_firmware_log success.',
+                                     'data_key': 'update_log',
+                                     'update_log': update_log
+                                     }), status.HTTP_304_NOT_MODIFIED
+        else:
+            app.config['FIRMWARE_UPDATE_LOG_CONTENT'] = update_log
+            return simplejson.dumps({'status': 'success',
+                                     'api': 'update_firmware_log',
+                                     'parameter': None,
+                                     'message': 'Call update_firmware_log success.',
+                                     'data_key': 'update_log',
+                                     'update_log': update_log
+                                     })
 
 
 @app.route("update_firmware/<string:uploaded_file_path>", methods=['GET'])
@@ -575,5 +586,18 @@ def index():
     return render_template('index.html')
 
 
+def init():
+    # Init firmware log
+    file_path = app.config['FIRMWARE_UPDATE_LOG']
+    if not os.path.exists(file_path):
+        print('FIRMWARE_UPDATE_LOG NOT FOUND, Please check it and then restart server.')
+        exit(1)
+
+    with open(file_path, 'r') as f:
+        update_log = f.read()
+        app.config['FIRMWARE_UPDATE_LOG_CONTENT'] = update_log
+
+
 if __name__ == '__main__':
     app.run(debug=True)
+    init()
