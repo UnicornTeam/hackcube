@@ -8,10 +8,17 @@
       </p>
     </b-alert>
 
+    <b-alert :show="showCRFAlert" variant="primary">
+      <h4 class="alert-heading">RF</h4>
+      <p>
+        频率{{latest_crf_item.频率}}发现协议为{{latest_crf_item.协议}}.数据内容为{{latest_crf_item.数据}}信号.
+      </p>
+    </b-alert>
+
     <b-alert :show="showNFCAlert" variant="success">
       <h4 class="alert-heading">NFC</h4>
       <p>
-        捕获卡号:{{latest_nfc_item.id}}, <u href="#" @click="clickNFC">点击查看</u>
+        捕获卡号:{{latest_nfc_item.ID}}, <u href="#" @click="clickNFC">点击查看</u>
       </p>
     </b-alert>
 
@@ -99,6 +106,8 @@
         showNFCAlert: false,
         latest_arf_item: '',
         showARFAlert: false,
+        latest_crf_item: '',
+        showCRFAlert: false,
         snifferSwitch: true,
         tpmsSwitch: false,
         attackSwitch: false,
@@ -121,7 +130,36 @@
     },
     methods: {
       clickNFC() {
-        router.push('/nfc');
+        router.push({
+          path: '/nfc',
+          name: 'NFC',
+          params: {
+            latest_nfc_item: this.latest_nfc_item,
+          },
+        });
+      },
+      fetchNFCData() {
+        axios
+          .get(`${process.env.BACKEND_HOST}/nfc_item`, {
+            validateStatus(status) {
+              return status < 400; // Reject only if the status code is greater than or equal to 400
+            },
+          })
+          .then((response) => {
+            const result = response.data;
+            // todo: check if nothing change
+            console.log(result);
+            if (response.status === 304) {
+              return;
+            }
+            this.latest_nfc_item = result[result.data_key];
+            this.showNFCAlert = true;
+            this.$Message.success('Detect new nfc data.');
+          })
+          .catch((err) => {
+            console.log(err.response);
+            this.$Message.error('Fetch nfc data fail.');
+          });
       },
       serialSend(parameter) {
         axios
@@ -163,6 +201,9 @@
               if (dataKey === 'arf_item') {
                 this.latest_arf_item = result[dataKey];
                 this.showARFAlert = true;
+              } else if (dataKey === 'crf_item') {
+                this.latest_crf_item = result[dataKey];
+                this.showCRFAlert = true;
               }
             })
             .catch((err) => {
@@ -219,10 +260,12 @@
       // TODO: 初始化数据
       if (this.snifferSwitch) {
         this.$timer.start('fetchData');
+        this.$timer.start('fetchNFCData');
       }
     },
     timers: {
       fetchData: { time: 3000, autostart: false, repeat: true },
+      fetchNFCData: { time: 3000, autostart: false, repeat: true },
     },
   };
 </script>

@@ -114,7 +114,7 @@
         simulateId: null,
         fields: ['VID', 'ID', 'WRITE', 'SIMULATE'],
         items: [
-          { Index: 0, VID: '050', ID: '000279080', WRITE: false, SIMULATE: false },
+          { VID: '050', ID: '000279080', WRITE: false, SIMULATE: false },
         ],
       };
     },
@@ -204,6 +204,12 @@
         this.$timer.start('fetchNFCData');
       } else {
         this.$timer.stop('fetchNFCData');
+      }
+      // console.log('this.$route.params', this.$route.params);
+      // console.log('router.params.latest_nfc_item', router.params.latest_nfc_item);
+      // console.log('this.$root.$router.params', this.$root.$router.params);
+      if (this.$route.params.latest_nfc_item) {
+        this.items = [this.$route.params.latest_nfc_item];
       }
     },
     timers: {
