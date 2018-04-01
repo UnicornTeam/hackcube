@@ -65,6 +65,19 @@
         // TODO: Send result to backend
         // TODO: Add upload success prompt
       },
+      fetchEnergyStatus() {
+        axios
+          .get(`${process.env.BACKEND_HOST}/hd_info`)
+          .then((response) => {
+            console.log(response.data);
+            const result = response.data;
+            this.storePercent = result[result.data_key];
+          })
+          .catch((err) => {
+            console.log(err.response);
+            this.$Message.error('Query energy status fail.');
+          });
+      },
       fetchUpdateLog() {
         axios
           .get(`${process.env.BACKEND_HOST}/update_firmware_log`, {
@@ -75,10 +88,9 @@
           .then((response) => {
             console.log(response.data);
             const result = response.data;
-            // TODO: Continuing set $updateLog to display update log
-            // TODO: If update finish, can I detect 304 NOT MODIFIED and stop internal request?
             if (response.status === 304) {
               this.$timer.stop('fetchUpdateLog');
+              this.$Message.success('Update finish.');
               return;
             }
             this.updateLog = result[result.data_key];
@@ -126,6 +138,7 @@
     },
     timers: {
       fetchUpdateLog: { time: 3000, autostart: false, repeat: true },
+      fetchEnergyStatus: { time: 3 * 1000, autostart: true, repeat: false },
     },
   };
 </script>
