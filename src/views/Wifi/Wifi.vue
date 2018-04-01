@@ -148,10 +148,17 @@ export default {
     fetchWifiList() {
       if (this.scanStatus === 'on') {
         axios
-          .get(`${process.env.BACKEND_HOST}/ap_list`)
+          .get(`${process.env.BACKEND_HOST}/ap_list`, {
+            validateStatus(status) {
+              return status < 400; // Reject only if the status code is greater than or equal to 400
+            },
+          })
           .then((response) => {
             const result = response.data;
             console.log(result);
+            if (response.status === 304) {
+              return;
+            }
             // this.$Message.success('Fetch wifi list success.');
             this.items = result[result.data_key];
           })

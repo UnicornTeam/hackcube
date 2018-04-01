@@ -77,10 +77,11 @@
             const result = response.data;
             // TODO: Continuing set $updateLog to display update log
             // TODO: If update finish, can I detect 304 NOT MODIFIED and stop internal request?
-            this.updateLog = result[result.data_key];
             if (response.status === 304) {
               this.$timer.stop('fetchUpdateLog');
+              return;
             }
+            this.updateLog = result[result.data_key];
           })
           .catch((err) => {
             console.log(err.response);

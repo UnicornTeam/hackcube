@@ -126,6 +126,9 @@
             const result = response.data;
             // todo: check if nothing change
             console.log(result);
+            if (response.status === 304) {
+              return;
+            }
             this.items = [result[result.data_key]];
           })
           .catch((err) => {
