@@ -4,6 +4,11 @@ class Config(object):
     SECRET_KEY = 'h\xcb\x81\xaf%\x81\xd5\x02\xc4L\xad,r\x04\xa4*\x8a\xfd\xb6m\\#<\xed'
     THUMBNAIL_FOLDER = 'data/thumbnail/'
     MAX_CONTENT_LENGTH = 100 * 1024 * 1024
+    ARF_DATA_FILE_MD5 = None
+    CRF_DATA_FILE_MD5 = None
+    NFC_DATA_FILE_MD5 = None
+    FIRMWARE_UPDATE_LOG_MD5 = None
+    AP_LIST_FILE_MD5 = None
 
 
 class ProductionConfig(Config):

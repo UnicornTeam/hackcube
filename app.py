@@ -1,9 +1,9 @@
 #!flask/bin/python
 # coding=utf-8
 
-# Author: Ngo Duy Khanh
-# Email: ngokhanhit@gmail.com
-# Git repository: https://github.com/ngoduykhanh/flask-file-uploader
+# Author: Anderson
+# Email: liuhongda@360.cn
+# Git repository: https://github.com/peacesky/flask-file-uploader.git
 # This work based on jQuery-File-Upload which can be found at https://github.com/blueimp/jQuery-File-Upload/
 
 import os
@@ -50,11 +50,18 @@ def allowed_file(filename):
 
 
 # TODO: Deal with 304 in Front_End
-# TODO: Check if file exist
 @app.route("/nfc_item", methods=['GET'])
 def get_nfc_item():
     nfc_item = {}
     file_path = app.config['NFC_DATA_FILE']
+    if not os.path.exists(file_path):
+        return simplejson.dumps({'status': 'fail',
+                                 'api': 'nfc_item',
+                                 'parameter': None,
+                                 'message': 'Call get_nfc_item fail.FILE NOT FOUND',
+                                 'nfc_item': nfc_item,
+                                 'data_key': 'nfc_item'
+                                 }), status.HTTP_404_NOT_FOUND
     with open(file_path, 'rb') as f:
         now_md5 = hashlib.md5(file_as_bytes(f)).hexdigest()
     if now_md5 == app.config['NFC_DATA_FILE_MD5']:
@@ -104,13 +111,13 @@ def get_rf_item(msg_type):
         with open(file_path, 'rb') as f:
             new_MD5 = hashlib.md5(file_as_bytes(f)).hexdigest()
             is_change = new_MD5 != app.config['ARF_MD5']
-            app.config['ARF_MD5'] = new_MD5 if is_change else app.config['ARF_MD5']
+            app.config['ARF_DATA_FILE_MD5'] = new_MD5 if is_change else app.config['ARF_DATA_FILE_MD5']
     elif msg_type == 'crf':
         file_path = app.config['CRF_DATA_FILE']
         with open(file_path, 'rb') as f:
             new_MD5 = hashlib.md5(file_as_bytes(f)).hexdigest()
             is_change = new_MD5 != app.config['CRF_MD5']
-            app.config['CRF_MD5'] = new_MD5 if is_change else app.config['CRF_MD5']
+            app.config['CRF_DATA_FILE_MD5'] = new_MD5 if is_change else app.config['CRF_DATA_FILE_MD5']
     else:
         return simplejson.dumps({'status': 'fail',
                                  'api': 'rf_item',
@@ -180,6 +187,18 @@ def get_ap_list():
                                  'ap_list': ap_list,
                                  'data_key': 'ap_list'
                                  }), status.HTTP_404_NOT_FOUND
+    with open(app.config['AP_LIST_FILE'], 'rb') as f:
+        new_MD5 = hashlib.md5(file_as_bytes(f)).hexdigest()
+    if new_MD5 == app.config['AP_LIST_FILE_MD5']:
+        return simplejson.dumps({'status': 'success',
+                                 'api': 'ap_list',
+                                 'parameter': None,
+                                 'message': 'Call ap_list success.But file NOT MODIFIED.',
+                                 'ap_list': ap_list,
+                                 'data_key': 'ap_list'
+                                 }), status.HTTP_304_NOT_MODIFIED
+
+    app.config['AP_LIST_FILE_MD5'] = new_MD5
     with open(app.config['AP_LIST_FILE'], 'r') as f:
         lines = f.readlines()
     for line in lines:
@@ -573,25 +592,25 @@ def init_data():
             except TypeError as e:
                 print(e)
 
-    # TODO: Init firmware log file MD5
     file_path = app.config['FIRMWARE_UPDATE_LOG_FILE']
     with open(file_path, 'rb') as f:
         app.config['FIRMWARE_UPDATE_LOG_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
 
-    # Init NFC DATA FILE MD5
     file_path = app.config['NFC_DATA_FILE']
     with open(file_path, 'rb') as f:
         app.config['NFC_DATA_FILE_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
 
-    # Init ARF DATA FILE MD5
     file_path = app.config['ARF_DATA_FILE']
     with open(file_path, 'rb') as f:
-        app.config['ARF_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
+        app.config['ARF_DATA_FILE_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
 
-    # Init CRF DATA FILE MD5
     file_path = app.config['CRF_DATA_FILE']
     with open(file_path, 'rb') as f:
-        app.config['CRF_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
+        app.config['CRF_DATA_FILE_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
+
+    file_path = app.config['AP_LIST_FILE']
+    with open(file_path, 'rb') as f:
+        app.config['AP_LIST_FILE_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
 
     # TODO: Improve code to intelligent detection
     folder_list = {

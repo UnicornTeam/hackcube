@@ -1,6 +1,6 @@
 TODO: Replace logging with print
-Done: Standardized all response format
-TODO: Check if shell exist before execute it.
+DONE: Standardized all response format
+DONE: Check if shell exist before execute it.
 TODO: Change response parser in Front-End
 TODO: Use class to Standardized all response format
 TODO: Remove create_thumbnail.Remove gen_file_name.
