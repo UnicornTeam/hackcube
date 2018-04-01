@@ -154,6 +154,7 @@
                 return;
               }
               const dataKey = result.data_key;
+              this.$Message.success('Detect new {} data.'.format(dataKey));
               const isExist = this.rfItems.indexOf(result[dataKey]) !== -1;
               if (isExist) {
                 return;
@@ -198,6 +199,9 @@
               }, 700);
             }
             this.$Message.success('Send all valid item to process!');
+            break;
+          case 'attack':
+            // 暂不实现
             break;
           default:
             break;
