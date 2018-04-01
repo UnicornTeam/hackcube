@@ -81,8 +81,10 @@ def allowed_file(filename):
 @app.route("/nfc_item", methods=['GET'])
 def get_nfc_item():
     nfc_item = {}
-    now_md5 = hashlib.md5(file_as_bytes(open(app.config['NFC_DATA_FILE'], 'rb'))).hexdigest()
-    if now_md5 == app.config['MD5']:
+    file_path = app.config['NFC_DATA_FILE']
+    with open(file_path, 'rb') as f:
+        now_md5 = hashlib.md5(file_as_bytes(f)).hexdigest()
+    if now_md5 == app.config['NFC_DATA_FILE_MD5']:
         return simplejson.dumps({'status': 'success',
                                  'api': 'get_nfc_item',
                                  'parameter': None,
@@ -90,8 +92,8 @@ def get_nfc_item():
                                  'nfc_item': nfc_item,
                                  'data_key': 'nfc_item'
                                  }), status.HTTP_304_NOT_MODIFIED
-    app.config['MD5'] = now_md5
-    with open(app.config['NFC_DATA_FILE'], 'r') as f:
+    app.config['NFC_DATA_FILE_MD5'] = now_md5
+    with open(file_path, 'r') as f:
         lines = f.readlines()
     while lines[-1].strip() == '':
         del lines[-1]
@@ -116,48 +118,62 @@ def get_nfc_item():
 
 @app.route("/rf_item/<string:msg_type>", methods=['GET'])
 def get_rf_item(msg_type):
-    rf_item = {}
+    result_item = {}
+    data_key = msg_type + "_item"
     if msg_type == 'arf':
-        new_MD5 = hashlib.md5(file_as_bytes(open(app.config['ARF_DATA_FILE'], 'rb'))).hexdigest()
-        is_change = new_MD5 != app.config['ARF_MD5']
-        app.config['ARF_MD5'] = new_MD5 if is_change else app.config['ARF_MD5']
         file_path = app.config['ARF_DATA_FILE']
+        with open(file_path, 'rb') as f:
+            new_MD5 = hashlib.md5(file_as_bytes(f)).hexdigest()
+            is_change = new_MD5 != app.config['ARF_MD5']
+            app.config['ARF_MD5'] = new_MD5 if is_change else app.config['ARF_MD5']
     elif msg_type == 'crf':
-        new_MD5 = hashlib.md5(file_as_bytes(open(app.config['CRF_DATA_FILE'], 'rb'))).hexdigest()
-        is_change = new_MD5 != app.config['CRF_MD5']
-        app.config['CRF_MD5'] = new_MD5 if is_change else app.config['CRF_MD5']
         file_path = app.config['CRF_DATA_FILE']
+        with open(file_path, 'rb') as f:
+            new_MD5 = hashlib.md5(file_as_bytes(f)).hexdigest()
+            is_change = new_MD5 != app.config['CRF_MD5']
+            app.config['CRF_MD5'] = new_MD5 if is_change else app.config['CRF_MD5']
     else:
         return simplejson.dumps({'status': 'fail',
-                                 'api': 'get_rf_item',
+                                 'api': 'rf_item',
                                  'parameter': msg_type,
-                                 'message': 'Call get_rf_item fail.',
-                                 'rf_item': rf_item,
-                                 'data_key': 'rf_item'
+                                 'message': 'Call rf_item fail.parameter msg_type error.',
+                                 data_key: result_item,
+                                 'data_key': data_key
                                  }), status.HTTP_400_BAD_REQUEST
 
-    key = msg_type + "_item"
     if not is_change:
-        return simplejson.dumps({key: None, 'key': key}), status.HTTP_304_NOT_MODIFIED
+        return simplejson.dumps({'status': 'success',
+                                 'api': 'rf_item',
+                                 'parameter': msg_type,
+                                 'message': 'Call rf_item success, but NOT MODIFIED.',
+                                 data_key: result_item,
+                                 'data_key': data_key
+                                 }), status.HTTP_304_NOT_MODIFIED
     with open(file_path, 'r') as f:
         lines = f.readlines()
-    while lines[-1].strip() == '':
+    while lines and not lines[-1].strip():
         del lines[-1]
     if not lines:
         return simplejson.dumps({'status': 'fail',
-                                 'api': 'get_rf_item',
+                                 'api': 'rf_item',
                                  'parameter': msg_type,
-                                 'message': 'Call get_rf_item fail.Item not exist.',
-                                 'rf_item': rf_item,
-                                 'data_key': 'rf_item'
+                                 'message': 'Call rf_item fail.Item not exist.',
+                                 data_key: result_item,
+                                 'data_key': data_key
                                  }), status.HTTP_404_NOT_FOUND
 
     # TODO: Get Vid and ID from file then response it
     # todo: 和前端[RF]data的items不匹配
     s = lines[-1].split(';')
     if len(s) != 4:
-        return simplejson.dumps({key: None, 'key': key}), status.HTTP_404_NOT_FOUND
-    rf_item = {
+        return simplejson.dumps({'status': 'fail',
+                                 'api': 'rf_item',
+                                 'parameter': msg_type,
+                                 'message': 'Call rf_item fail.Item format error.',
+                                 data_key: result_item,
+                                 'data_key': data_key
+                                 }), status.HTTP_404_NOT_FOUND
+    result_item = {
         u'频率': s[0].split(':')[-1],
         u'协议': s[1].split(':')[-1],
         u'调制': s[2].split(':')[-1],
@@ -168,8 +184,8 @@ def get_rf_item(msg_type):
     return simplejson.dumps({'status': 'success',
                              'api': 'get_rf_item',
                              'parameter': msg_type,
-                             'message': 'Call get_rf_item success.',
-                             'rf_item': rf_item,
+                             'message': 'Call rf_item success.',
+                             'rf_item': result_item,
                              'data_key': 'rf_item'
                              })
 
@@ -399,8 +415,8 @@ def update_firmware_log():
                                  }), status.HTTP_404_NOT_FOUND
     # Check if update log is NOT MODIFIED by MD5
     with open(file_path, 'rb') as f:
-        MD5 = hashlib.md5(file_as_bytes(f)).hexdigest()
-    if MD5 == app.config['FIRMWARE_UPDATE_LOG_MD5']:
+        new_MD5 = hashlib.md5(file_as_bytes(f)).hexdigest()
+    if new_MD5 == app.config['FIRMWARE_UPDATE_LOG_MD5']:
         return simplejson.dumps({'status': 'success',
                                  'api': 'update_firmware_log',
                                  'parameter': None,
@@ -409,7 +425,7 @@ def update_firmware_log():
                                  'update_log': update_log
                                  }), status.HTTP_304_NOT_MODIFIED
     else:
-        app.config['FIRMWARE_UPDATE_LOG_MD5'] = MD5
+        app.config['FIRMWARE_UPDATE_LOG_MD5'] = new_MD5
         with open(file_path, 'r') as f:
             update_log = f.read()
         return simplejson.dumps({'status': 'success',
@@ -554,26 +570,39 @@ def index():
     return render_template('index.html')
 
 
-def init():
+def check_file(file_path, file_name):
+    if not os.path.exists(file_path):
+        print('{} in [{}] NOT FOUND, Please check it and then restart server.'.format(file_name, file_path))
+        exit(1)
+    return True
+
+
+def init_data():
     # TODO: Init firmware log file MD5
     file_path = app.config['FIRMWARE_UPDATE_LOG']
-    if not os.path.exists(file_path):
-        print('FIRMWARE_UPDATE_LOG NOT FOUND, Please check it and then restart server.')
-        exit(1)
-    else:
+    if check_file(file_path, 'FIRMWARE_UPDATE_LOG'):
         with open(file_path, 'rb') as f:
             app.config['FIRMWARE_UPDATE_LOG_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
 
     # Init NFC DATA FILE MD5
     file_path = app.config['NFC_DATA_FILE']
-    if not os.path.exists(file_path):
-        print('NFC_DATA_FILE NOT FOUND, Please check it and then restart server.')
-        exit(1)
-    else:
+    if check_file(file_path, 'NFC_DATA_FILE'):
         with open(file_path, 'rb') as f:
             app.config['NFC_DATA_FILE_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
 
+    # Init ARF DATA FILE MD5
+    file_path = app.config['ARF_DATA_FILE']
+    if check_file(file_path, 'ARF_DATA_FILE'):
+        with open(file_path, 'rb') as f:
+            app.config['ARF_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
+
+    # Init CRF DATA FILE MD5
+    file_path = app.config['CRF_DATA_FILE']
+    if check_file(file_path, 'CRF_DATA_FILE'):
+        with open(file_path, 'rb') as f:
+            app.config['CRF_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
+
 
 if __name__ == '__main__':
+    init_data()
     app.run(debug=True)
-    init()
