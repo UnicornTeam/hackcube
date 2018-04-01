@@ -72,9 +72,6 @@ def file_as_bytes(f):
         return f.read()
 
 
-app.config['MD5'] = hashlib.md5(file_as_bytes(open(app.config['NFC_DATA_FILE'], 'rb'))).hexdigest()
-
-
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -400,26 +397,28 @@ def update_firmware_log():
                                  'data_key': 'update_log',
                                  'update_log': update_log
                                  }), status.HTTP_404_NOT_FOUND
-    with open(file_path, 'r') as f:
-        update_log = f.read()
-        # Check if update log is NOT MODIFIED
-        if update_log == app.config['FIRMWARE_UPDATE_LOG_CONTENT']:
-            return simplejson.dumps({'status': 'success',
-                                     'api': 'update_firmware_log',
-                                     'parameter': None,
-                                     'message': 'Call update_firmware_log success.',
-                                     'data_key': 'update_log',
-                                     'update_log': update_log
-                                     }), status.HTTP_304_NOT_MODIFIED
-        else:
-            app.config['FIRMWARE_UPDATE_LOG_CONTENT'] = update_log
-            return simplejson.dumps({'status': 'success',
-                                     'api': 'update_firmware_log',
-                                     'parameter': None,
-                                     'message': 'Call update_firmware_log success.',
-                                     'data_key': 'update_log',
-                                     'update_log': update_log
-                                     })
+    # Check if update log is NOT MODIFIED by MD5
+    with open(file_path, 'rb') as f:
+        MD5 = hashlib.md5(file_as_bytes(f)).hexdigest()
+    if MD5 == app.config['FIRMWARE_UPDATE_LOG_MD5']:
+        return simplejson.dumps({'status': 'success',
+                                 'api': 'update_firmware_log',
+                                 'parameter': None,
+                                 'message': 'Call update_firmware_log success.',
+                                 'data_key': 'update_log',
+                                 'update_log': update_log
+                                 }), status.HTTP_304_NOT_MODIFIED
+    else:
+        app.config['FIRMWARE_UPDATE_LOG_MD5'] = MD5
+        with open(file_path, 'r') as f:
+            update_log = f.read()
+        return simplejson.dumps({'status': 'success',
+                                 'api': 'update_firmware_log',
+                                 'parameter': None,
+                                 'message': 'Call update_firmware_log success.',
+                                 'data_key': 'update_log',
+                                 'update_log': update_log
+                                 })
 
 
 @app.route("update_firmware/<string:uploaded_file_path>", methods=['GET'])
@@ -556,15 +555,23 @@ def index():
 
 
 def init():
-    # Init firmware log
+    # TODO: Init firmware log file MD5
     file_path = app.config['FIRMWARE_UPDATE_LOG']
     if not os.path.exists(file_path):
         print('FIRMWARE_UPDATE_LOG NOT FOUND, Please check it and then restart server.')
         exit(1)
+    else:
+        with open(file_path, 'rb') as f:
+            app.config['FIRMWARE_UPDATE_LOG_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
 
-    with open(file_path, 'r') as f:
-        update_log = f.read()
-        app.config['FIRMWARE_UPDATE_LOG_CONTENT'] = update_log
+    # Init NFC DATA FILE MD5
+    file_path = app.config['NFC_DATA_FILE']
+    if not os.path.exists(file_path):
+        print('NFC_DATA_FILE NOT FOUND, Please check it and then restart server.')
+        exit(1)
+    else:
+        with open(file_path, 'rb') as f:
+            app.config['NFC_DATA_FILE_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
 
 
 if __name__ == '__main__':
