@@ -121,7 +121,11 @@
     methods: {
       fetchNFCData() {
         axios
-          .get(`${process.env.BACKEND_HOST}/nfc_item`)
+          .get(`${process.env.BACKEND_HOST}/nfc_item`, {
+            validateStatus(status) {
+              return status < 400; // Reject only if the status code is greater than or equal to 400
+            },
+          })
           .then((response) => {
             const result = response.data;
             // todo: check if nothing change

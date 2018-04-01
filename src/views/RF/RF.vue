@@ -140,7 +140,11 @@
         const dataAPIs = ['arf', 'crf'];
         for (const api of dataAPIs) {
           axios
-            .get(`${process.env.BACKEND_HOST}/rf_item/${api}`)
+            .get(`${process.env.BACKEND_HOST}/rf_item/${api}`, {
+              validateStatus(status) {
+                return status < 400; // Reject only if the status code is greater than or equal to 400
+              },
+            })
             .then((response) => {
               const result = response.data;
               // todo: check what 304 not modify will do
