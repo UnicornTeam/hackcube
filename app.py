@@ -9,57 +9,29 @@
 import os
 import hashlib
 import subprocess
-import traceback
 from subprocess import CalledProcessError
 
-import PIL
 import simplejson
-from PIL import Image
 from flask import Flask, request, render_template, redirect, url_for, send_from_directory
 from flask_api import status
 from flask_bootstrap import Bootstrap
 from flask_cors import CORS
 
+from config.bcolor import bcolors
+from config.config import DevelopmentConfig, TestingConfig, ProductionConfig
 from lib.upload_file import uploadfile
 
-# app = Flask(__name__)
-app = Flask('foo')
+app = Flask(__name__)
 CORS(app, supports_credentials=True)
-app.config['SECRET_KEY'] = 'h\xcb\x81\xaf%\x81\xd5\x02\xc4L\xad,r\x04\xa4*\x8a\xfd\xb6m\\#<\xed'
-
-app.config['THUMBNAIL_FOLDER'] = 'data/thumbnail/'
-app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
 app.config['DEBUG'] = True
 app.config['TEST'] = False
 
 if app.config['DEBUG']:
-    app.config['AP_LIST_FILE'] = 'data/example_source/AP_list_tmp'
-    app.config['STA_LIST_FILE'] = 'data/example_source/STA_list_tmp'
-    app.config['NFC_DATA_FILE'] = 'data/example_source/bNFC_data'
-    app.config['ARF_DATA_FILE'] = 'data/example_source/aRF_Keeploq_data'
-    app.config['CRF_DATA_FILE'] = 'data/example_source/cRF_24l01_data'
-    app.config['FIRMWARE_UPDATE_LOG'] = 'data/example_source/update_firmware_log'
-    app.config['HD_INFO'] = 'data/example_source/HD_info'
+    app.config.from_object(DevelopmentConfig)
+elif app.config['TESTING']:
+    app.config.from_object(TestingConfig)
 else:
-    app.config['AP_LIST_FILE'] = '/root/monitor_file/AP_list_tmp'
-    app.config['STA_LIST_FILE'] = '/root/monitor_file/STA_list_tmp'
-    app.config['NFC_DATA_FILE'] = '/root/serial_file/data/bNFC_data'
-    app.config['RF_DATA_FILE'] = '/root/serial_file/data/aRF_Keeploq_data'
-    app.config['CRF_DATA_FILE'] = '/root/serial_file/data/cRF_24l01_data'
-    app.config['FIRMWARE_UPDATE_LOG'] = '/root/user_file/INFO/update_firmware_log'
-    app.config['HD_INFO'] = '/etc/HD_info'
-
-app.config['STA_BLOCK_SHELL'] = "/root/monitor_file/STA_block.sh"
-app.config['WIFI_SCAN_SHELL'] = "/root/monitor_file/wifi_scan.sh"
-app.config['AP_BLOCK_SHELL'] = "/root/monitor_file/AP_block.sh"
-app.config['SERIAL_SEND_SHELL'] = "/root/serial_files/serial_send.sh"
-app.config['UPLOAD_FOLDERS'] = {
-    'HID-Script': "/root/user_file/HID/",
-    'INFO-Pie': "/root/user_file/raspberrypi",
-    'INFO-Ardu': "/root/user_file/arduino/"
-}
-
-# app.config['AP_BLOCK_SHELL'] = "data/example-bash/test.sh"
+    app.config.from_object(ProductionConfig)
 
 ALLOWED_EXTENSIONS = {'txt', 'gif', 'png', 'jpg', 'jpeg', 'bmp', 'rar', 'zip', '7zip', 'doc', 'docx'}
 IGNORED_FILES = {'.gitignore'}
@@ -78,6 +50,7 @@ def allowed_file(filename):
 
 
 # TODO: Deal with 304 in Front_End
+# TODO: Check if file exist
 @app.route("/nfc_item", methods=['GET'])
 def get_nfc_item():
     nfc_item = {}
@@ -367,10 +340,10 @@ def serial_send(parameter):
                              })
 
 
-@app.route('hd_info')
+@app.route('/hd_info', methods=['GET'])
 def get_hd_info():
     hd_info = None
-    file_path = app.config['HD_INFO']
+    file_path = app.config['HD_INFO_FILE']
     if not os.path.exists(file_path):
         return simplejson.dumps({'status': 'fail',
                                  'api': 'hd_info',
@@ -407,10 +380,10 @@ def get_hd_info():
                              })
 
 
-@app.route("update_firmware_log", methods=['GET'])
+@app.route("/update_firmware_log", methods=['GET'])
 def update_firmware_log():
     update_log = None
-    file_path = app.config['FIRMWARE_UPDATE_LOG']
+    file_path = app.config['FIRMWARE_UPDATE_LOG_FILE']
     if not os.path.exists(file_path):
         return simplejson.dumps({'status': 'fail',
                                  'api': 'update_firmware_log',
@@ -443,7 +416,7 @@ def update_firmware_log():
                                  })
 
 
-@app.route("update_firmware/<string:uploaded_file_path>", methods=['GET'])
+@app.route("/update_firmware/<string:uploaded_file_path>", methods=['GET'])
 def update_firmware(uploaded_file_path):
     if not update_firmware:
         return simplejson.dumps({'status': 'fail',
@@ -575,37 +548,59 @@ def index():
     return render_template('index.html')
 
 
-def check_file(file_path, file_name):
+def check_file(file_path, file_key):
     if not os.path.exists(file_path):
-        print('{} in [{}] NOT FOUND, Please check it and then restart server.'.format(file_name, file_path))
+        print('{} in [{}] NOT FOUND, Please check it and then restart server.'.format(file_key, file_path))
         exit(1)
     return True
 
 
 def init_data():
+    if app.config['DEBUG']:
+        print(bcolors.WARNING + 'NOTE: You are running server in DEBUG mode, please make sure '
+              'change to product mode before release.' + bcolors.ENDC)
+    elif app.config['TESTING']:
+        print(bcolors.WARNING + 'NOTE: You are running server in TESTING mode, please make sure '
+              'change to product mode before release.' + bcolors.ENDC)
+    else:
+        print('NOTE: You are running server in PRODUCTION mode, If you want more'
+              'debug information, you can run in DEBUG or TESTING mode.')
+
+    for key, value in app.config.items():
+        if '_FILE' == key[-5:] or '_SHELL' == key[-6:]:
+            try:
+                check_file(value, key)
+            except TypeError as e:
+                print(e)
+
     # TODO: Init firmware log file MD5
-    file_path = app.config['FIRMWARE_UPDATE_LOG']
-    if check_file(file_path, 'FIRMWARE_UPDATE_LOG'):
-        with open(file_path, 'rb') as f:
-            app.config['FIRMWARE_UPDATE_LOG_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
+    file_path = app.config['FIRMWARE_UPDATE_LOG_FILE']
+    with open(file_path, 'rb') as f:
+        app.config['FIRMWARE_UPDATE_LOG_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
 
     # Init NFC DATA FILE MD5
     file_path = app.config['NFC_DATA_FILE']
-    if check_file(file_path, 'NFC_DATA_FILE'):
-        with open(file_path, 'rb') as f:
-            app.config['NFC_DATA_FILE_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
+    with open(file_path, 'rb') as f:
+        app.config['NFC_DATA_FILE_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
 
     # Init ARF DATA FILE MD5
     file_path = app.config['ARF_DATA_FILE']
-    if check_file(file_path, 'ARF_DATA_FILE'):
-        with open(file_path, 'rb') as f:
-            app.config['ARF_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
+    with open(file_path, 'rb') as f:
+        app.config['ARF_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
 
     # Init CRF DATA FILE MD5
     file_path = app.config['CRF_DATA_FILE']
-    if check_file(file_path, 'CRF_DATA_FILE'):
-        with open(file_path, 'rb') as f:
-            app.config['CRF_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
+    with open(file_path, 'rb') as f:
+        app.config['CRF_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
+
+    # TODO: Improve code to intelligent detection
+    folder_list = {
+        'HID-Script': app.config['UPLOAD_FOLDERS']['HID-Script'],
+        'INFO-Pie': app.config['UPLOAD_FOLDERS']['INFO-Pie'],
+        'INFO-Ardu': app.config['UPLOAD_FOLDERS']['INFO-Ardu'],
+    }
+    for folder_key, folder_path in folder_list.items():
+        check_file(folder_path, folder_key)
 
 
 if __name__ == '__main__':

@@ -18,7 +18,7 @@ class APBlockTestCase(unittest.TestCase):
     # TODO: Add fail test
     def test_ap_block_on_success(self):
         action = 'on'
-        instance.app.config['AP_BLOCK_SHELL'] = "example-bash/test_success.sh"
+        instance.app.config['AP_BLOCK_SHELL'] = "example_bash/test_success.sh"
         resp = self.app.get('/{}/{}/{}'.format(self.api, self.ssid, action))
         exp_resp = {'status': 'success',
                     'action': action,
@@ -30,7 +30,7 @@ class APBlockTestCase(unittest.TestCase):
     # TODO: Add fail test
     def test_ap_block_off_success(self):
         action = 'off'
-        instance.app.config['AP_BLOCK_SHELL'] = "example-bash/test_success.sh"
+        instance.app.config['AP_BLOCK_SHELL'] = "example_bash/test_success.sh"
         resp = self.app.get('/{}/{}/{}'.format(self.api, self.ssid, action))
         exp_resp = {'status': 'success',
                     'action': action,
