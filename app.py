@@ -80,37 +80,6 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-# TODO: Check whether need change this rule.
-# TODO: Decide where the uploaded file should be store.
-def gen_file_name(filename):
-    """
-    If file was exist already, rename it and return a new name
-    """
-    i = 1
-    while os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], filename)):
-        name, extension = os.path.splitext(filename)
-        filename = '%s_%s%s' % (name, str(i), extension)
-        i += 1
-
-    return filename
-
-
-def create_thumbnail(image):
-    try:
-        base_width = 80
-        img = Image.open(os.path.join(app.config['UPLOAD_FOLDER'], image))
-        w_percent = (base_width / float(img.size[0]))
-        h_size = int((float(img.size[1]) * float(w_percent)))
-        img = img.resize((base_width, h_size), PIL.Image.ANTIALIAS)
-        img.save(os.path.join(app.config['THUMBNAIL_FOLDER'], image))
-
-        return True
-
-    except:
-        print(traceback.format_exc())
-        return False
-
-
 # TODO: Deal with 304 in Front_End
 @app.route("/nfc_item", methods=['GET'])
 def get_nfc_item():
