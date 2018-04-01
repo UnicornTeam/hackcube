@@ -11,6 +11,7 @@
 
 
 - WIFI List 分页
+- 测试能否正确处理INFO页面的304，增加其他页面的304处理逻辑
 
 - Change all response parser correspond backend response api.NOTE: Use data-key to get data.
 

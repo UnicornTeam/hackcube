@@ -146,7 +146,7 @@
               // todo: check what 304 not modify will do
               // todo: write test code
               console.log(result);
-              const dataKey = result.key;
+              const dataKey = result.data_key;
               const isExist = this.rfItems.indexOf(result[dataKey]) !== -1;
               if (isExist) {
                 return;

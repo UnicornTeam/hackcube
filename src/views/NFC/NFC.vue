@@ -126,7 +126,7 @@
             const result = response.data;
             // todo: check if nothing change
             console.log(result);
-            this.items = [result.nfc_item];
+            this.items = [result[result.data_key]];
           })
           .catch((err) => {
             console.log(err.response);

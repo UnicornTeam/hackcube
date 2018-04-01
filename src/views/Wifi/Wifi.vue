@@ -153,7 +153,7 @@ export default {
             const result = response.data;
             console.log(result);
             // this.$Message.success('Fetch wifi list success.');
-            this.items = result.ap_list;
+            this.items = result[result.data_key];
           })
           .catch((err) => {
             console.log(err.response);
