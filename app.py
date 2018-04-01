@@ -86,9 +86,9 @@ def get_nfc_item():
         now_md5 = hashlib.md5(file_as_bytes(f)).hexdigest()
     if now_md5 == app.config['NFC_DATA_FILE_MD5']:
         return simplejson.dumps({'status': 'success',
-                                 'api': 'get_nfc_item',
+                                 'api': 'nfc_item',
                                  'parameter': None,
-                                 'message': 'Call get_nfc_item success.There is no new NFC item',
+                                 'message': 'Call get_nfc_item success.But no new NFC item',
                                  'nfc_item': nfc_item,
                                  'data_key': 'nfc_item'
                                  }), status.HTTP_304_NOT_MODIFIED
@@ -98,7 +98,13 @@ def get_nfc_item():
     while lines[-1].strip() == '':
         del lines[-1]
     if not lines:
-        return simplejson.dumps({"nfc_item": None}), status.HTTP_404_NOT_FOUND
+        return simplejson.dumps({'status': 'fail',
+                                 'api': 'nfc_item',
+                                 'parameter': None,
+                                 'message': 'Call get_nfc_item fail.Item NOT FOUND',
+                                 'nfc_item': nfc_item,
+                                 'data_key': 'nfc_item'
+                                 }), status.HTTP_404_NOT_FOUND
     else:
         id = lines[-1]
         vid = '050'
@@ -108,7 +114,7 @@ def get_nfc_item():
             'VID': vid
         }
         return simplejson.dumps({'status': 'success',
-                                 'api': 'get_nfc_item',
+                                 'api': 'nfc_item',
                                  'parameter': None,
                                  'message': 'Call get_nfc_item success.',
                                  'nfc_item': nfc_item,
@@ -499,13 +505,12 @@ def upload():
                 files.save(uploaded_file_path)
             except IOError as e:
                 print(e)
-                data = simplejson.dumps({'status': 'fail',
+                return simplejson.dumps({'status': 'fail',
                                          'api': 'upload',
                                          'parameter': filename,
                                          'message': 'Upload file fail.Error raise while save file.',
                                          'data_key': None
-                                         })
-                return data, status.HTTP_500_INTERNAL_SERVER_ERROR
+                                         }), status.HTTP_500_INTERNAL_SERVER_ERROR
 
             mime_type = files.content_type
             # create thumbnail after saving
