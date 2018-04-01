@@ -88,7 +88,6 @@ def get_nfc_item():
     else:
         id = lines[-1]
         vid = '050'
-        # todo: 和前端[RF]data的items不匹配
         nfc_item = {
             'ID': id,
             'VID': vid
@@ -110,13 +109,13 @@ def get_rf_item(msg_type):
         file_path = app.config['ARF_DATA_FILE']
         with open(file_path, 'rb') as f:
             new_MD5 = hashlib.md5(file_as_bytes(f)).hexdigest()
-            is_change = new_MD5 != app.config['ARF_MD5']
+            is_change = new_MD5 != app.config['ARF_DATA_FILE_MD5']
             app.config['ARF_DATA_FILE_MD5'] = new_MD5 if is_change else app.config['ARF_DATA_FILE_MD5']
     elif msg_type == 'crf':
         file_path = app.config['CRF_DATA_FILE']
         with open(file_path, 'rb') as f:
             new_MD5 = hashlib.md5(file_as_bytes(f)).hexdigest()
-            is_change = new_MD5 != app.config['CRF_MD5']
+            is_change = new_MD5 != app.config['CRF_DATA_FILE_MD5']
             app.config['CRF_DATA_FILE_MD5'] = new_MD5 if is_change else app.config['CRF_DATA_FILE_MD5']
     else:
         return simplejson.dumps({'status': 'fail',
