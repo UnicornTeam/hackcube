@@ -385,10 +385,10 @@ def get_hd_info():
                                  'data_key': 'hd_info',
                                  'hd_info': hd_info
                                  }), status.HTTP_500_INTERNAL_SERVER_ERROR
-    total = lines[0]
-    used = lines[1]
+    total = int(lines[0].split('G')[0])
+    used = int(lines[1].split('G')[0])
     # get percentage
-    hd_info = round(used / total, 2) * 100
+    hd_info = used * 100 / total
     return simplejson.dumps({'status': 'success',
                              'api': 'hd_info',
                              'parameter': None,
