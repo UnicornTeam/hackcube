@@ -379,6 +379,46 @@ def serial_send(parameter):
                              })
 
 
+@app.route('hd_info')
+def get_hd_info():
+    hd_info = None
+    file_path = app.config['HD_INFO']
+    if not os.path.exists(file_path):
+        return simplejson.dumps({'status': 'fail',
+                                 'api': 'hd_info',
+                                 'parameter': None,
+                                 'message': 'Call hd_info fail, file not found.',
+                                 'data_key': 'hd_info',
+                                 'hd_info': hd_info
+                                 }), status.HTTP_404_NOT_FOUND
+
+    with open(file_path, 'r') as f:
+        lines = f.readlines()
+        for i in range(len(lines)):
+            if not lines[i]:
+                del lines[i]
+
+    if len(lines) != 2:
+        return simplejson.dumps({'status': 'fail',
+                                 'api': 'hd_info',
+                                 'parameter': None,
+                                 'message': 'Call hd_info fail,log file format error.',
+                                 'data_key': 'hd_info',
+                                 'hd_info': hd_info
+                                 }), status.HTTP_500_INTERNAL_SERVER_ERROR
+    total = lines[0]
+    used = lines[1]
+    # get percentage
+    hd_info = round(used / total, 2) * 100
+    return simplejson.dumps({'status': 'success',
+                             'api': 'hd_info',
+                             'parameter': None,
+                             'message': 'Call hd_info success.',
+                             'data_key': 'hd_info',
+                             'hd_info': hd_info
+                             })
+
+
 @app.route("update_firmware_log", methods=['GET'])
 def update_firmware_log():
     update_log = None
