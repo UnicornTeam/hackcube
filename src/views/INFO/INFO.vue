@@ -123,7 +123,7 @@
       onUploadSuccess(response, file) {
         // todo: how to get file name of file, then set uploadedFilePath
         // todo: send command with uploadedFilePath
-        this.uploadedFilePath = `/root/user_file/arduino/${file.name}`;
+        this.uploadedFilePath = `/root/user_file/INFO/arduino/${file.name}`;
         this.$Message.success(`Upload ${file.name} success`);
       },
       onUploadError(error, file, fileList) {

@@ -14,3 +14,10 @@ div.van-switch {
 div.board {
   margin-left: 10px;margin-right: 10px;padding-right: 10px;
 }
+
+td {
+  overflow: hidden!important;
+  text-overflow:ellipsis!important;
+  white-space: nowrap!important;
+  max-width: 10em!important;
+}
