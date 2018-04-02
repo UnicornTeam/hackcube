@@ -9,13 +9,14 @@ class Config(object):
     NFC_DATA_FILE_MD5 = None
     FIRMWARE_UPDATE_LOG_MD5 = None
     AP_LIST_FILE_MD5 = None
+    STA_LIST_FILE_MD5 = None
 
 
 class ProductionConfig(Config):
     AP_LIST_FILE = '/root/monitor_file/AP_list_tmp'
     STA_LIST_FILE = '/root/monitor_file/STA_list_tmp'
     NFC_DATA_FILE = '/root/serial_file/data/bNFC_data'
-    RF_DATA_FILE = '/root/serial_file/data/aRF_Keeploq_data'
+    ARF_DATA_FILE = '/root/serial_file/data/aRF_Keeloq_data'
     CRF_DATA_FILE = '/root/serial_file/data/cRF_24l01_data'
     FIRMWARE_UPDATE_LOG_FILE = '/root/user_file/INFO/update_firmware_log'
     HD_INFO_FILE = '/etc/HD_info'
@@ -23,11 +24,12 @@ class ProductionConfig(Config):
     STA_BLOCK_SHELL = "/root/monitor_file/STA_block.sh"
     WIFI_SCAN_SHELL = "/root/monitor_file/wifi_scan.sh"
     AP_BLOCK_SHELL = "/root/monitor_file/AP_block.sh"
-    SERIAL_SEND_SHELL = "/root/serial_files/serial_send.sh"
+    SERIAL_SEND_SHELL = "/root/serial_file/serial_send.sh"
+    UPDATE_FIRMWARE_SHELL = "/root/user_file/INFO/update.sh"
     UPLOAD_FOLDERS = {
         'HID-Script': "/root/user_file/HID/",
-        'INFO-Pie': "/root/user_file/raspberrypi",
-        'INFO-Ardu': "/root/user_file/arduino/"
+        'INFO-Pie': "/root/user_file/INFO/raspberrypi/",
+        'INFO-Ardu': "/root/user_file/INFO/arduino/"
     }
 
 
@@ -36,7 +38,7 @@ class DevelopmentConfig(Config):
     AP_LIST_FILE = 'data/example_source/AP_list_tmp'
     STA_LIST_FILE = 'data/example_source/STA_list_tmp'
     NFC_DATA_FILE = 'data/example_source/bNFC_data'
-    ARF_DATA_FILE = 'data/example_source/aRF_Keeploq_data'
+    ARF_DATA_FILE = 'data/example_source/aRF_Keeloq_data'
     CRF_DATA_FILE = 'data/example_source/cRF_24l01_data'
     FIRMWARE_UPDATE_LOG_FILE = 'data/example_source/update_firmware_log'
     HD_INFO_FILE = 'data/example_source/HD_info'
@@ -45,6 +47,7 @@ class DevelopmentConfig(Config):
     WIFI_SCAN_SHELL = "data/example_bash/test_success.sh"
     AP_BLOCK_SHELL = "data/example_bash/test_success.sh"
     SERIAL_SEND_SHELL = "data/example_bash/test_success.sh"
+    UPDATE_FIRMWARE_SHELL = "data/example_bash/test_success.sh"
     UPLOAD_FOLDERS = {
         'HID-Script': "data/example_dir/HID/",
         'INFO-Pie': "data/example_dir/raspberrypi/",

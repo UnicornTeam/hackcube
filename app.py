@@ -148,8 +148,6 @@ def get_rf_item(msg_type):
                                  'data_key': data_key
                                  }), status.HTTP_404_NOT_FOUND
 
-    # TODO: Get Vid and ID from file then response it
-    # todo: 和前端[RF]data的items不匹配
     s = lines[-1].split(';')
     if len(s) != 4:
         return simplejson.dumps({'status': 'fail',
@@ -171,8 +169,8 @@ def get_rf_item(msg_type):
                              'api': 'get_rf_item',
                              'parameter': msg_type,
                              'message': 'Call rf_item success.',
-                             'rf_item': result_item,
-                             'data_key': 'rf_item'
+                             data_key: result_item,
+                             'data_key': data_key
                              })
 
 
@@ -203,14 +201,22 @@ def get_ap_list():
         lines = f.readlines()
     for line in lines:
         l = line.split()
-        if len(l) < 5:
+        if len(l) == 3:
+            i = {
+                'BSSID': l[0],
+                'RSSI': l[2],
+                'SSID': '(hidden)',
+                'JAM': False
+            }
+        elif len(l) == 4:
+            i = {
+                'BSSID': l[0],
+                'RSSI': l[2],
+                'SSID': l[3],
+                'JAM': False
+            }
+        else:
             continue
-        i = {
-            'BSSID': l[0],
-            'RSSI': l[2],
-            'SSID': l[3],
-            'JAM': False
-        }
         ap_list.append(i)
     return simplejson.dumps({'status': 'success',
                              'api': 'ap_list',
@@ -233,12 +239,25 @@ def get_sta_list():
                                  'data_key': 'sta_list'
                                  }), status.HTTP_404_NOT_FOUND
 
-    with open(app.config['STA_LIST_FILE'], 'r') as f:
+    file_path = app.config['STA_LIST_FILE']
+    with open(file_path, 'rb') as f:
+        new_MD5 = hashlib.md5(file_as_bytes(f)).hexdigest()
+    if new_MD5 == app.config['STA_LIST_FILE_MD5']:
+        return simplejson.dumps({'status': 'success',
+                                 'api': 'sta_list',
+                                 'parameter': None,
+                                 'message': 'Call sta_list success.But file NOT MODIFIED.',
+                                 'sta_list': sta_list,
+                                 'data_key': 'sta_list'
+                                 }), status.HTTP_304_NOT_MODIFIED
+    app.config['STA_LIST_FILE_MD5'] = new_MD5
+    with open(file_path, 'r') as f:
         lines = f.readlines()
     for line in lines:
+        if not line:
+            continue
         l = line.split()
         if len(l) < 4:
-            print("Too short: ", l)
             continue
         i = {
             'MAC': l[0],
@@ -335,13 +354,6 @@ def wifi_scan(action, channel):
 
 @app.route("/serial_send/<string:parameter>", methods=['GET'])
 def serial_send(parameter):
-    if parameter[:2] not in ['ns', 'nw']:
-        return simplejson.dumps({'status': 'fail',
-                                 'api': 'serial_send',
-                                 'parameter': parameter,
-                                 'message': 'Call serial_send fail, parameter error',
-                                 'data_key': None
-                                 }), status.HTTP_400_BAD_REQUEST
     try:
         subprocess.call("{} {}".format(app.config['SERIAL_SEND_SHELL'], parameter), shell=True)
     except CalledProcessError:
@@ -435,8 +447,10 @@ def update_firmware_log():
                                  })
 
 
-@app.route("/update_firmware/<string:uploaded_file_path>", methods=['GET'])
-def update_firmware(uploaded_file_path):
+@app.route("/update_firmware", methods=['POST'])
+def update_firmware():
+    # TODO: Parse as dict and get data
+    uploaded_file_path = request.data.split('"')[3]
     if not update_firmware:
         return simplejson.dumps({'status': 'fail',
                                  'api': 'update_firmware',
@@ -478,8 +492,8 @@ def upload():
                 app.config['UPLOAD_FOLDER'] = "data/"
             elif app.config['TEST']:
                 app.config['UPLOAD_FOLDER'] = "../data/"
-            elif app.config['DEBUG']:
-                app.config['UPLOAD_FOLDER'] = "data/"
+            # elif app.config['DEBUG']:
+            #     app.config['UPLOAD_FOLDER'] = "data/"
             elif extra not in app.config['UPLOAD_FOLDERS']:
                 app.config['UPLOAD_FOLDER'] = "data/"
             else:
@@ -575,10 +589,10 @@ def check_file(file_path, file_key):
 def init_data():
     if app.config['DEBUG']:
         print(bcolors.WARNING + 'NOTE: You are running server in DEBUG mode, please make sure '
-              'change to product mode before release.' + bcolors.ENDC)
+                                'change to product mode before release.' + bcolors.ENDC)
     elif app.config['TESTING']:
         print(bcolors.WARNING + 'NOTE: You are running server in TESTING mode, please make sure '
-              'change to product mode before release.' + bcolors.ENDC)
+                                'change to product mode before release.' + bcolors.ENDC)
     else:
         print('NOTE: You are running server in PRODUCTION mode, If you want more'
               'debug information, you can run in DEBUG or TESTING mode.')
@@ -610,6 +624,10 @@ def init_data():
     with open(file_path, 'rb') as f:
         app.config['AP_LIST_FILE_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
 
+    file_path = app.config['STA_LIST_FILE']
+    with open(file_path, 'rb') as f:
+        app.config['STA_LIST_FILE_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
+
     # TODO: Improve code to intelligent detection
     folder_list = {
         'HID-Script': app.config['UPLOAD_FOLDERS']['HID-Script'],
@@ -622,4 +640,4 @@ def init_data():
 
 if __name__ == '__main__':
     init_data()
-    app.run(debug=True)
+    app.run(host='0.0.0.0')
