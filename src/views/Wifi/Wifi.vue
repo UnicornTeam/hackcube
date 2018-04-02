@@ -141,8 +141,8 @@ export default {
           }
         })
         .catch((err) => {
-          console.log(err.response);
-          this.$Message.error(err);
+          console.log(err);
+          // this.$Message.error(err);
         });
     },
     fetchWifiList() {

@@ -1,6 +1,8 @@
 .DS_Store
 node_modules/
 dist/
+Cube_Manage
+Cube_Manage.tar.gz
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

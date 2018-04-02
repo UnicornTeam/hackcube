@@ -13,7 +13,7 @@ import VueTimers from 'vue-timers';
 import App from './App';
 import router from './router';
 import '../static/global.css';
-
+import store from '../store';
 
 Vue.use(Vant);
 Vue.use(BootstrapVue);
@@ -25,6 +25,7 @@ Vue.config.productionTip = false;
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
+  store,
   router,
   template: '<App/>',
   components: { App },
