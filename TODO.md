@@ -1,3 +1,5 @@
+- Store origin data when navigate to another page, and restore it when back to origin page.
+
 - 不同页面间的数据传递：
   - NFC获取到数据后，通知RF界面展示通知
   - NFC页面生命周期会不会被destroy?

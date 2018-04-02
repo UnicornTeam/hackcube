@@ -1,4 +1,4 @@
-# bootstrap-vue-experiments
+# Cube Manager
 
 > A Vue.js project
 
@@ -26,5 +26,9 @@ npm run e2e
 # run all tests
 npm test
 ```
+
+## Backend Host
+`http://localhost:5000`
+You can change it in config/*.env.js
 
 For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).

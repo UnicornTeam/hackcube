@@ -205,9 +205,7 @@
       } else {
         this.$timer.stop('fetchNFCData');
       }
-      // console.log('this.$route.params', this.$route.params);
-      // console.log('router.params.latest_nfc_item', router.params.latest_nfc_item);
-      // console.log('this.$root.$router.params', this.$root.$router.params);
+
       if (this.$route.params.latest_nfc_item) {
         this.items = [this.$route.params.latest_nfc_item];
       }
