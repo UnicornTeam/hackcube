@@ -49,7 +49,6 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-# TODO: Deal with 304 in Front_End
 @app.route("/nfc_item", methods=['GET'])
 def get_nfc_item():
     nfc_item = {}
@@ -90,7 +89,9 @@ def get_nfc_item():
         vid = '050'
         nfc_item = {
             'ID': id,
-            'VID': vid
+            'VID': vid,
+            'WRITE': False,
+            'SIMULATE': False
         }
         return simplejson.dumps({'status': 'success',
                                  'api': 'nfc_item',
@@ -461,8 +462,6 @@ def update_firmware(uploaded_file_path):
                              })
 
 
-# TODO: Receive more parameter to do more action
-# TODO: Decide which kind of filetype will be upload
 @app.route("/upload", methods=['GET', 'POST'])
 def upload():
     if request.method == 'POST':
