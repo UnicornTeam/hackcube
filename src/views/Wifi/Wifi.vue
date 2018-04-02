@@ -198,7 +198,6 @@ export default {
     },
   },
   created() {
-    // TODO: 初始化数据
     // TODO: Save the final fresh wifi list when leave page
     // TODO: And restore it when back to this page.
     console.log(`items is: ${this.ap_items}`);

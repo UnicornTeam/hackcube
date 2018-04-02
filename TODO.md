@@ -1,15 +1,15 @@
 - Store origin data when navigate to another page, and restore it when back to origin page.
 
-- AP List、Client List初始化为空
-- NFC Page 按钮关闭无操作
-- RF Page 里的TPMS数字输入框太窄
+DONE AP List、Client List初始化为空
+DONE NFC Page 按钮关闭无操作
+DONE RF Page 里的TPMS数字输入框太窄
 
 Done [Check All]for const of obj NOT for const in obj
 
 - INFO Update log 字体颜色太浅
 Done WIFI 和 Client List
-  - 点击了下面任意按钮停止Scan
-  - WIFI 信道默认显示6
+  DONE 点击了下面任意按钮停止Scan
+  DONE WIFI 信道默认显示6
 Done Client List 动态渲染
 
 - 不同页面间的数据传递：

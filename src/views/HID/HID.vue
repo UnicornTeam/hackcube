@@ -69,14 +69,6 @@
             this.$Message.error('Please input Key before submit.');
           }
         },
-        onRead(file, content) {
-          console.log(file);
-          console.log(content);
-          console.log(Buffer.from(file.content, 'base64').toString('utf-8'));
-          // TODO: Send result to backend
-          // TODO: Add upload success prompt
-        },
-        // TODO: Deal with onClick logic.
         onClick(index) {
           console.log(index);
           switch (index) {
@@ -93,10 +85,6 @@
               break;
           }
         },
-        beforeUpload(file) {
-          // TODO: Add more feature argument
-          console.log(file);
-        },
         onUploadSuccess(response) {
           console.log(response);
           this.$Message.success('Upload success');
@@ -105,10 +93,6 @@
           console.log(err);
           this.$Message.error('Upload fail');
         },
-      },
-      created() {
-        // TODO: 初始化数据
-        console.log(`items is: ${this.items}`);
       },
     };
 </script>

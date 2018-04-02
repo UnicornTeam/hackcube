@@ -101,7 +101,6 @@
     },
     data() {
       return {
-        // todo: set latest_nfc_item and showNFCAlert from NFC page
         latest_nfc_item: '',
         showNFCAlert: false,
         latest_arf_item: '',
@@ -147,7 +146,6 @@
           })
           .then((response) => {
             const result = response.data;
-            // todo: check if nothing change
             console.log(result);
             if (response.status === 304) {
               return;
@@ -186,7 +184,6 @@
             })
             .then((response) => {
               const result = response.data;
-              // todo: check what 304 not modify will do
               // todo: write test code
               console.log(result);
               if (response.status === 304) {
@@ -224,7 +221,6 @@
             }
             break;
           case 'tpms':
-            // todo: send data to serial_send
             if (!this.tpmsSwitch) {
               return;
             }
@@ -239,8 +235,8 @@
               // this.serialSend(parameter);
               const that = this;
               setTimeout(() => {
-                // todo: does it need promotion after per request send?
                 that.serialSend(parameter);
+                that.$Message.success(`Success put ${parameter}`);
               }, 700);
             }
             this.$Message.success('Send all valid item to process!');
@@ -252,7 +248,6 @@
             break;
         }
       },
-      // TODO: Deal with onClick logic.
       onClick(index) {
         console.log(index);
         const item = this.rfItems[index];
@@ -261,7 +256,6 @@
       },
     },
     created() {
-      // TODO: 初始化数据
       if (this.snifferSwitch) {
         this.$timer.start('fetchData');
         this.$timer.start('fetchNFCData');

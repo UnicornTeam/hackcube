@@ -21,3 +21,12 @@ td {
   white-space: nowrap!important;
   max-width: 10em!important;
 }
+
+.ivu-input-disabled {
+  background-color: #ffffff!important;
+}
+
+td[aria-colindex] {
+  padding-right: 4px!important;
+  padding-left: 4px!important;
+}

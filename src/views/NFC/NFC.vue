@@ -41,7 +41,6 @@
     <b-container>
       <b-row>
         <b-col cols="4">
-          <!-- TODO: Check if only need input one vid ? -->
           <b-form-input v-model="writeVid"
                         type="text"
                         placeholder="VID">
@@ -71,7 +70,6 @@
     <b-container fluid>
       <b-row>
         <b-col cols="4">
-          <!-- TODO: Check if only need input one vid ? -->
           <b-form-input v-model="simulateVid"
                         type="text"
                         placeholder="VID">
@@ -128,7 +126,6 @@
           })
           .then((response) => {
             const result = response.data;
-            // todo: check if nothing change
             console.log(result);
             if (response.status === 304) {
               return;
@@ -162,7 +159,6 @@
         }
       },
       onSwitchAction(actionType, isOpen, VID, ID) {
-      // TODO: 如果是关闭，直接关闭并return
         if (!isOpen) {
           return;
         }
@@ -204,7 +200,6 @@
       },
     },
     created() {
-      // TODO: 初始化数据
       if (this.readSwitch) {
         this.$timer.start('fetchNFCData');
       } else {

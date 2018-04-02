@@ -16,7 +16,6 @@
     ></b-progress>
     <br/><br/>
 
-    <!-- TODO: 上传预览，上传进度 -->
     <h5>上传arduino固件</h5>
     <Upload
       :data="extraDataArdu"
@@ -58,13 +57,6 @@
       };
     },
     methods: {
-      onRead(file, content) {
-        console.log(file);
-        console.log(content);
-        console.log(Buffer.from(file.content, 'base64').toString('utf-8'));
-        // TODO: Send result to backend
-        // TODO: Add upload success prompt
-      },
       fetchEnergyStatus() {
         axios
           .get(`${process.env.BACKEND_HOST}/hd_info`)
@@ -100,7 +92,6 @@
             this.$Message.error('Call process fail');
           });
       },
-      // TODO: Deal with onClick logic.
       onClick() {
         if (this.uploadedFilePath) {
           axios
@@ -109,7 +100,6 @@
             console.log(response.data);
             const result = response.data;
             this.$Message.success(result.message);
-            // todo: start interval to fetch log
             this.$timer.start('fetchUpdateLog');
           })
           .catch((err) => {
@@ -121,8 +111,6 @@
         }
       },
       onUploadSuccess(response, file) {
-        // todo: how to get file name of file, then set uploadedFilePath
-        // todo: send command with uploadedFilePath
         this.uploadedFilePath = `/root/user_file/INFO/arduino/${file.name}`;
         this.$Message.success(`Upload ${file.name} success`);
       },
@@ -131,10 +119,6 @@
         console.log(fileList.name);
         this.$Message.error(`Upload ${fileList.name} fail`);
       },
-    },
-    created() {
-      // TODO: 初始化数据
-      console.log(`items is: ${this.items}`);
     },
     timers: {
       fetchUpdateLog: { time: 3000, autostart: false, repeat: true },
