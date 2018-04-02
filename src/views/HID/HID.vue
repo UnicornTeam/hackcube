@@ -1,5 +1,5 @@
 <template>
-  <div style="margin: 10px">
+  <div class="board">
     <cube-nav/>
 
     <h1 class="text-center">Cube HID Manage</h1>
@@ -11,17 +11,11 @@
                   placeholder="Key">
     </b-form-input>
     <br/>
-
-    <h5>上传攻击脚本</h5>
-    <Upload
-      :data="extraData"
-      :before-upload="beforeUpload"
-      :action="uploadHost"
-      :on-success="onUploadSuccess"
-      :on-error="onUploadFail">
-      <Button type="ghost" icon="ios-cloud-upload-outline">Upload files</Button>
-    </Upload>
+    <div class="text-center">
+      <Button type="ghost" icon="ios-cloud-upload-outline" @click="onClickSubmit">Submit</Button>
+    </div>
     <br/><br/>
+
 
     <h5>Script</h5>
     <b-table :items="items" :fields="fields">
@@ -34,29 +28,47 @@
 
 <script>
     import CubeNav from '@/components/CubeNav';
-    import { Upload, Button } from 'iview';
+    import axios from 'axios';
 
     export default {
       name: 'HID',
       components: {
         CubeNav,
-        Upload,
-        Button,
       },
       data() {
         return {
           Key: null,
           uploadHost: process.env.UPLOAD_API,
           extraData: { type: 'HID-Script' },
-          fields: ['Info', 'Size', 'Run'],
+          fields: ['Info', 'Name', 'Run'],
           items: [
-            { Index: 0, Info: '539fsdf', Size: '522', Run: false },
-            { Index: 1, Info: '54j3n4j', Size: '94', Run: false },
-            { Index: 2, Info: 'ipfd93v', Size: '101', Run: false },
+            { Index: 0, Info: '29d172a6', Name: '锁屏', Run: false },
+            { Index: 1, Info: 'd2f392f1', Name: '添加用户', Run: false },
+            { Index: 2, Info: '9209993f', Name: 'ShellCode', Run: false },
           ],
         };
       },
       methods: {
+        serialSend(parameter) {
+          axios
+            .get(`${process.env.BACKEND_HOST}/serial_send/${parameter}`)
+            .then((response) => {
+              const result = response.data;
+              console.log(result);
+              this.$Message.success('Execute success.');
+            })
+            .catch((err) => {
+              console.log(err.response);
+              this.$Message.error('Execute fail.');
+            });
+        },
+        onClickSubmit() {
+          if (this.Key) {
+            this.serialSend(this.Key);
+          } else {
+            this.$Message.error('Please input Key before submit.');
+          }
+        },
         onRead(file, content) {
           console.log(file);
           console.log(content);
@@ -67,15 +79,27 @@
         // TODO: Deal with onClick logic.
         onClick(index) {
           console.log(index);
+          switch (index) {
+            case 0:
+              this.serialSend('ha');
+              break;
+            case 1:
+              this.serialSend('hb');
+              break;
+            case 2:
+              // 暂时不管
+              break;
+            default:
+              break;
+          }
         },
         beforeUpload(file) {
           // TODO: Add more feature argument
           console.log(file);
         },
-        onUploadSuccess(response, file, fileList) {
+        onUploadSuccess(response) {
           console.log(response);
           this.$Message.success('Upload success');
-          fileList.remove(file);
         },
         onUploadFail(err) {
           console.log(err);

@@ -1,5 +1,5 @@
 <template>
-  <div style="margin: 10px">
+  <div class="board">
     <cube-nav/>
 
     <h1 class="text-center">Cube Status Manage</h1>
@@ -20,33 +20,42 @@
     <h5>上传arduino固件</h5>
     <Upload
       :data="extraDataArdu"
-      :before-upload="beforeUpload"
-      action="//localhost/upload">
-      <Button type="ghost" icon="ios-cloud-upload-outline">Upload files</Button>
+      :on-success="onUploadSuccess"
+      :on-error="onUploadError"
+      :action="uploadHost">
+      <Button type="ghost" icon="ios-cloud-upload-outline">Upload</Button>
     </Upload>
 
-    <br/><br/>
+    <div class="text-center">
+      <Button type="ghost" @click="onClick">Submit</Button>
+    </div>
 
-    <h5>上传树莓派固件</h5>
-    <Upload
-      :data="extraDataPie"
-      :before-upload="beforeUpload"
-      action="//localhost/upload">
-      <Button type="ghost" icon="ios-cloud-upload-outline">Upload files</Button>
-    </Upload>
+    <br/>
+
+    <Input v-model="updateLog" type="textarea" :autosize="{minRows: 4,maxRows: 10}" placeholder="Upload log..." disabled></Input>
+
   </div>
 </template>
 
 <script>
   import CubeNav from '@/components/CubeNav';
-  import { Upload, Button } from 'iview';
+  import axios from 'axios';
 
   export default {
     name: 'INFO',
     components: {
       CubeNav,
-      Upload,
-      Button,
+    },
+    data() {
+      return {
+        uploadHost: process.env.UPLOAD_API,
+        updateLog: '',
+        energyPercent: 78,
+        storePercent: 30,
+        extraDataPie: { type: 'INFO-Pie' },
+        extraDataArdu: { type: 'INFO-Ardu' },
+        uploadedFilePath: '',
+      };
     },
     methods: {
       onRead(file, content) {
@@ -56,26 +65,80 @@
         // TODO: Send result to backend
         // TODO: Add upload success prompt
       },
+      fetchEnergyStatus() {
+        axios
+          .get(`${process.env.BACKEND_HOST}/hd_info`)
+          .then((response) => {
+            console.log(response.data);
+            const result = response.data;
+            this.storePercent = result[result.data_key];
+          })
+          .catch((err) => {
+            console.log(err.response);
+            this.$Message.error('Query energy status fail.');
+          });
+      },
+      fetchUpdateLog() {
+        axios
+          .get(`${process.env.BACKEND_HOST}/update_firmware_log`, {
+            validateStatus(status) {
+              return status < 400; // Reject only if the status code is greater than or equal to 400
+            },
+          })
+          .then((response) => {
+            console.log(response.data);
+            const result = response.data;
+            if (response.status === 304) {
+              this.$timer.stop('fetchUpdateLog');
+              this.$Message.success('Update finish.');
+              return;
+            }
+            this.updateLog = result[result.data_key];
+          })
+          .catch((err) => {
+            console.log(err.response);
+            this.$Message.error('Call process fail');
+          });
+      },
       // TODO: Deal with onClick logic.
-      onClick(index) {
-        console.log(index);
+      onClick() {
+        if (this.uploadedFilePath) {
+          axios
+          .post(`${process.env.BACKEND_HOST}/update_firmware`, { uploadedFilePath: this.uploadedFilePath })
+          .then((response) => {
+            console.log(response.data);
+            const result = response.data;
+            this.$Message.success(result.message);
+            // todo: start interval to fetch log
+            this.$timer.start('fetchUpdateLog');
+          })
+          .catch((err) => {
+            console.log(err.response);
+            this.$Message.error('Call process fail');
+          });
+        } else {
+          this.$Message.error('Please upload file before submit!');
+        }
       },
-      beforeUpload(file) {
-        // TODO: Add more feature argument
-        console.log(file);
+      onUploadSuccess(response, file) {
+        // todo: how to get file name of file, then set uploadedFilePath
+        // todo: send command with uploadedFilePath
+        this.uploadedFilePath = `/root/user_file/INFO/arduino/${file.name}`;
+        this.$Message.success(`Upload ${file.name} success`);
       },
-    },
-    data() {
-      return {
-        energyPercent: 68,
-        storePercent: 83,
-        extraDataPie: { type: 'INFO-Pie' },
-        extraDataArdu: { type: 'INFO-Ardu' },
-      };
+      onUploadError(error, file, fileList) {
+        console.error(error, file, fileList);
+        console.log(fileList.name);
+        this.$Message.error(`Upload ${fileList.name} fail`);
+      },
     },
     created() {
       // TODO: 初始化数据
       console.log(`items is: ${this.items}`);
+    },
+    timers: {
+      fetchUpdateLog: { time: 3000, autostart: false, repeat: true },
+      fetchEnergyStatus: { time: 3 * 1000, autostart: true, repeat: false },
     },
   };
 </script>
