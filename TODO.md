@@ -1,5 +1,17 @@
 - Store origin data when navigate to another page, and restore it when back to origin page.
 
+- AP List、Client List初始化为空
+- NFC Page 按钮关闭无操作
+- RF Page 里的TPMS数字输入框太窄
+
+- [Check All]for const of obj NOT for const in obj
+
+- INFO Update log 字体颜色太浅
+- WIFI 和 Client List
+  - 点击了下面任意按钮停止Scan
+  - WIFI 信道默认显示6
+- Client List 动态渲染
+
 - 不同页面间的数据传递：
   - NFC获取到数据后，通知RF界面展示通知
   - NFC页面生命周期会不会被destroy?

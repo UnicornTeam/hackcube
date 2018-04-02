@@ -104,27 +104,27 @@
       onClick() {
         if (this.uploadedFilePath) {
           axios
-            .get(`${process.env.BACKEND_HOST}/update_firmware/${this.uploadedFilePath}`)
-            .then((response) => {
-              console.log(response.data);
-              const result = response.data;
-              this.$Message.success(result.message);
-              // todo: start interval to fetch log
-              this.$timer.start('fetchUpdateLog');
-            })
-            .catch((err) => {
-              console.log(err.response);
-              this.$Message.error('Call process fail');
-            });
+          .post(`${process.env.BACKEND_HOST}/update_firmware`, { uploadedFilePath: this.uploadedFilePath })
+          .then((response) => {
+            console.log(response.data);
+            const result = response.data;
+            this.$Message.success(result.message);
+            // todo: start interval to fetch log
+            this.$timer.start('fetchUpdateLog');
+          })
+          .catch((err) => {
+            console.log(err.response);
+            this.$Message.error('Call process fail');
+          });
         } else {
           this.$Message.error('Please upload file before submit!');
         }
       },
-      onUploadSuccess(response, file, fileList) {
+      onUploadSuccess(response, file) {
         // todo: how to get file name of file, then set uploadedFilePath
         // todo: send command with uploadedFilePath
-        this.uploadedFilePath = `/root/user_file/arduino/${fileList.name}`;
-        this.$Message.success(`Upload ${fileList.name} success`);
+        this.uploadedFilePath = `/root/user_file/arduino/${file.name}`;
+        this.$Message.success(`Upload ${file.name} success`);
       },
       onUploadError(error, file, fileList) {
         console.error(error, file, fileList);

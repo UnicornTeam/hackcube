@@ -19,10 +19,10 @@
 
     <b-table :items="items" :fields="fields">
       <div slot="WRITE" slot-scope="data">
-        <van-switch v-model="items[data.index].WRITE" @change="onSwitchAction('write', items[data.index].VID, items[data.index].ID)" size="25px"/>
+        <van-switch v-model="items[data.index].WRITE" @change="onSwitchAction('nw', items[data.index].VID, items[data.index].ID)" size="25px"/>
       </div>
       <div slot="SIMULATE" slot-scope="data">
-        <van-switch v-model="items[data.index].SIMULATE" @change="onSwitchAction('simulate', items[data.index].VID, items[data.index].ID)" size="25px"/>
+        <van-switch v-model="items[data.index].SIMULATE" @change="onSwitchAction('ns', items[data.index].VID, items[data.index].ID)" size="25px"/>
       </div>
     </b-table>
 
@@ -162,6 +162,7 @@
         }
       },
       onSwitchAction(actionType, VID, ID) {
+        // TODO: 如果是关闭，直接关闭并return
         if (VID && ID) {
           const parameter = `${actionType}${VID}${ID}`;
           this.serialSend(parameter);
@@ -177,19 +178,19 @@
               this.writeSwitch = !this.writeSwitch;
             } else {
               const parameter = `${actionType}${this.writeVid}${this.writeId}`;
-              this.serialSend(actionType, parameter);
+              this.serialSend(parameter);
             }
             break;
           case 'ns':
             if (!(this.simulateVid && this.simulateId)) {
               this.$Message.error('请输入ID和VID');
               this.simulateSwitch = !this.simulateSwitch;
-            } else if ((isValidIds(this.simulateVid, this.simulateId))) {
+            } else if (!(isValidIds(this.simulateVid, this.simulateId))) {
               this.$Message.error('请输入规范的ID和VID');
-              this.writeSwitch = !this.simulateSwitch;
+              this.simulateSwitch = !this.simulateSwitch;
             } else {
               const parameter = `${actionType}${this.simulateVid}${this.simulateId}`;
-              this.serialSend(actionType, parameter);
+              this.serialSend(parameter);
             }
             break;
           default:

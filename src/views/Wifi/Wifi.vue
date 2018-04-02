@@ -22,20 +22,20 @@
       </b-row>
     </b-container>
 
-    <b-table :items="items" :fields="fields">
+    <b-table :items="ap_items" :fields="fields">
       <div slot="JAM" slot-scope="data">
-        <van-switch v-model="items[data.index].JAM"
-                    @change="onSwitch('ap_block', items[data.index].BSSID, data.index, items[data.index].JAM)" />
+        <van-switch v-model="ap_items[data.index].JAM"
+                    @change="onSwitch('ap_block', ap_items[data.index].BSSID, data.index, ap_items[data.index].JAM)" />
       </div>
     </b-table>
 
 
     <!-- Client list -->
     <h5>Client List</h5>
-    <b-table :items="items2" :fields="fields2">
+    <b-table :items="sta_items" :fields="fields2">
       <div slot="JAM" slot-scope="data">
-        <van-switch v-model="items2[data.index].JAM"
-                    @change="onSwitch('sta_block', items2[data.index].MAC, data.index, items2[data.index].JAM)" />
+        <van-switch v-model="sta_items[data.index].JAM"
+                    @change="onSwitch('sta_block', sta_items[data.index].MAC, data.index, sta_items[data.index].JAM)" />
       </div>
     </b-table>
   </div>
@@ -56,7 +56,7 @@ export default {
     return {
       scanStatus: 'off',
       fields: ['SSID', 'BSSID', 'RSSI', 'JAM'],
-      items: [
+      ap_items: [
         {
           Index: 0,
           SSID: '360WIFI-XX',
@@ -80,7 +80,7 @@ export default {
         },
       ],
       fields2: ['NAME', 'MAC', 'RSSI', 'JAM'],
-      items2: [
+      sta_items: [
         {
           Index: 0,
           NAME: 'iPhone',
@@ -160,7 +160,7 @@ export default {
               return;
             }
             // this.$Message.success('Fetch wifi list success.');
-            this.items = result[result.data_key];
+            this.ap_items = result[result.data_key];
           })
           .catch((err) => {
             console.log(err.response);
@@ -223,7 +223,7 @@ export default {
     // TODO: 初始化数据
     // TODO: Save the final fresh wifi list when leave page
     // TODO: And restore it when back to this page.
-    console.log(`items is: ${this.items}`);
+    console.log(`items is: ${this.ap_items}`);
     this.getChannelList();
   },
   timers: {

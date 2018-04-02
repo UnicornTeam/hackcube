@@ -1,21 +1,21 @@
 <template>
   <div class="board">
     <cube-nav/>
-    <b-alert :show="showARFAlert" variant="primary">
+    <b-alert :show="showARFAlert" variant="primary" dismissible>
       <h4 class="alert-heading">RF</h4>
       <p>
         频率{{latest_arf_item.频率}}发现协议为{{latest_arf_item.协议}}.数据内容为{{latest_arf_item.数据}}信号.
       </p>
     </b-alert>
 
-    <b-alert :show="showCRFAlert" variant="primary">
+    <b-alert :show="showCRFAlert" variant="primary" dismissible>
       <h4 class="alert-heading">RF</h4>
       <p>
         频率{{latest_crf_item.频率}}发现协议为{{latest_crf_item.协议}}.数据内容为{{latest_crf_item.数据}}信号.
       </p>
     </b-alert>
 
-    <b-alert :show="showNFCAlert" variant="success">
+    <b-alert :show="showNFCAlert" variant="success" dismissible>
       <h4 class="alert-heading">NFC</h4>
       <p>
         捕获卡号:{{latest_nfc_item.ID}}, <u href="#" @click="clickNFC">点击查看</u>
@@ -176,6 +176,7 @@
       },
       fetchData() {
         const dataAPIs = ['arf', 'crf'];
+        const that = this;
         for (const api of dataAPIs) {
           axios
             .get(`${process.env.BACKEND_HOST}/rf_item/${api}`, {
@@ -192,23 +193,23 @@
                 return;
               }
               const dataKey = result.data_key;
-              this.$Message.success('Detect new {} data.'.format(dataKey));
-              const isExist = this.rfItems.indexOf(result[dataKey]) !== -1;
+              that.$Message.success(`Detect new ${dataKey} data.`);
+              const isExist = that.rfItems.indexOf(result[dataKey]) !== -1;
               if (isExist) {
                 return;
               }
-              this.rfItems.unshift(result[dataKey]);
+              that.rfItems.unshift(result[dataKey]);
               if (dataKey === 'arf_item') {
-                this.latest_arf_item = result[dataKey];
-                this.showARFAlert = true;
+                that.latest_arf_item = result[dataKey];
+                that.showARFAlert = true;
               } else if (dataKey === 'crf_item') {
-                this.latest_crf_item = result[dataKey];
-                this.showCRFAlert = true;
+                that.latest_crf_item = result[dataKey];
+                that.showCRFAlert = true;
               }
             })
             .catch((err) => {
               console.log(err.response);
-              this.$Message.error(`Fetch ${api} data fail.`);
+              that.$Message.error(`Fetch ${api} data fail.`);
             });
         }
       },
@@ -224,19 +225,22 @@
             break;
           case 'tpms':
             // todo: send data to serial_send
-            if (!this.tpmsSwitch) {
-              return;
-            }
-            for (const item in this.tpmsItems) {
+            // if (!this.tpmsSwitch) {
+            //   return;
+            // }
+            for (const item of this.tpmsItems) {
               // todo: write test code
               if (!item.电压 && !item.压力 && !item.温度 && !item.气阀) {
+                console.log('continue tpmsItem');
                 // this.$Message.error('You need input one or more.');
                 return;
               }
-              const parameter = `t${item.ID}${item.电压}${item.压力}${item.温度}${item.气阀}`;
-              setTimeout(function timer() {
+              const parameter = `"t${item.ID}${item.电压}${item.压力}${item.温度}${item.气阀}"`;
+              // this.serialSend(parameter);
+              const that = this;
+              setTimeout(() => {
                 // todo: does it need promotion after per request send?
-                this.serialSend(parameter);
+                that.serialSend(parameter);
               }, 700);
             }
             this.$Message.success('Send all valid item to process!');
@@ -252,7 +256,7 @@
       onClick(index) {
         console.log(index);
         const item = this.rfItems[index];
-        const parameter = `rfreq:${item.频率};protocol:${item.协议};modulation:${item.调制};data:${item.数据}`;
+        const parameter = `"rfreq:${item.频率};protocol:${item.协议};modulation:${item.调制};data:${item.数据}"`;
         this.serialSend(parameter);
       },
     },
