@@ -19,10 +19,10 @@
 
     <b-table :items="items" :fields="fields">
       <div slot="WRITE" slot-scope="data">
-        <van-switch v-model="items[data.index].WRITE" @change="onSwitchAction('nw', items[data.index].VID, items[data.index].ID)" size="25px"/>
+        <van-switch v-model="items[data.index].WRITE" @change="onSwitchAction('nw', items[data.index].WRITE, items[data.index].VID, items[data.index].ID)" size="25px"/>
       </div>
       <div slot="SIMULATE" slot-scope="data">
-        <van-switch v-model="items[data.index].SIMULATE" @change="onSwitchAction('ns', items[data.index].VID, items[data.index].ID)" size="25px"/>
+        <van-switch v-model="items[data.index].SIMULATE" @change="onSwitchAction('ns', items[data.index].SIMULATE, items[data.index].VID, items[data.index].ID)" size="25px"/>
       </div>
     </b-table>
 
@@ -33,7 +33,7 @@
           <h5>Write</h5>
         </b-col>
         <b-col cols="3">
-          <van-switch v-model="writeSwitch" @change="onSwitchAction('nw')" size="25px"/>
+          <van-switch v-model="writeSwitch" @change="onSwitchAction('nw', writeSwitch)" size="25px"/>
         </b-col>
       </b-row>
     </b-container>
@@ -63,7 +63,7 @@
           <h5>Simulate</h5>
         </b-col>
         <b-col cols="3">
-          <van-switch v-model="simulateSwitch" @change="onSwitchAction('ns')" size="25px"/>
+          <van-switch v-model="simulateSwitch" @change="onSwitchAction('ns', simulateSwitch)" size="25px"/>
         </b-col>
       </b-row>
     </b-container>
@@ -77,7 +77,7 @@
                         placeholder="VID">
           </b-form-input>
         </b-col>
-        <b-col cols="8" style="padding-left: 0">
+        <b-col cols="8">
           <b-form-input v-model="simulateId"
                         type="text"
                         placeholder="ID">
@@ -161,8 +161,12 @@
           this.$timer.stop('fetchNFCData');
         }
       },
-      onSwitchAction(actionType, VID, ID) {
-        // TODO: 如果是关闭，直接关闭并return
+      onSwitchAction(actionType, isOpen, VID, ID) {
+      // TODO: 如果是关闭，直接关闭并return
+        if (!isOpen) {
+          return;
+        }
+
         if (VID && ID) {
           const parameter = `${actionType}${VID}${ID}`;
           this.serialSend(parameter);

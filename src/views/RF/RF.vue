@@ -225,9 +225,9 @@
             break;
           case 'tpms':
             // todo: send data to serial_send
-            // if (!this.tpmsSwitch) {
-            //   return;
-            // }
+            if (!this.tpmsSwitch) {
+              return;
+            }
             for (const item of this.tpmsItems) {
               // todo: write test code
               if (!item.电压 && !item.压力 && !item.温度 && !item.气阀) {
@@ -235,7 +235,7 @@
                 // this.$Message.error('You need input one or more.');
                 return;
               }
-              const parameter = `"t${item.ID}${item.电压}${item.压力}${item.温度}${item.气阀}"`;
+              const parameter = `t${item.ID}${item.电压}${item.压力}${item.温度}${item.气阀}`;
               // this.serialSend(parameter);
               const that = this;
               setTimeout(() => {
