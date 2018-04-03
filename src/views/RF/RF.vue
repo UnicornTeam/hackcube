@@ -56,17 +56,17 @@
     </b-container>
 
     <b-table responsive :items="tpmsItems" :fields="fields_input">
-      <div slot="voltage" slot-scope="data">
-        <b-form-input v-model="tpmsItems[data.index].voltage" type="text"></b-form-input>
+      <div slot="VOL" slot-scope="data">
+        <b-form-input v-model="tpmsItems[data.index].VOL" type="text"></b-form-input>
       </div>
-      <div slot="pressure" slot-scope="data">
-        <b-form-input v-model="tpmsItems[data.index].pressure" type="text"></b-form-input>
+      <div slot="PRESS" slot-scope="data">
+        <b-form-input v-model="tpmsItems[data.index].PRESS" type="text"></b-form-input>
       </div>
-      <div slot="TMP" slot-scope="data">
-        <b-form-input v-model="tpmsItems[data.index].TMP" type="text"></b-form-input>
+      <div slot="TEMP" slot-scope="data">
+        <b-form-input v-model="tpmsItems[data.index].TEMP" type="text"></b-form-input>
       </div>
-      <div slot='valve' slot-scope="data">
-        <b-form-input v-model="tpmsItems[data.index].valve" type="text"></b-form-input>
+      <div slot='VALVE' slot-scope="data">
+        <b-form-input v-model="tpmsItems[data.index].VALVE" type="text"></b-form-input>
       </div>
     </b-table>
 
@@ -135,13 +135,13 @@
         // if continue animate
         animate: true,
         fields_show: ['data', 'freq', 'prot', 'MOD', 'play'],
-        fields_input: ['ID', 'voltage', 'pressure', 'TMP', 'valve'],
+        fields_input: ['ID', 'VOL', 'PRESS', 'TEMP', 'VALVE'],
         rfItems: [],
         tpmsItems: [
-          { ID: '20959185', voltage: 'a0', pressure: '20', TMP: '60', valve: '08' },
-          { ID: 'eb107f85', voltage: 'a0', pressure: '20', TMP: '60', valve: '08' },
-          { ID: 'F0FB2385', voltage: 'a0', pressure: '20', TMP: '60', valve: '08' },
-          { ID: '2093ef85', voltage: 'a0', pressure: '20', TMP: '60', valve: '08' },
+          { ID: '20959185', VOL: 'a0', PRESS: '20', TEMP: '60', VALVE: '08' },
+          { ID: 'eb107f85', VOL: 'a0', PRESS: '20', TEMP: '60', VALVE: '08' },
+          { ID: 'F0FB2385', VOL: 'a0', PRESS: '20', TEMP: '60', VALVE: '08' },
+          { ID: '2093ef85', VOL: 'a0', PRESS: '20', TEMP: '60', VALVE: '08' },
         ],
         protocolList: [
           {
@@ -191,12 +191,14 @@
             }
           });
       },
-      serialSend(parameter) {
+      serialSend(parameter, isAlert) {
         axios
           .get(`${process.env.BACKEND_HOST}/serial_send/${parameter}`)
           .then((response) => {
             const result = response.data;
-            this.$Message.success(result.message);
+            if (isAlert === true) {
+              this.$Message.success(result.message);
+            }
           })
           .catch((err) => {
             if (err.response) {
@@ -280,7 +282,6 @@
             const result = response.data;
             // todo: write test code
             const dataKey = result.data_key;
-            that.$Message.success(result.message);
             // TODO: Check if need to translate to integer
             that.attackProgress = parseInt(result[dataKey], 0);
             if (that.attackProgress === 100) {
@@ -314,14 +315,13 @@
             }
             for (const item of this.tpmsItems) {
               // todo: write test code
-              if (!item.voltage && !item.pressure && !item.TMP && !item.valve) {
+              if (!item.VOL && !item.PRESS && !item.TEMP && !item.VALVE) {
                 return;
               }
-              const parameter = `t${item.ID}${item.voltage}${item.pressure}${item.TMP}${item.valve}`;
-              // this.serialSend(parameter);
+              const parameter = `t${item.ID}${item.VOL}${item.PRESS}${item.TEMP}${item.VALVE}`;
               const that = this;
               setTimeout(() => {
-                that.serialSend(parameter);
+                that.serialSend(parameter, true);
                 that.$Message.success(`Success put ${parameter}`);
               }, 700);
             }
@@ -329,6 +329,8 @@
             break;
           case 'attack':
             if (!this.attackSwitch) {
+              this.attackProgress = 0;
+              this.$timer.stop('getAttackProgress');
               return;
             }
             if (!this.attackValueLeft && this.attackValueRight) {
@@ -337,11 +339,11 @@
               return;
             }
             if (this.protocol === 'PT224X') {
-              const parameter = `rc2start${this.attackValueLeft}end${this.this.attackValueRight}`;
-              this.serialSend(parameter);
+              const parameter = `rc2start${this.attackValueLeft}end${this.attackValueRight}`;
+              this.serialSend(parameter, false);
             } else if (this.protocol === 'PT224X') {
-              const parameter = `rc1start${this.attackValueLeft}end${this.this.attackValueRight}`;
-              this.serialSend(parameter);
+              const parameter = `rc1start${this.attackValueLeft}end${this.attackValueRight}`;
+              this.serialSend(parameter, false);
             } else {
               this.$message.error('Please select right protocol.');
               return;
@@ -355,7 +357,7 @@
       onClick(index) {
         const item = this.rfItems[index];
         const parameter = `"rfreq:${item.freq};protocol:${item.prot};modulation:${item.MOD};data:${item.data}"`;
-        this.serialSend(parameter);
+        this.serialSend(parameter, true);
       },
     },
     created() {
