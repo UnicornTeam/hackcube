@@ -7,7 +7,7 @@
     <br/>
     <b-container>
       <b-row >
-        <b-col cols="4">
+        <b-col cols="5">
           <h5>WiFi List</h5>
         </b-col>
         <b-col cols="1"></b-col>
@@ -17,7 +17,8 @@
           </Select>
         </b-col>
         <b-col cols="1">
-          <b-button size="sm" variant="success" @click="onClickScan">Scan</b-button>
+          <b-button size="sm" variant="primary" v-if="scanStatus==='off'" @click="onClickScan">Scan</b-button>
+          <b-button size="sm" variant="danger" v-if="scanStatus==='on'" @click="onClickScan">Stop</b-button>
         </b-col>
       </b-row>
     </b-container>
@@ -29,7 +30,7 @@
                     data.index, ap_items[(apCurrentPage-1) * apPerPage + data.index].JAM)" />
       </div>
     </b-table>
-    <b-pagination v-if="ap_items.length" size="sm" :total-rows="ap_items.length" v-model="apCurrentPage" :per-page="apPerPage">
+    <b-pagination align="center" v-if="ap_items.length" size="sm" :total-rows="ap_items.length" v-model="apCurrentPage" :per-page="apPerPage">
     </b-pagination>
     <br/><br/>
 
@@ -42,7 +43,7 @@
                     data.index, sta_items[(staCurrentPage-1) * staPerPage + data.index].JAM)" />
       </div>
     </b-table>
-    <b-pagination v-if="sta_items.length" size="sm" :total-rows="sta_items.length" v-model="staCurrentPage" :per-page="staPerPage">
+    <b-pagination align="center" v-if="sta_items.length" size="sm" :total-rows="sta_items.length" v-model="staCurrentPage" :per-page="staPerPage">
     </b-pagination>
   </div>
 </template>
