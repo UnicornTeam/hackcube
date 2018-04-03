@@ -144,17 +144,16 @@
           })
           .then((response) => {
             const result = response.data;
-            console.log(result);
             if (response.status === 304) {
               return;
             }
             this.latest_nfc_item = result[result.data_key];
             this.showNFCAlert = true;
-            this.$Message.info('Detect new nfc data.');
+            this.$Message.info(result.message);
           })
           .catch((err) => {
-            console.log(err.response);
-            this.$Message.error('Fetch nfc data fail.');
+            const message = err.response.data.message;
+            this.$Message.error(message);
           });
       },
       serialSend(parameter) {
@@ -162,12 +161,11 @@
           .get(`${process.env.BACKEND_HOST}/serial_send/${parameter}`)
           .then((response) => {
             const result = response.data;
-            console.log(result);
-            this.$Message.success('Execute success.');
+            this.$Message.success(result.message);
           })
           .catch((err) => {
-            console.log(err.response);
-            this.$Message.error('Execute fail.');
+            const message = err.response.data.message;
+            this.$Message.error(message);
           });
       },
       fetchRFItem() {
@@ -183,12 +181,11 @@
             .then((response) => {
               const result = response.data;
               // todo: write test code
-              console.log(result);
               if (response.status === 304) {
                 return;
               }
               const dataKey = result.data_key;
-              that.$Message.success(`Detect new ${dataKey} data.`);
+              that.$Message.success(result.message);
               const isExist = that.rfItems.indexOf(result[dataKey]) !== -1;
               if (isExist) {
                 return;
@@ -203,8 +200,8 @@
               }
             })
             .catch((err) => {
-              console.log(err.response);
-              that.$Message.error(`Fetch ${api} data fail.`);
+              const message = err.response.data.message;
+              this.$Message.error(message);
             });
         }
       },
@@ -218,21 +215,20 @@
           .then((response) => {
             const result = response.data;
             // todo: write test code
-            console.log(result);
             const dataKey = result.data_key;
             // todo: add Transition animation
-            that.$Message.success(`Detect new ${dataKey} data.`);
+            that.$Message.success(result.message);
             that.rfItems = that.rfItems.concat(result[dataKey]);
             this.spinShow = false;
           })
           .catch((err) => {
-            console.log(err.response);
-            that.$Message.error(`Fetch ${api} data fail.`);
+            this.spinShow = false;
+            const message = err.response.data.message;
+            this.$Message.error(message);
           });
         }
       },
       onSwitch(switchType) {
-        console.log(switchType);
         switch (switchType) {
           case 'sniffer':
             if (this.snifferSwitch) {
@@ -250,8 +246,6 @@
             for (const item of this.tpmsItems) {
               // todo: write test code
               if (!item.voltage && !item.pressure && !item.temperature && !item.valve) {
-                console.log('continue tpmsItem');
-                // this.$Message.error('You need input one or more.');
                 return;
               }
               const parameter = `t${item.ID}${item.voltage}${item.pressure}${item.temperature}${item.valve}`;
@@ -272,7 +266,6 @@
         }
       },
       onClick(index) {
-        console.log(index);
         const item = this.rfItems[index];
         const parameter = `"rfreq:${item.freq};protocol:${item.protocol};modulation:${item.modulation};data:${item.data}"`;
         this.serialSend(parameter);

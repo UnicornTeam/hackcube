@@ -64,13 +64,12 @@
         axios
           .get(`${process.env.BACKEND_HOST}/hd_info`)
           .then((response) => {
-            console.log(response.data);
             const result = response.data;
             this.storePercent = result[result.data_key];
           })
           .catch((err) => {
-            console.log(err.response);
-            this.$Message.error('Query energy status fail.');
+            const message = err.response.data.message;
+            this.$Message.error(message);
           });
       },
       fetchUpdateLog() {
@@ -82,7 +81,6 @@
             },
           })
           .then((response) => {
-            console.log(response.data);
             const result = response.data;
             if (response.status === 304) {
               this.$timer.stop('fetchUpdateLog');
@@ -93,8 +91,9 @@
             this.updateLog = result[result.data_key];
           })
           .catch((err) => {
-            console.log(err.response);
-            this.$Message.error('Call process fail');
+            this.spinShow = false;
+            const message = err.response.data.message;
+            this.$Message.error(message);
           });
       },
       onClick() {
@@ -102,14 +101,13 @@
           axios
           .post(`${process.env.BACKEND_HOST}/update_firmware`, { uploadedFilePath: this.uploadedFilePath })
           .then((response) => {
-            console.log(response.data);
             const result = response.data;
             this.$Message.success(result.message);
             this.$timer.start('fetchUpdateLog');
           })
           .catch((err) => {
-            console.log(err.response);
-            this.$Message.error('Call process fail');
+            const message = err.response.data.message;
+            this.$Message.error(message);
           });
         } else {
           this.$Message.error('Please upload file before submit!');
@@ -120,8 +118,6 @@
         this.$Message.success(`Upload ${file.name} success`);
       },
       onUploadError(error, file, fileList) {
-        console.error(error, file, fileList);
-        console.log(fileList.name);
         this.$Message.error(`Upload ${fileList.name} fail`);
       },
     },

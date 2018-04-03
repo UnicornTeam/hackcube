@@ -126,7 +126,6 @@
           })
           .then((response) => {
             const result = response.data;
-            console.log(result);
             if (response.status === 304) {
               return;
             }
@@ -134,21 +133,20 @@
             this.$Message.info('Detect new nfc data.');
           })
           .catch((err) => {
-            console.log(err.response);
-            this.$Message.error('Fetch nfc data fail.');
+            const message = err.response.data.message;
+            this.$Message.error(message);
           });
       },
       serialSend(parameter) {
         axios
           .get(`${process.env.BACKEND_HOST}/serial_send/${parameter}`)
           .then((response) => {
-            const result = response.data;
-            console.log(result);
-            this.$Message.success('Execute success.');
+            const message = response.data.message;
+            this.$Message.success(message);
           })
           .catch((err) => {
-            console.log(err.response);
-            this.$Message.error('Execute fail.');
+            const message = err.response.data.message;
+            this.$Message.error(message);
           });
       },
       onSwitchRead(checked) {

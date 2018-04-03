@@ -53,13 +53,12 @@
           axios
             .get(`${process.env.BACKEND_HOST}/serial_send/${parameter}`)
             .then((response) => {
-              const result = response.data;
-              console.log(result);
-              this.$Message.success('Execute success.');
+              const message = response.data.message;
+              this.$Message.success(message);
             })
             .catch((err) => {
-              console.log(err.response);
-              this.$Message.error('Execute fail.');
+              const message = err.response.data.message;
+              this.$Message.error(message);
             });
         },
         onClickSubmit() {
@@ -70,7 +69,6 @@
           }
         },
         onClick(index) {
-          console.log(index);
           switch (index) {
             case 0:
               this.serialSend('ha');
@@ -85,12 +83,10 @@
               break;
           }
         },
-        onUploadSuccess(response) {
-          console.log(response);
+        onUploadSuccess() {
           this.$Message.success('Upload success');
         },
-        onUploadFail(err) {
-          console.log(err);
+        onUploadFail() {
           this.$Message.error('Upload fail');
         },
       },

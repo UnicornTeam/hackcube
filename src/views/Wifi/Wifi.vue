@@ -84,19 +84,17 @@ export default {
   },
   methods: {
     onSwitch(api, value, index, isOpen) {
-      console.log(api, value, index, isOpen);
       this.$timer.stop('fetchWifiList');
       const action = isOpen ? 'on' : 'off';
       axios
         .get(`${process.env.BACKEND_HOST}/${api}/${value}/${action}`)
         .then((response) => {
-          console.log(response.data);
           const result = response.data;
           this.$Message.success(result.message);
         })
         .catch((err) => {
-          console.log(err.response);
-          this.$Message.error('Call process fail');
+          const message = err.response.data.message;
+          this.$Message.error(message);
         });
     },
     onClickScan() {
@@ -108,9 +106,7 @@ export default {
         .get(
           `${process.env.BACKEND_HOST}/wifi_scan/${this.scanStatus}/${channel}`,
         )
-        .then((response) => {
-          const result = response.data;
-          console.log(result);
+        .then(() => {
           if (this.scanStatus === 'on') {
             this.$timer.start('fetchWifiList');
             this.$Message.info('Start scan WiFi.');
@@ -122,8 +118,8 @@ export default {
           }
         })
         .catch((err) => {
-          console.log(err.response);
-          this.$Message.error(err);
+          const message = err.response.data.message;
+          this.$Message.error(message);
         });
     },
     fetchWifiList() {
@@ -138,7 +134,6 @@ export default {
             })
             .then((response) => {
               const result = response.data;
-              console.log(result);
               if (response.status === 304) {
                 this.apSpinShow = false;
                 this.staSpinShow = false;
@@ -154,8 +149,10 @@ export default {
               }
             })
             .catch((err) => {
-              console.log(err.response);
-              this.$Message.error('Fetch wifi list fail.');
+              const message = err.response.data.message;
+              this.$Message.error(message);
+              this.apSpinShow = false;
+              this.staSpinShow = false;
             });
         }
       }
@@ -214,7 +211,6 @@ export default {
   created() {
     // TODO: Save the final fresh wifi list when leave page
     // TODO: And restore it when back to this page.
-    console.log(`items is: ${this.ap_items}`);
     this.getChannelList();
   },
   timers: {
