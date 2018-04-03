@@ -8,7 +8,7 @@ Done [Check All]for const of obj NOT for const in obj
 
 TODO: INFO Update log 字体颜色太浅
 DONE: WIFI Scan条件渲染
-TODO: RF RF通知点击下滑
+DONE: RF RF通知点击下滑
 TODO: 改为全英文
 DONE: WIFI滑动抖动
 DONE: 导航的UI改进

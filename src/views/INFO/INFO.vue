@@ -31,7 +31,7 @@
 
     <br/>
 
-    <Input v-model="updateLog" type="textarea" :autosize="{minRows: 4,maxRows: 10}" placeholder="Upload log..." disabled></Input>
+    <Input v-model="updateLog" type="textarea" :autosize="{minRows: 4,maxRows: 10}" placeholder="Upload log..."></Input>
 
   </div>
 </template>
