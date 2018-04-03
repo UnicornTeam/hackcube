@@ -2,7 +2,7 @@
   <div>
     <nav>
       <b-nav full tabs>
-        <b-nav-item to="/">WIFI</b-nav-item>
+        <b-nav-item to="/wifi">WIFI</b-nav-item>
         <!--<b-nav-item to="bt">BT</b-nav-item>-->
         <b-nav-item to="nfc">NFC</b-nav-item>
         <b-nav-item to="rf">RF</b-nav-item>
@@ -17,7 +17,7 @@
                :show="showDismissibleAlert"
                @dismissed="showDismissibleAlert=false">
         <h4>Warning!</h4>
-        <p>本设备仅限风险演示,请您注意自觉遵守相关法律法规.</p>
+        <p>This equipment is limited to risk demonstration, please pay attention to consciously abide by relevant laws and regulations.</p>
       </b-alert>
     </div>
   </div>
