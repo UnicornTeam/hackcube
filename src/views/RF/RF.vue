@@ -4,14 +4,14 @@
     <b-alert :show="showARFAlert" variant="primary" dismissible>
       <h4 class="alert-heading">RF</h4>
       <p>
-        In frequency {{latest_arf_item.freq}} found protocol: {{latest_arf_item.protocol}}, data: {{latest_arf_item.data}} signal.<a href="#content">Learn More.</a>
+        In frequency {{latest_arf_item.freq}} found prot: {{latest_arf_item.prot}}, data: {{latest_arf_item.data}} signal.<a href="#content">Learn More.</a>
       </p>
     </b-alert>
 
     <b-alert :show="showCRFAlert" variant="primary" dismissible>
       <h4 class="alert-heading">RF</h4>
       <p>
-        In frequency {{latest_crf_item.freq}} found protocol: {{latest_crf_item.protocol}}, data: {{latest_crf_item.data}} signal.<a href="#content">Learn More.</a>
+        In frequency {{latest_crf_item.freq}} found prot: {{latest_crf_item.prot}}, data: {{latest_crf_item.data}} signal.<a href="#content">Learn More.</a>
       </p>
     </b-alert>
 
@@ -36,8 +36,8 @@
       </b-row>
     </b-container>
     <div>
-      <b-table responsive :items="rfItems" :fields="fields_show">
-        <div slot="playback" slot-scope="data">
+      <b-table :items="rfItems" :fields="fields_show">
+        <div slot="play" slot-scope="data">
           <b-button size="sm" variant="primary" @click="onClick(data.index)">Run</b-button>
         </div>
       </b-table>
@@ -114,7 +114,7 @@
         attackSwitch: false,
         // if continue animate
         animate: true,
-        fields_show: ['data', 'freq', 'protocol', 'modulation', 'playback'],
+        fields_show: ['data', 'freq', 'prot', 'MOD', 'play'],
         fields_input: ['ID', 'voltage', 'pressure', 'temperature', 'valve'],
         rfItems: [],
         tpmsItems: [
@@ -279,7 +279,7 @@
       },
       onClick(index) {
         const item = this.rfItems[index];
-        const parameter = `"rfreq:${item.freq};protocol:${item.protocol};modulation:${item.modulation};data:${item.data}"`;
+        const parameter = `"rfreq:${item.freq};protocol:${item.prot};modulation:${item.MOD};data:${item.data}"`;
         this.serialSend(parameter);
       },
     },
@@ -297,6 +297,21 @@
   };
 </script>
 
-<style scoped>
-
+<style>
+  /*td[aria-colindex] {*/
+    /*max-width: 30px!important;*/
+    /*word-wrap: break-word;*/
+    /*padding-right: 4px!important;*/
+    /*padding-left: 4px!important;*/
+    /*text-align:center;*/
+    /*vertical-align:middle;*/
+  /*}*/
+  td[aria-colindex] {
+    max-width: 6em;
+    word-wrap: break-word;
+    padding-right: 4px;
+    padding-left: 4px;
+    text-align:center;
+    vertical-align:middle;
+  }
 </style>

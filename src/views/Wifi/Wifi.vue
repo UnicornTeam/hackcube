@@ -228,5 +228,15 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
+  td[aria-colindex] {
+    overflow: hidden!important;
+    text-overflow:ellipsis!important;
+    white-space: nowrap!important;
+    max-width: 6em;
+    padding-right: 4px;
+    padding-left: 4px;
+    text-align:center;
+    vertical-align:middle;
+  }
 </style>

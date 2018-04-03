@@ -8,3 +8,4 @@ Release 2018.4.3 Note:
 - 解决INFO页面更新日志字体过浅的问题
 - WIFI页面表格Pagination改为居中显示
 - 改进错误提示信息
+- 修改sta_list 中的not associate 为None

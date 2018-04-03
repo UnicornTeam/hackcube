@@ -6,6 +6,9 @@ DONE RF Page 里的TPMS数字输入框太窄
 
 Done [Check All]for const of obj NOT for const in obj
 TODO: Request Fail 次数达到上限停止请求
+TODO：切换页面时，发送停止指令再跳转走
+TODO: WiFi页面切出后 再切回 恢复状态 检测WIFI 文件是否为空
+TODO: RF 页面表头缩写
 DONE: 添加动画
 DONE: INFO Update log 字体颜色太浅
 DONE: WIFI Scan条件渲染

@@ -35,16 +35,16 @@ div.board {
   margin-left: 10px;margin-right: 10px;
 }
 
-tr[aria-colindex] td[aria-colindex] {
+/*td[aria-colindex] {*/
   /*overflow: hidden!important;*/
-  text-overflow:ellipsis!important;
-  white-space: nowrap!important;
-  max-width: 10em!important;
-  padding-right: 4px!important;
-  padding-left: 4px!important;
-  text-align:center;
-  vertical-align:middle;
-}
+  /*text-overflow:ellipsis!important;*/
+  /*white-space: nowrap!important;*/
+  /*max-width: 8em!important;*/
+  /*padding-right: 4px!important;*/
+  /*padding-left: 4px!important;*/
+  /*text-align:center;*/
+  /*vertical-align:middle;*/
+/*}*/
 
 td[aria-colindex] > div {
   min-width: 40px;
