@@ -22,27 +22,32 @@
         </b-col>
       </b-row>
     </b-container>
-
-    <b-table :items="ap_items" :fields="fields" :per-page="apPerPage" :current-page="apCurrentPage">
-      <div slot="JAM" slot-scope="data">
-        <van-switch v-model="ap_items[(apCurrentPage-1) * apPerPage + data.index].JAM"
-                    @change="onSwitch('ap_block', ap_items[(apCurrentPage-1) * apPerPage + data.index].BSSID,
-                    data.index, ap_items[(apCurrentPage-1) * apPerPage + data.index].JAM)" />
-      </div>
-    </b-table>
-    <b-pagination align="center" v-if="ap_items.length" size="sm" :total-rows="ap_items.length" v-model="apCurrentPage" :per-page="apPerPage">
-    </b-pagination>
+    <div>
+      <b-table :items="ap_items" :fields="fields" :per-page="apPerPage" :current-page="apCurrentPage">
+        <div slot="JAM" slot-scope="data">
+          <van-switch v-model="ap_items[(apCurrentPage-1) * apPerPage + data.index].JAM"
+                      @change="onSwitch('ap_block', ap_items[(apCurrentPage-1) * apPerPage + data.index].BSSID,
+                      data.index, ap_items[(apCurrentPage-1) * apPerPage + data.index].JAM)" />
+        </div>
+      </b-table>
+      <b-pagination align="center" v-if="ap_items.length" size="sm" :total-rows="ap_items.length" v-model="apCurrentPage" :per-page="apPerPage">
+      </b-pagination>
+      <Spin fix v-if="apSpinShow"></Spin>
+    </div>
     <br/><br/>
 
     <!-- Client list -->
     <h5>Client List</h5>
-    <b-table :items="sta_items" :fields="fields2" :per-page="staPerPage" :current-page="staCurrentPage">
-      <div slot="JAM" slot-scope="data">
-        <van-switch v-model="sta_items[(staCurrentPage-1) * staPerPage + data.index].JAM"
-                    @change="onSwitch('sta_block', sta_items[(staCurrentPage-1) * staPerPage + data.index].MAC,
-                    data.index, sta_items[(staCurrentPage-1) * staPerPage + data.index].JAM)" />
-      </div>
-    </b-table>
+    <div>
+      <b-table :items="sta_items" :fields="fields2" :per-page="staPerPage" :current-page="staCurrentPage">
+        <div slot="JAM" slot-scope="data">
+          <van-switch v-model="sta_items[(staCurrentPage-1) * staPerPage + data.index].JAM"
+                      @change="onSwitch('sta_block', sta_items[(staCurrentPage-1) * staPerPage + data.index].MAC,
+                      data.index, sta_items[(staCurrentPage-1) * staPerPage + data.index].JAM)" />
+        </div>
+      </b-table>
+      <Spin fix v-if="staSpinShow"></Spin>
+    </div>
     <b-pagination align="center" v-if="sta_items.length" size="sm" :total-rows="sta_items.length" v-model="staCurrentPage" :per-page="staPerPage">
     </b-pagination>
   </div>
@@ -61,6 +66,8 @@ export default {
   },
   data() {
     return {
+      apSpinShow: false,
+      staSpinShow: false,
       scanStatus: 'off',
       fields: ['SSID', 'BSSID', 'RSSI', 'JAM'],
       ap_items: [],
@@ -107,6 +114,8 @@ export default {
           if (this.scanStatus === 'on') {
             this.$timer.start('fetchWifiList');
             this.$Message.info('Start scan WiFi.');
+            this.apSpinShow = true;
+            this.staSpinShow = true;
           } else if (this.scanStatus === 'off') {
             this.$timer.stop('fetchWifiList');
             this.$Message.info('Stop scan WiFi.');
@@ -131,13 +140,17 @@ export default {
               const result = response.data;
               console.log(result);
               if (response.status === 304) {
+                this.apSpinShow = false;
+                this.staSpinShow = false;
                 return;
               }
               // this.$Message.success('Fetch wifi list success.');
               if (api === 'ap_list') {
                 this.ap_items = result[result.data_key];
+                this.apSpinShow = false;
               } else {
                 this.sta_items = result[result.data_key];
+                this.staSpinShow = false;
               }
             })
             .catch((err) => {

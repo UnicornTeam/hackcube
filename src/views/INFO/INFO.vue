@@ -30,8 +30,10 @@
     </div>
 
     <br/>
-
-    <Input v-model="updateLog" type="textarea" :autosize="{minRows: 4,maxRows: 10}" placeholder="Upload log..."></Input>
+    <div>
+      <Input readonly v-model="updateLog" type="textarea" :autosize="{minRows: 6,maxRows: 14}" placeholder="Upload log..."></Input>
+      <Spin fix v-if="spinShow"></Spin>
+    </div>
 
   </div>
 </template>
@@ -47,6 +49,7 @@
     },
     data() {
       return {
+        spinShow: false,
         uploadHost: process.env.UPLOAD_API,
         updateLog: '',
         energyPercent: 78,
@@ -71,6 +74,7 @@
           });
       },
       fetchUpdateLog() {
+        this.spinShow = true;
         axios
           .get(`${process.env.BACKEND_HOST}/update_firmware_log`, {
             validateStatus(status) {
@@ -83,6 +87,7 @@
             if (response.status === 304) {
               this.$timer.stop('fetchUpdateLog');
               this.$Message.info('Update finish.');
+              this.spinShow = false;
               return;
             }
             this.updateLog = result[result.data_key];
@@ -121,7 +126,7 @@
       },
     },
     timers: {
-      fetchUpdateLog: { time: 3000, autostart: false, repeat: true },
+      fetchUpdateLog: { time: 100, autostart: false, repeat: true },
       fetchStorageStatus: { time: 0, autostart: true, repeat: false },
     },
   };

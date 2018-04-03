@@ -35,13 +35,14 @@
         </b-col>
       </b-row>
     </b-container>
-    <!--<div id='content'>-->
+    <div>
       <b-table responsive :items="rfItems" :fields="fields_show">
         <div slot="playback" slot-scope="data">
           <b-button size="sm" variant="primary" @click="onClick(data.index)">Run</b-button>
         </div>
       </b-table>
-    <!--</div>-->
+      <Spin fix v-if="spinShow"></Spin>
+    </div>
 
     <b-container>
       <b-row align-h="between">
@@ -101,6 +102,7 @@
     },
     data() {
       return {
+        spinShow: true,
         latest_nfc_item: '',
         showNFCAlert: false,
         latest_arf_item: '',
@@ -207,6 +209,7 @@
         }
       },
       fetchAllRFItems() {
+        this.spinShow = true;
         const dataAPIs = ['arf', 'crf'];
         const that = this;
         for (const api of dataAPIs) {
@@ -220,6 +223,7 @@
             // todo: add Transition animation
             that.$Message.success(`Detect new ${dataKey} data.`);
             that.rfItems = that.rfItems.concat(result[dataKey]);
+            this.spinShow = false;
           })
           .catch((err) => {
             console.log(err.response);
