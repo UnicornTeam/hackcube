@@ -152,8 +152,11 @@
             this.$Message.info(result.message);
           })
           .catch((err) => {
-            const message = err.response.data.message;
-            this.$Message.error(message);
+            if (err.response) {
+              this.$Message.error(err.response.data.message);
+            } else {
+              this.$Message.error('Request fail');
+            }
           });
       },
       serialSend(parameter) {
@@ -164,8 +167,11 @@
             this.$Message.success(result.message);
           })
           .catch((err) => {
-            const message = err.response.data.message;
-            this.$Message.error(message);
+            if (err.response) {
+              this.$Message.error(err.response.data.message);
+            } else {
+              this.$Message.error('Request fail');
+            }
           });
       },
       fetchRFItem() {
@@ -200,8 +206,11 @@
               }
             })
             .catch((err) => {
-              const message = err.response.data.message;
-              this.$Message.error(message);
+              if (err.response) {
+                this.$Message.error(err.response.data.message);
+              } else {
+                this.$Message.error('Request fail');
+              }
             });
         }
       },
@@ -223,8 +232,11 @@
           })
           .catch((err) => {
             this.spinShow = false;
-            const message = err.response.data.message;
-            this.$Message.error(message);
+            if (err.response) {
+              this.$Message.error(err.response.data.message);
+            } else {
+              this.$Message.error('Request fail');
+            }
           });
         }
       },

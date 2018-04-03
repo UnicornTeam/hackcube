@@ -68,8 +68,11 @@
             this.storePercent = result[result.data_key];
           })
           .catch((err) => {
-            const message = err.response.data.message;
-            this.$Message.error(message);
+            if (err.response) {
+              this.$Message.error(err.response.data.message);
+            } else {
+              this.$Message.error('Request fail');
+            }
           });
       },
       fetchUpdateLog() {
@@ -92,8 +95,11 @@
           })
           .catch((err) => {
             this.spinShow = false;
-            const message = err.response.data.message;
-            this.$Message.error(message);
+            if (err.response) {
+              this.$Message.error(err.response.data.message);
+            } else {
+              this.$Message.error('Request fail');
+            }
           });
       },
       onClick() {
@@ -106,8 +112,11 @@
             this.$timer.start('fetchUpdateLog');
           })
           .catch((err) => {
-            const message = err.response.data.message;
-            this.$Message.error(message);
+            if (err.response) {
+              this.$Message.error(err.response.data.message);
+            } else {
+              this.$Message.error('Request fail');
+            }
           });
         } else {
           this.$Message.error('Please upload file before submit!');

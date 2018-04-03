@@ -57,8 +57,11 @@
               this.$Message.success(message);
             })
             .catch((err) => {
-              const message = err.response.data.message;
-              this.$Message.error(message);
+              if (err.response) {
+                this.$Message.error(err.response.data.message);
+              } else {
+                this.$Message.error('Request fail');
+              }
             });
         },
         onClickSubmit() {

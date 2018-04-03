@@ -93,8 +93,11 @@ export default {
           this.$Message.success(result.message);
         })
         .catch((err) => {
-          const message = err.response.data.message;
-          this.$Message.error(message);
+          if (err.response) {
+            this.$Message.error(err.response.data.message);
+          } else {
+            this.$Message.error('Request fail');
+          }
         });
     },
     onClickScan() {
@@ -118,8 +121,11 @@ export default {
           }
         })
         .catch((err) => {
-          const message = err.response.data.message;
-          this.$Message.error(message);
+          if (err.response) {
+            this.$Message.error(err.response.data.message);
+          } else {
+            this.$Message.error('Request fail');
+          }
         });
     },
     fetchWifiList() {
@@ -149,10 +155,13 @@ export default {
               }
             })
             .catch((err) => {
-              const message = err.response.data.message;
-              this.$Message.error(message);
               this.apSpinShow = false;
               this.staSpinShow = false;
+              if (err.response) {
+                this.$Message.error(err.response.data.message);
+              } else {
+                this.$Message.error('Request fail');
+              }
             });
         }
       }
