@@ -7,13 +7,15 @@ DONE RF Page 里的TPMS数字输入框太窄
 Done [Check All]for const of obj NOT for const in obj
 
 TODO: INFO Update log 字体颜色太浅
-TODO: WIFI Scan条件渲染
+DONE: WIFI Scan条件渲染
 TODO: RF RF通知点击下滑
 TODO: 改为全英文
-TODO: WIFI滑动抖动
+DONE: WIFI滑动抖动
 TODO: 导航的UI改进
 TODO: 进入RF页面时读取/root/serial_file/data/aRF_Keeloq_data 和 cRF_24l01_data全部内容来初始化表格
-TODO: Pagination 居中
+DONE: Pagination 居中
+TODO: TPMS switch no empty check
+
 Done WIFI 和 Client List
   DONE 点击了下面任意按钮停止Scan
   DONE WIFI 信道默认显示6

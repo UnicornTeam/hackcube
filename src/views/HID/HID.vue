@@ -20,7 +20,7 @@
     <h5>Script</h5>
     <b-table :items="items" :fields="fields">
       <div slot="Run" slot-scope="data">
-        <b-button size="sm" variant="success" @click="onClick(data.index)">Run</b-button>
+        <b-button size="sm" variant="primary" @click="onClick(data.index)">Run</b-button>
       </div>
     </b-table>
   </div>

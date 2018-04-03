@@ -38,7 +38,7 @@
 
     <b-table :items="rfItems" :fields="fields_show">
       <div slot="重放" slot-scope="data">
-        <b-button size="sm" variant="success" @click="onClick(data.index)">Run</b-button>
+        <b-button size="sm" variant="primary" @click="onClick(data.index)">Run</b-button>
       </div>
     </b-table>
 

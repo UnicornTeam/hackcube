@@ -18,6 +18,10 @@ body {
   overflow: hidden;
 }
 
+.van-switch--on {
+  background-color: #57a3f3;
+}
+
 div.van-switch {
   font-size: 25px!important;
 }
