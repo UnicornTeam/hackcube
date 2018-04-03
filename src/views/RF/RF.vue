@@ -276,13 +276,12 @@
     },
     created() {
       if (this.snifferSwitch) {
-        this.$timer.start('fetchAllRFItems');
         this.$timer.start('fetchRFItem');
         this.$timer.start('fetchNFCData');
       }
     },
     timers: {
-      fetchAllRFItems: { time: 3000, autostart: false, repeat: false },
+      fetchAllRFItems: { time: 0, autostart: true, repeat: false },
       fetchRFItem: { time: 3000, autostart: false, repeat: true },
       fetchNFCData: { time: 3000, autostart: false, repeat: true },
     },

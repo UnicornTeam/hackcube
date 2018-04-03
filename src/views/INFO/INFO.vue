@@ -57,7 +57,7 @@
       };
     },
     methods: {
-      fetchEnergyStatus() {
+      fetchStorageStatus() {
         axios
           .get(`${process.env.BACKEND_HOST}/hd_info`)
           .then((response) => {
@@ -122,7 +122,7 @@
     },
     timers: {
       fetchUpdateLog: { time: 3000, autostart: false, repeat: true },
-      fetchEnergyStatus: { time: 3 * 1000, autostart: true, repeat: false },
+      fetchStorageStatus: { time: 0, autostart: true, repeat: false },
     },
   };
 </script>
