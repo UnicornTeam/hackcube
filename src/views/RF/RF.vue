@@ -100,7 +100,20 @@
         </b-col>
       </b-row>
     </b-container>
-    <br/><br/><br/><br/>
+    <br/><br/>
+    <b-container>
+      <b-row class="justify-content-md-center">
+        <b-col col lg="2">
+          <!-- TODO: Finish onclick and long tap -->
+          <b-button variant="ghost">A</b-button>
+        </b-col>
+        <b-col cols="4" md="auto">Center</b-col>
+        <b-col col lg="2">
+          <b-button variant="ghost">D</b-button>
+        </b-col>
+      </b-row>
+    </b-container>
+    <br/><br/>
   </div>
 </template>
 
