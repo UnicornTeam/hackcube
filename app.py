@@ -102,6 +102,64 @@ def get_nfc_item():
                                  })
 
 
+@app.route("/all_rf_item/<string:msg_type>", methods=['GET'])
+def get_all_rf_item(msg_type):
+    result_items = []
+    data_key = msg_type + "_item"
+    if msg_type == 'arf':
+        file_path = app.config['ARF_DATA_FILE']
+    elif msg_type == 'crf':
+        file_path = app.config['CRF_DATA_FILE']
+    else:
+        return simplejson.dumps({'status': 'fail',
+                                 'api': 'all_rf_item',
+                                 'parameter': msg_type,
+                                 'message': 'Call all_rf_item fail.parameter msg_type error.',
+                                 data_key: result_items,
+                                 'data_key': data_key
+                                 }), status.HTTP_400_BAD_REQUEST
+
+    with open(file_path, 'r') as f:
+        lines = f.readlines()
+    while lines and not lines[-1].strip():
+        del lines[-1]
+    if not lines:
+        return simplejson.dumps({'status': 'fail',
+                                 'api': 'all_rf_item',
+                                 'parameter': msg_type,
+                                 'message': 'Call all_rf_item fail.Item not exist.',
+                                 data_key: result_items,
+                                 'data_key': data_key
+                                 }), status.HTTP_404_NOT_FOUND
+
+    for line in lines:
+        s = line.split(';')
+        if len(s) != 4:
+            return simplejson.dumps({'status': 'fail',
+                                     'api': 'all_rf_item',
+                                     'parameter': msg_type,
+                                     'message': 'Call all_rf_item fail.Item format error.',
+                                     data_key: result_items,
+                                     'data_key': data_key
+                                     }), status.HTTP_404_NOT_FOUND
+        result_item = {
+            'freq': s[0].split(':')[-1],
+            'protocol': s[1].split(':')[-1],
+            'modulation': s[2].split(':')[-1],
+            'data': s[3].split(':')[-1],
+            'playback': False,
+            'msg_type': msg_type
+        }
+        result_items.append(result_item)
+    return simplejson.dumps({'status': 'success',
+                             'api': 'all_rf_item',
+                             'parameter': msg_type,
+                             'message': 'Call all_rf_item success.',
+                             data_key: result_items,
+                             'data_key': data_key
+                             })
+
+
 @app.route("/rf_item/<string:msg_type>", methods=['GET'])
 def get_rf_item(msg_type):
     result_item = {}
@@ -158,12 +216,12 @@ def get_rf_item(msg_type):
                                  'data_key': data_key
                                  }), status.HTTP_404_NOT_FOUND
     result_item = {
-        u'频率': s[0].split(':')[-1],
-        u'协议': s[1].split(':')[-1],
-        u'调制': s[2].split(':')[-1],
-        u'数据': s[3].split(':')[-1],
-        u'重放': False,
-        u'msg_type': msg_type
+        'freq': s[0].split(':')[-1],
+        'protocol': s[1].split(':')[-1],
+        'modulation': s[2].split(':')[-1],
+        'data': s[3].split(':')[-1],
+        'playback': False,
+        'msg_type': msg_type
     }
     return simplejson.dumps({'status': 'success',
                              'api': 'get_rf_item',
