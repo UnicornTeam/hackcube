@@ -11,7 +11,7 @@ DONE: WIFI Scan条件渲染
 TODO: RF RF通知点击下滑
 TODO: 改为全英文
 DONE: WIFI滑动抖动
-TODO: 导航的UI改进
+DONE: 导航的UI改进
 TODO: 进入RF页面时读取/root/serial_file/data/aRF_Keeloq_data 和 cRF_24l01_data全部内容来初始化表格
 DONE: Pagination 居中
 TODO: TPMS switch no empty check

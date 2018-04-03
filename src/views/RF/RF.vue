@@ -4,21 +4,21 @@
     <b-alert :show="showARFAlert" variant="primary" dismissible>
       <h4 class="alert-heading">RF</h4>
       <p>
-        频率{{latest_arf_item.频率}}发现协议为{{latest_arf_item.协议}}.数据内容为{{latest_arf_item.数据}}信号.
+        频率{{latest_arf_item.频率}}发现协议为{{latest_arf_item.协议}}.数据内容为{{latest_arf_item.数据}}信号.<a href="#content">点击查看</a>
       </p>
     </b-alert>
 
     <b-alert :show="showCRFAlert" variant="primary" dismissible>
       <h4 class="alert-heading">RF</h4>
       <p>
-        频率{{latest_crf_item.频率}}发现协议为{{latest_crf_item.协议}}.数据内容为{{latest_crf_item.数据}}信号.
+        频率{{latest_crf_item.频率}}发现协议为{{latest_crf_item.协议}}.数据内容为{{latest_crf_item.数据}}信号.<a href="#content">点击查看</a>
       </p>
     </b-alert>
 
     <b-alert :show="showNFCAlert" variant="success" dismissible>
       <h4 class="alert-heading">NFC</h4>
       <p>
-        捕获卡号:{{latest_nfc_item.ID}}, <u href="#" @click="clickNFC">点击查看</u>
+        捕获卡号:{{latest_nfc_item.ID}}, <u @click="clickNFC">点击查看</u>
       </p>
     </b-alert>
 
@@ -36,7 +36,7 @@
       </b-row>
     </b-container>
 
-    <b-table :items="rfItems" :fields="fields_show">
+    <b-table id='content' :items="rfItems" :fields="fields_show">
       <div slot="重放" slot-scope="data">
         <b-button size="sm" variant="primary" @click="onClick(data.index)">Run</b-button>
       </div>
