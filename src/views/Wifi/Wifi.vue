@@ -3,11 +3,11 @@
     <cube-nav/>
 
     <h1 class="text-center">Cube Wifi Manage</h1>
-    <h3 class="text-center">对工作在2.4Ghz 5Ghz设备进行安全风险检测</h3>
+    <h3 class="text-center">Security Risk Detection on 2.4Ghz 5Ghz Devices</h3>
     <br/>
     <b-container>
       <b-row >
-        <b-col cols="4">
+        <b-col cols="5" style="padding-left: 0;">
           <h5>WiFi List</h5>
         </b-col>
         <b-col cols="1"></b-col>
@@ -17,27 +17,39 @@
           </Select>
         </b-col>
         <b-col cols="1">
-          <b-button size="sm" variant="success" @click="onClickScan">Scan</b-button>
+          <b-button size="sm" variant="primary" v-if="scanStatus==='off'" @click="onClickScan">Scan</b-button>
+          <b-button size="sm" variant="danger" v-if="scanStatus==='on'" @click="onClickScan">Stop</b-button>
         </b-col>
       </b-row>
     </b-container>
-
-    <b-table :items="items" :fields="fields">
-      <div slot="JAM" slot-scope="data">
-        <van-switch v-model="items[data.index].JAM"
-                    @change="onSwitch('ap_block', items[data.index].BSSID, data.index, items[data.index].JAM)" />
-      </div>
-    </b-table>
-
+    <div>
+      <b-table :items="ap_items" :fields="fields" :per-page="apPerPage" :current-page="apCurrentPage">
+        <div slot="JAM" slot-scope="data">
+          <van-switch v-model="ap_items[(apCurrentPage-1) * apPerPage + data.index].JAM"
+                      @change="onSwitch('ap_block', ap_items[(apCurrentPage-1) * apPerPage + data.index].BSSID,
+                      data.index, ap_items[(apCurrentPage-1) * apPerPage + data.index].JAM)" />
+        </div>
+      </b-table>
+      <b-pagination align="center" v-if="ap_items.length" size="sm" :total-rows="ap_items.length" v-model="apCurrentPage" :per-page="apPerPage">
+      </b-pagination>
+      <Spin fix v-if="apSpinShow"></Spin>
+    </div>
+    <br/><br/>
 
     <!-- Client list -->
     <h5>Client List</h5>
-    <b-table :items="items2" :fields="fields2">
-      <div slot="JAM" slot-scope="data">
-        <van-switch v-model="items2[data.index].JAM"
-                    @change="onSwitch('sta_block', items2[data.index].MAC, data.index, items2[data.index].JAM)" />
-      </div>
-    </b-table>
+    <div>
+      <b-table :items="sta_items" :fields="fields2" :per-page="staPerPage" :current-page="staCurrentPage">
+        <div slot="JAM" slot-scope="data">
+          <van-switch v-model="sta_items[(staCurrentPage-1) * staPerPage + data.index].JAM"
+                      @change="onSwitch('sta_block', sta_items[(staCurrentPage-1) * staPerPage + data.index].MAC,
+                      data.index, sta_items[(staCurrentPage-1) * staPerPage + data.index].JAM)" />
+        </div>
+      </b-table>
+      <Spin fix v-if="staSpinShow"></Spin>
+    </div>
+    <b-pagination align="center" v-if="sta_items.length" size="sm" :total-rows="sta_items.length" v-model="staCurrentPage" :per-page="staPerPage">
+    </b-pagination>
   </div>
 </template>
 
@@ -54,118 +66,104 @@ export default {
   },
   data() {
     return {
+      apSpinShow: false,
+      staSpinShow: false,
       scanStatus: 'off',
       fields: ['SSID', 'BSSID', 'RSSI', 'JAM'],
-      items: [
-        {
-          Index: 0,
-          SSID: '360WIFI-XX',
-          BSSID: '11:22:33:44:55:66',
-          RSSI: '-80',
-          JAM: false,
-        },
-        {
-          Index: 1,
-          SSID: '360WIFI-X2',
-          BSSID: '11:22:33:44:55:66',
-          RSSI: '-94',
-          JAM: false,
-        },
-        {
-          Index: 2,
-          SSID: '360WIFI-X3',
-          BSSID: '11:22:33:44:55:66',
-          RSSI: '-81',
-          JAM: false,
-        },
-      ],
-      fields2: ['NAME', 'MAC', 'RSSI', 'JAM'],
-      items2: [
-        {
-          Index: 0,
-          NAME: 'iPhone',
-          MAC: '11:22:33:44:55:66',
-          RSSI: '522',
-          JAM: false,
-        },
-        {
-          Index: 1,
-          NAME: 'Android',
-          MAC: '11:22:33:44:55:66',
-          RSSI: '94',
-          JAM: false,
-        },
-        {
-          Index: 2,
-          NAME: 'iPhone',
-          MAC: '11:22:33:44:55:66',
-          RSSI: '101',
-          JAM: false,
-        },
-      ],
-      channel: null,
+      ap_items: [],
+      fields2: ['MAC', 'BSSID', 'RSSI', 'JAM'],
+      sta_items: [],
+      channel: 6,
       defaultChannel: 6,
       channelList: [],
+      apPerPage: 6,
+      apCurrentPage: 1,
+      staPerPage: 6,
+      staCurrentPage: 1,
     };
   },
   methods: {
     onSwitch(api, value, index, isOpen) {
-      console.log(api, value, index, isOpen);
+      this.$timer.stop('fetchWifiList');
       const action = isOpen ? 'on' : 'off';
       axios
         .get(`${process.env.BACKEND_HOST}/${api}/${value}/${action}`)
         .then((response) => {
-          console.log(response.data);
           const result = response.data;
           this.$Message.success(result.message);
         })
         .catch((err) => {
-          console.log(err.response);
-          this.$Message.error('Call process fail');
+          if (err.response) {
+            this.$Message.error(err.response.data.message);
+          } else {
+            this.$Message.error('Request fail');
+          }
         });
     },
     onClickScan() {
       // send request with action to backend
       this.scanStatus = this.scanStatus === 'on' ? 'off' : 'on';
-      const channel = this.channel === null ? this.defaultChannel : this.channel;
+      const channel =
+        this.channel === null ? this.defaultChannel : this.channel;
       axios
-        .get(`${process.env.BACKEND_HOST}/wifi_scan/${this.scanStatus}/${channel}`)
-        .then((response) => {
-          const result = response.data;
-          console.log(result);
-          this.$Message.success(result.message);
+        .get(
+          `${process.env.BACKEND_HOST}/wifi_scan/${this.scanStatus}/${channel}`,
+        )
+        .then(() => {
           if (this.scanStatus === 'on') {
             this.$timer.start('fetchWifiList');
+            this.$Message.info('Start scan WiFi.');
+            this.apSpinShow = true;
+            this.staSpinShow = true;
           } else if (this.scanStatus === 'off') {
             this.$timer.stop('fetchWifiList');
+            this.$Message.info('Stop scan WiFi.');
           }
         })
         .catch((err) => {
-          console.log(err);
-          // this.$Message.error(err);
+          if (err.response) {
+            this.$Message.error(err.response.data.message);
+          } else {
+            this.$Message.error('Request fail');
+          }
         });
     },
     fetchWifiList() {
       if (this.scanStatus === 'on') {
-        axios
-          .get(`${process.env.BACKEND_HOST}/ap_list`, {
-            validateStatus(status) {
-              return status < 400; // Reject only if the status code is greater than or equal to 400
-            },
-          })
-          .then((response) => {
-            const result = response.data;
-            console.log(result);
-            if (response.status === 304) {
-              return;
-            }
-            // this.$Message.success('Fetch wifi list success.');
-            this.items = result[result.data_key];
-          })
-          .catch((err) => {
-            console.log(err.response);
-            this.$Message.error('Fetch wifi list fail.');
-          });
+        const apiList = ['ap_list', 'sta_list'];
+        for (const api of apiList) {
+          axios
+            .get(`${process.env.BACKEND_HOST}/${api}`, {
+              validateStatus(status) {
+                return status < 400;
+              },
+            })
+            .then((response) => {
+              const result = response.data;
+              if (response.status === 304) {
+                this.apSpinShow = false;
+                this.staSpinShow = false;
+                return;
+              }
+              // this.$Message.success('Fetch wifi list success.');
+              if (api === 'ap_list') {
+                this.ap_items = result[result.data_key];
+                this.apSpinShow = false;
+              } else {
+                this.sta_items = result[result.data_key];
+                this.staSpinShow = false;
+              }
+            })
+            .catch((err) => {
+              this.apSpinShow = false;
+              this.staSpinShow = false;
+              if (err.response) {
+                this.$Message.error(err.response.data.message);
+              } else {
+                this.$Message.error('Request fail');
+              }
+            });
+        }
       }
     },
     getChannelList() {
@@ -220,10 +218,8 @@ export default {
     },
   },
   created() {
-    // TODO: 初始化数据
     // TODO: Save the final fresh wifi list when leave page
     // TODO: And restore it when back to this page.
-    console.log(`items is: ${this.items}`);
     this.getChannelList();
   },
   timers: {
@@ -232,5 +228,15 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
+  td[aria-colindex] {
+    overflow: hidden!important;
+    text-overflow:ellipsis!important;
+    white-space: nowrap!important;
+    max-width: 6em;
+    padding-right: 4px;
+    padding-left: 4px;
+    text-align:center;
+    vertical-align:middle;
+  }
 </style>

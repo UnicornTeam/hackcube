@@ -1,29 +1,29 @@
 <template>
   <div class="board">
     <cube-nav/>
-    <b-alert :show="showARFAlert" variant="primary">
+    <b-alert :show="showARFAlert" variant="primary" dismissible>
       <h4 class="alert-heading">RF</h4>
       <p>
-        频率{{latest_arf_item.频率}}发现协议为{{latest_arf_item.协议}}.数据内容为{{latest_arf_item.数据}}信号.
+        In frequency {{latest_arf_item.freq}} found prot: {{latest_arf_item.prot}}, data: {{latest_arf_item.data}} signal.<a href="#content">Learn More.</a>
       </p>
     </b-alert>
 
-    <b-alert :show="showCRFAlert" variant="primary">
+    <b-alert :show="showCRFAlert" variant="primary" dismissible>
       <h4 class="alert-heading">RF</h4>
       <p>
-        频率{{latest_crf_item.频率}}发现协议为{{latest_crf_item.协议}}.数据内容为{{latest_crf_item.数据}}信号.
+        In frequency {{latest_crf_item.freq}} found prot: {{latest_crf_item.prot}}, data: {{latest_crf_item.data}} signal.<a href="#content">Learn More.</a>
       </p>
     </b-alert>
 
-    <b-alert :show="showNFCAlert" variant="success">
+    <b-alert :show="showNFCAlert" variant="success" dismissible>
       <h4 class="alert-heading">NFC</h4>
       <p>
-        捕获卡号:{{latest_nfc_item.ID}}, <u href="#" @click="clickNFC">点击查看</u>
+        Found NFC card ID: {{latest_nfc_item.ID}}, <u @click="clickNFC">Learn More.</u>
       </p>
     </b-alert>
 
     <h1 class="text-center">Cube RF Manage</h1>
-    <h3 class="text-center">对工作在433Mhz,315Mhz的设备进行安全风险检测</h3>
+    <h3 class="text-center">Security Risk Detection on 433Mhz,315Mhz Devices</h3>
     <br/><br/>
     <b-container>
       <b-row align-h="between">
@@ -35,13 +35,14 @@
         </b-col>
       </b-row>
     </b-container>
-
-    <b-table :items="rfItems" :fields="fields_show">
-      <div slot="重放" slot-scope="data">
-        <b-button size="sm" variant="success" @click="onClick(data.index)">Run</b-button>
-      </div>
-    </b-table>
-
+    <div>
+      <b-table :items="rfItems" :fields="fields_show">
+        <div slot="play" slot-scope="data">
+          <b-button size="sm" variant="primary" @click="onClick(data.index)">Run</b-button>
+        </div>
+      </b-table>
+      <Spin fix v-if="spinShow"></Spin>
+    </div>
 
     <b-container>
       <b-row align-h="between">
@@ -54,18 +55,18 @@
       </b-row>
     </b-container>
 
-    <b-table :items="tpmsItems" :fields="fields_input">
-      <div slot="电压" slot-scope="data">
-        <b-form-input v-model="tpmsItems[data.index].电压" type="text"></b-form-input>
+    <b-table responsive :items="tpmsItems" :fields="fields_input">
+      <div slot="VOL" slot-scope="data">
+        <b-form-input v-model="tpmsItems[data.index].VOL" type="text"></b-form-input>
       </div>
-      <div slot="压力" slot-scope="data">
-        <b-form-input v-model="tpmsItems[data.index].压力" type="text"></b-form-input>
+      <div slot="PRESS" slot-scope="data">
+        <b-form-input v-model="tpmsItems[data.index].PRESS" type="text"></b-form-input>
       </div>
-      <div slot="温度" slot-scope="data">
-        <b-form-input v-model="tpmsItems[data.index].温度" type="text"></b-form-input>
+      <div slot="TEMP" slot-scope="data">
+        <b-form-input v-model="tpmsItems[data.index].TEMP" type="text"></b-form-input>
       </div>
-      <div slot='气阀' slot-scope="data">
-        <b-form-input v-model="tpmsItems[data.index].气阀" type="text"></b-form-input>
+      <div slot='VALVE' slot-scope="data">
+        <b-form-input v-model="tpmsItems[data.index].VALVE" type="text"></b-form-input>
       </div>
     </b-table>
 
@@ -82,8 +83,37 @@
       </b-row>
     </b-container>
 
-    <b-progress :value="70" variant="danger" :animated="animate" class="mb-3"/>
-
+    <b-progress :value="attackProgress" variant="danger" :animated="animate" class="mb-3"/>
+    <Select size="large" v-model="protocol" placeholder="Protocol">
+      <Option value="PT224X">PT224X</Option>
+      <Option value="PT226X" disabled>PT226X</Option>
+      <!--<Option v-for="item in protocolList" :value="item.value" :key="item.value">{{ item.label }}</Option>-->
+    </Select>
+    <br/><br/>
+    <b-container>
+      <b-row align-h="between">
+        <b-col cols="6" style="padding-left: 0">
+          <b-form-input v-model="attackValueLeft" type="text"></b-form-input>
+        </b-col>
+        <b-col cols="6" style="padding-right: 0">
+          <b-form-input v-model="attackValueRight" type="text"></b-form-input>
+        </b-col>
+      </b-row>
+    </b-container>
+    <br/><br/>
+    <b-container>
+      <b-row class="justify-content-md-center">
+        <b-col col lg="2">
+          <!-- TODO: Finish onclick and long tap -->
+          <b-button variant="ghost">A</b-button>
+        </b-col>
+        <b-col cols="4" md="auto">Center</b-col>
+        <b-col col lg="2">
+          <b-button variant="ghost">D</b-button>
+        </b-col>
+      </b-row>
+    </b-container>
+    <br/><br/>
   </div>
 </template>
 
@@ -101,7 +131,11 @@
     },
     data() {
       return {
-        // todo: set latest_nfc_item and showNFCAlert from NFC page
+        attackProgress: 0,
+        attackValueLeft: '1755',
+        attackValueRight: '17a5',
+        spinShow: true,
+        protocol: 'PT224X',
         latest_nfc_item: '',
         showNFCAlert: false,
         latest_arf_item: '',
@@ -113,18 +147,26 @@
         attackSwitch: false,
         // if continue animate
         animate: true,
-        fields_show: ['数据', '频率', '协议', '调制', '重放'],
-        fields_input: ['ID', '电压', '压力', '温度', '气阀'],
-        rfItems: [
-          { 频率: '315.00Mhz', 协议: 'PT226X', 调制: 'ASK', 重放: false, 数据: 'hfgh34h' },
-          { 频率: '433.92Mhz', 协议: 'Keeloq', 调制: 'ASK', 重放: false, 数据: 'hfgd3fd' },
-          { 频率: '433.92Mhz', 协议: 'PT224X', 调制: 'FSK', 重放: false, 数据: 'sa29f9w' },
-        ],
+        fields_show: ['data', 'freq', 'prot', 'MOD', 'play'],
+        fields_input: ['ID', 'VOL', 'PRESS', 'TEMP', 'VALVE'],
+        rfItems: [],
         tpmsItems: [
-          { ID: '20959185', 电压: '', 压力: '', 温度: '', 气阀: '' },
-          { ID: 'eb107f85', 电压: '', 压力: '', 温度: '', 气阀: '' },
-          { ID: 'F0FB2385', 电压: '', 压力: '', 温度: '', 气阀: '' },
-          { ID: '2093ef85', 电压: '', 压力: '', 温度: '', 气阀: '' },
+          { ID: '20959185', VOL: 'a0', PRESS: '20', TEMP: '60', VALVE: '08' },
+          { ID: 'eb107f85', VOL: 'a0', PRESS: '20', TEMP: '60', VALVE: '08' },
+          { ID: 'F0FB2385', VOL: 'a0', PRESS: '20', TEMP: '60', VALVE: '08' },
+          { ID: '2093ef85', VOL: 'a0', PRESS: '20', TEMP: '60', VALVE: '08' },
+        ],
+        protocolList: [
+          {
+            value: 'PT226X',
+            label: 'PT226X',
+            disabled: true,
+          },
+          {
+            value: 'PT224X',
+            label: 'PT224X',
+            disabled: false,
+          },
         ],
       };
     },
@@ -147,35 +189,41 @@
           })
           .then((response) => {
             const result = response.data;
-            // todo: check if nothing change
-            console.log(result);
             if (response.status === 304) {
               return;
             }
             this.latest_nfc_item = result[result.data_key];
             this.showNFCAlert = true;
-            this.$Message.success('Detect new nfc data.');
+            this.$Message.info(result.message);
           })
           .catch((err) => {
-            console.log(err.response);
-            this.$Message.error('Fetch nfc data fail.');
+            if (err.response) {
+              this.$Message.error(err.response.data.message);
+            } else {
+              this.$Message.error('Request fail');
+            }
           });
       },
-      serialSend(parameter) {
+      serialSend(parameter, isAlert) {
         axios
           .get(`${process.env.BACKEND_HOST}/serial_send/${parameter}`)
           .then((response) => {
             const result = response.data;
-            console.log(result);
-            this.$Message.success('Execute success.');
+            if (isAlert === true) {
+              this.$Message.success(result.message);
+            }
           })
           .catch((err) => {
-            console.log(err.response);
-            this.$Message.error('Execute fail.');
+            if (err.response) {
+              this.$Message.error(err.response.data.message);
+            } else {
+              this.$Message.error('Request fail');
+            }
           });
       },
-      fetchData() {
+      fetchRFItem() {
         const dataAPIs = ['arf', 'crf'];
+        const that = this;
         for (const api of dataAPIs) {
           axios
             .get(`${process.env.BACKEND_HOST}/rf_item/${api}`, {
@@ -185,91 +233,171 @@
             })
             .then((response) => {
               const result = response.data;
-              // todo: check what 304 not modify will do
               // todo: write test code
-              console.log(result);
               if (response.status === 304) {
                 return;
               }
               const dataKey = result.data_key;
-              this.$Message.success('Detect new {} data.'.format(dataKey));
-              const isExist = this.rfItems.indexOf(result[dataKey]) !== -1;
+              that.$Message.success(result.message);
+              const isExist = that.rfItems.indexOf(result[dataKey]) !== -1;
               if (isExist) {
                 return;
               }
-              this.rfItems.unshift(result[dataKey]);
+              that.rfItems.unshift(result[dataKey]);
               if (dataKey === 'arf_item') {
-                this.latest_arf_item = result[dataKey];
-                this.showARFAlert = true;
+                that.latest_arf_item = result[dataKey];
+                that.showARFAlert = true;
               } else if (dataKey === 'crf_item') {
-                this.latest_crf_item = result[dataKey];
-                this.showCRFAlert = true;
+                that.latest_crf_item = result[dataKey];
+                that.showCRFAlert = true;
               }
             })
             .catch((err) => {
-              console.log(err.response);
-              this.$Message.error(`Fetch ${api} data fail.`);
+              if (err.response) {
+                this.$Message.error(err.response.data.message);
+              } else {
+                this.$Message.error('Request fail');
+              }
             });
         }
       },
+      fetchAllRFItems() {
+        this.spinShow = true;
+        const dataAPIs = ['arf', 'crf'];
+        const that = this;
+        for (const api of dataAPIs) {
+          axios
+          .get(`${process.env.BACKEND_HOST}/all_rf_item/${api}`)
+          .then((response) => {
+            const result = response.data;
+            // todo: write test code
+            const dataKey = result.data_key;
+            // todo: add Transition animation
+            that.$Message.success(result.message);
+            that.rfItems = that.rfItems.concat(result[dataKey]);
+            this.spinShow = false;
+          })
+          .catch((err) => {
+            this.spinShow = false;
+            if (err.response) {
+              this.$Message.error(err.response.data.message);
+            } else {
+              this.$Message.error('Request fail');
+            }
+          });
+        }
+      },
+      getAttackProgress() {
+        const that = this;
+        axios
+          .get(`${process.env.BACKEND_HOST}/attack_status`)
+          .then((response) => {
+            const result = response.data;
+            // todo: write test code
+            const dataKey = result.data_key;
+            // TODO: Check if need to translate to integer
+            that.attackProgress = parseInt(result[dataKey], 0);
+            if (that.attackProgress === 100) {
+              that.$timer.stop('getAttackProgress');
+            }
+          })
+          .catch((err) => {
+            this.spinShow = false;
+            if (err.response) {
+              this.$Message.error(err.response.data.message);
+            } else {
+              this.$Message.error('Request fail');
+            }
+          });
+      },
       onSwitch(switchType) {
-        console.log(switchType);
+        // let parameter = '';
         switch (switchType) {
           case 'sniffer':
             if (this.snifferSwitch) {
-              this.$timer.start('fetchData');
+              this.$timer.start('fetchRFItem');
+              this.$message.info('Start detect new RF item.');
             } else {
-              this.$timer.stop('fetchData');
+              this.$timer.stop('fetchRFItem');
+              this.$message.info('Stop detect new RF item.');
             }
             break;
           case 'tpms':
-            // todo: send data to serial_send
             if (!this.tpmsSwitch) {
               return;
             }
-            for (const item in this.tpmsItems) {
+            for (const item of this.tpmsItems) {
               // todo: write test code
-              if (!item.电压 && !item.压力 && !item.温度 && !item.气阀) {
-                // this.$Message.error('You need input one or more.');
+              if (!item.VOL && !item.PRESS && !item.TEMP && !item.VALVE) {
                 return;
               }
-              const parameter = `t${item.ID}${item.电压}${item.压力}${item.温度}${item.气阀}`;
-              setTimeout(function timer() {
-                // todo: does it need promotion after per request send?
-                this.serialSend(parameter);
+              const parameter = `t${item.ID}${item.VOL}${item.PRESS}${item.TEMP}${item.VALVE}`;
+              const that = this;
+              setTimeout(() => {
+                that.serialSend(parameter, true);
+                that.$Message.success(`Success put ${parameter}`);
               }, 700);
             }
             this.$Message.success('Send all valid item to process!');
             break;
           case 'attack':
-            // 暂不实现
+            if (!this.attackSwitch) {
+              this.attackProgress = 0;
+              this.$timer.stop('getAttackProgress');
+              return;
+            }
+            if (!this.attackValueLeft && this.attackValueRight) {
+              this.$message.error('Please input at least on parameter.');
+              this.attackSwitch = false;
+              return;
+            }
+            if (this.protocol === 'PT224X') {
+              const parameter = `rc2start${this.attackValueLeft}end${this.attackValueRight}`;
+              this.serialSend(parameter, false);
+            } else if (this.protocol === 'PT224X') {
+              const parameter = `rc1start${this.attackValueLeft}end${this.attackValueRight}`;
+              this.serialSend(parameter, false);
+            } else {
+              this.$message.error('Please select right protocol.');
+              return;
+            }
+            this.$timer.start('getAttackProgress');
             break;
           default:
             break;
         }
       },
-      // TODO: Deal with onClick logic.
       onClick(index) {
-        console.log(index);
         const item = this.rfItems[index];
-        const parameter = `rfreq:${item.频率};protocol:${item.协议};modulation:${item.调制};data:${item.数据}`;
-        this.serialSend(parameter);
+        const parameter = `"rfreq:${item.freq};protocol:${item.prot};modulation:${item.MOD};data:${item.data}"`;
+        this.serialSend(parameter, true);
       },
     },
     created() {
-      // TODO: 初始化数据
       if (this.snifferSwitch) {
-        this.$timer.start('fetchData');
+        this.$timer.start('fetchRFItem');
         this.$timer.start('fetchNFCData');
       }
     },
     timers: {
-      fetchData: { time: 3000, autostart: false, repeat: true },
+      fetchAllRFItems: { time: 0, autostart: true, repeat: false },
+      fetchRFItem: { time: 3000, autostart: false, repeat: true },
       fetchNFCData: { time: 3000, autostart: false, repeat: true },
+      getAttackProgress: { time: 500, autostart: false, repeat: true },
     },
   };
 </script>
 
-<style scoped>
-
+<style>
+  td[aria-colindex] {
+    max-width: 6em;
+    word-wrap: break-word;
+    padding-right: 4px;
+    padding-left: 4px;
+    text-align:center;
+    vertical-align:middle;
+  }
+  td[aria-colindex] > div {
+    width: 3.5em;
+  }
 </style>

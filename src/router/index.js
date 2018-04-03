@@ -16,6 +16,11 @@ export default new Router({
       component: Wifi,
     },
     {
+      path: '/wifi',
+      name: 'Wifi',
+      component: Wifi,
+    },
+    {
       path: '/nfc',
       name: 'NFC',
       component: NFC,

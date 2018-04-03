@@ -1,0 +1,11 @@
+Release 2018.4.3 Note:
+
+- 在WIFI获取、等待固件更新日志、获取RF初始列表时添加过渡动画
+- UI改为全英文，包括提示消息、表头、描述信息等
+- 修复WIFI页面下拉抖动问题
+- 修复导航栏的WIFI项一直为选中状态的问题
+- WiFi Scan 按钮实现条件渲 染，分为Scan(蓝色)和Stop(红色)两种状态
+- 解决INFO页面更新日志字体过浅的问题
+- WIFI页面表格Pagination改为居中显示
+- 改进错误提示信息
+- 修改sta_list 中的not associate 为None

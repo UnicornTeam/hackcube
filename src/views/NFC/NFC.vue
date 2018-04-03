@@ -3,7 +3,7 @@
     <cube-nav/>
 
     <h1 class="text-center">Cube NFC Manage</h1>
-    <h3 class="text-center">对工作在125Khz, 13.5Mhz的卡片进行安全风险检测</h3>
+    <h3 class="text-center">Safety Risk Detection for Cards Working at 125Khz, 13.5Mhz.</h3>
     <br/>
     <!-- Read List -->
     <b-container>
@@ -11,7 +11,7 @@
         <b-col cols="4">
           <h5>Read</h5>
         </b-col>
-        <b-col cols="3">
+        <b-col cols="2">
           <van-switch v-model="readSwitch" @change="onSwitchRead" size="25px"/>
         </b-col>
       </b-row>
@@ -19,10 +19,10 @@
 
     <b-table :items="items" :fields="fields">
       <div slot="WRITE" slot-scope="data">
-        <van-switch v-model="items[data.index].WRITE" @change="onSwitchAction('write', items[data.index].VID, items[data.index].ID)" size="25px"/>
+        <van-switch v-model="items[data.index].WRITE" @change="onSwitchAction('nw', items[data.index].WRITE, items[data.index].VID, items[data.index].ID)" size="25px"/>
       </div>
       <div slot="SIMULATE" slot-scope="data">
-        <van-switch v-model="items[data.index].SIMULATE" @change="onSwitchAction('simulate', items[data.index].VID, items[data.index].ID)" size="25px"/>
+        <van-switch v-model="items[data.index].SIMULATE" @change="onSwitchAction('ns', items[data.index].SIMULATE, items[data.index].VID, items[data.index].ID)" size="25px"/>
       </div>
     </b-table>
 
@@ -33,7 +33,7 @@
           <h5>Write</h5>
         </b-col>
         <b-col cols="3">
-          <van-switch v-model="writeSwitch" @change="onSwitchAction('nw')" size="25px"/>
+          <van-switch v-model="writeSwitch" @change="onSwitchAction('nw', writeSwitch)" size="25px"/>
         </b-col>
       </b-row>
     </b-container>
@@ -41,7 +41,6 @@
     <b-container>
       <b-row>
         <b-col cols="4">
-          <!-- TODO: Check if only need input one vid ? -->
           <b-form-input v-model="writeVid"
                         type="text"
                         placeholder="VID">
@@ -63,7 +62,7 @@
           <h5>Simulate</h5>
         </b-col>
         <b-col cols="3">
-          <van-switch v-model="simulateSwitch" @change="onSwitchAction('ns')" size="25px"/>
+          <van-switch v-model="simulateSwitch" @change="onSwitchAction('ns', simulateSwitch)" size="25px"/>
         </b-col>
       </b-row>
     </b-container>
@@ -71,13 +70,12 @@
     <b-container fluid>
       <b-row>
         <b-col cols="4">
-          <!-- TODO: Check if only need input one vid ? -->
           <b-form-input v-model="simulateVid"
                         type="text"
                         placeholder="VID">
           </b-form-input>
         </b-col>
-        <b-col cols="8" style="padding-left: 0">
+        <b-col cols="8">
           <b-form-input v-model="simulateId"
                         type="text"
                         placeholder="ID">
@@ -128,30 +126,33 @@
           })
           .then((response) => {
             const result = response.data;
-            // todo: check if nothing change
-            console.log(result);
             if (response.status === 304) {
               return;
             }
             this.items = [result[result.data_key]];
-            this.$Message.success('Detect new nfc data.');
+            this.$Message.info('Detect new nfc data.');
           })
           .catch((err) => {
-            console.log(err.response);
-            this.$Message.error('Fetch nfc data fail.');
+            if (err.response) {
+              this.$Message.error(err.response.data.message);
+            } else {
+              this.$Message.error('Request fail');
+            }
           });
       },
       serialSend(parameter) {
         axios
           .get(`${process.env.BACKEND_HOST}/serial_send/${parameter}`)
           .then((response) => {
-            const result = response.data;
-            console.log(result);
-            this.$Message.success('Execute success.');
+            const message = response.data.message;
+            this.$Message.success(message);
           })
           .catch((err) => {
-            console.log(err.response);
-            this.$Message.error('Execute fail.');
+            if (err.response) {
+              this.$Message.error(err.response.data.message);
+            } else {
+              this.$Message.error('Request fail');
+            }
           });
       },
       onSwitchRead(checked) {
@@ -161,7 +162,11 @@
           this.$timer.stop('fetchNFCData');
         }
       },
-      onSwitchAction(actionType, VID, ID) {
+      onSwitchAction(actionType, isOpen, VID, ID) {
+        if (!isOpen) {
+          return;
+        }
+
         if (VID && ID) {
           const parameter = `${actionType}${VID}${ID}`;
           this.serialSend(parameter);
@@ -170,36 +175,35 @@
         switch (actionType) {
           case 'nw':
             if (!(this.writeVid && this.writeId)) {
-              this.$Message.error('请输入ID和VID');
+              this.$Message.error('Please input ID and VID');
               this.writeSwitch = !this.writeSwitch;
             } else if (!(isValidIds(this.writeVid, this.writeId))) {
-              this.$Message.error('请输入规范的ID和VID');
+              this.$Message.error('Please input the right ID and VID');
               this.writeSwitch = !this.writeSwitch;
             } else {
               const parameter = `${actionType}${this.writeVid}${this.writeId}`;
-              this.serialSend(actionType, parameter);
+              this.serialSend(parameter);
             }
             break;
           case 'ns':
             if (!(this.simulateVid && this.simulateId)) {
-              this.$Message.error('请输入ID和VID');
+              this.$Message.error('Please input the right ID and VID');
               this.simulateSwitch = !this.simulateSwitch;
-            } else if ((isValidIds(this.simulateVid, this.simulateId))) {
-              this.$Message.error('请输入规范的ID和VID');
-              this.writeSwitch = !this.simulateSwitch;
+            } else if (!(isValidIds(this.simulateVid, this.simulateId))) {
+              this.$Message.error('Please input the right ID and VID');
+              this.simulateSwitch = !this.simulateSwitch;
             } else {
               const parameter = `${actionType}${this.simulateVid}${this.simulateId}`;
-              this.serialSend(actionType, parameter);
+              this.serialSend(parameter);
             }
             break;
           default:
-            this.$Message.error('请输入正确的API');
+            this.$Message.error('Please input the right API');
             break;
         }
       },
     },
     created() {
-      // TODO: 初始化数据
       if (this.readSwitch) {
         this.$timer.start('fetchNFCData');
       } else {

@@ -3,21 +3,20 @@
     <cube-nav/>
 
     <h1 class="text-center">Cube Status Manage</h1>
-    <h3 class="text-center">显示Cube设备状态</h3>
+    <h3 class="text-center">Display Cube device status</h3>
     <br/>
-    <h5 class="text-center">电量</h5>
+    <h5 class="text-center">Electricity</h5>
     <b-progress :value="energyPercent"
                 variant="dark"
     ></b-progress>
     <br/>
-    <h5 class="text-center">硬盘</h5>
+    <h5 class="text-center">Hard driver</h5>
     <b-progress :value="storePercent"
                 variant="dark"
     ></b-progress>
     <br/><br/>
 
-    <!-- TODO: 上传预览，上传进度 -->
-    <h5>上传arduino固件</h5>
+    <h5>Upload arduino firmware</h5>
     <Upload
       :data="extraDataArdu"
       :on-success="onUploadSuccess"
@@ -31,8 +30,10 @@
     </div>
 
     <br/>
-
-    <Input v-model="updateLog" type="textarea" :autosize="{minRows: 4,maxRows: 10}" placeholder="Upload log..." disabled></Input>
+    <div>
+      <Input readonly v-model="updateLog" type="textarea" :autosize="{minRows: 6,maxRows: 14}" placeholder="Upload log..."></Input>
+      <Spin fix v-if="spinShow"></Spin>
+    </div>
 
   </div>
 </template>
@@ -48,6 +49,7 @@
     },
     data() {
       return {
+        spinShow: false,
         uploadHost: process.env.UPLOAD_API,
         updateLog: '',
         energyPercent: 78,
@@ -58,27 +60,23 @@
       };
     },
     methods: {
-      onRead(file, content) {
-        console.log(file);
-        console.log(content);
-        console.log(Buffer.from(file.content, 'base64').toString('utf-8'));
-        // TODO: Send result to backend
-        // TODO: Add upload success prompt
-      },
-      fetchEnergyStatus() {
+      fetchStorageStatus() {
         axios
           .get(`${process.env.BACKEND_HOST}/hd_info`)
           .then((response) => {
-            console.log(response.data);
             const result = response.data;
             this.storePercent = result[result.data_key];
           })
           .catch((err) => {
-            console.log(err.response);
-            this.$Message.error('Query energy status fail.');
+            if (err.response) {
+              this.$Message.error(err.response.data.message);
+            } else {
+              this.$Message.error('Request fail');
+            }
           });
       },
       fetchUpdateLog() {
+        this.spinShow = true;
         axios
           .get(`${process.env.BACKEND_HOST}/update_firmware_log`, {
             validateStatus(status) {
@@ -86,59 +84,55 @@
             },
           })
           .then((response) => {
-            console.log(response.data);
             const result = response.data;
             if (response.status === 304) {
               this.$timer.stop('fetchUpdateLog');
-              this.$Message.success('Update finish.');
+              this.$Message.info('Update finish.');
+              this.spinShow = false;
               return;
             }
             this.updateLog = result[result.data_key];
           })
           .catch((err) => {
-            console.log(err.response);
-            this.$Message.error('Call process fail');
+            this.spinShow = false;
+            if (err.response) {
+              this.$Message.error(err.response.data.message);
+            } else {
+              this.$Message.error('Request fail');
+            }
           });
       },
-      // TODO: Deal with onClick logic.
       onClick() {
         if (this.uploadedFilePath) {
           axios
-            .get(`${process.env.BACKEND_HOST}/update_firmware/${this.uploadedFilePath}`)
-            .then((response) => {
-              console.log(response.data);
-              const result = response.data;
-              this.$Message.success(result.message);
-              // todo: start interval to fetch log
-              this.$timer.start('fetchUpdateLog');
-            })
-            .catch((err) => {
-              console.log(err.response);
-              this.$Message.error('Call process fail');
-            });
+          .post(`${process.env.BACKEND_HOST}/update_firmware`, { uploadedFilePath: this.uploadedFilePath })
+          .then((response) => {
+            const result = response.data;
+            this.$Message.success(result.message);
+            this.$timer.start('fetchUpdateLog');
+          })
+          .catch((err) => {
+            if (err.response) {
+              this.$Message.error(err.response.data.message);
+            } else {
+              this.$Message.error('Request fail');
+            }
+          });
         } else {
           this.$Message.error('Please upload file before submit!');
         }
       },
-      onUploadSuccess(response, file, fileList) {
-        // todo: how to get file name of file, then set uploadedFilePath
-        // todo: send command with uploadedFilePath
-        this.uploadedFilePath = `/root/user_file/arduino/${fileList.name}`;
-        this.$Message.success(`Upload ${fileList.name} success`);
+      onUploadSuccess(response, file) {
+        this.uploadedFilePath = `/root/user_file/INFO/arduino/${file.name}`;
+        this.$Message.success(`Upload ${file.name} success`);
       },
       onUploadError(error, file, fileList) {
-        console.error(error, file, fileList);
-        console.log(fileList.name);
         this.$Message.error(`Upload ${fileList.name} fail`);
       },
     },
-    created() {
-      // TODO: 初始化数据
-      console.log(`items is: ${this.items}`);
-    },
     timers: {
-      fetchUpdateLog: { time: 3000, autostart: false, repeat: true },
-      fetchEnergyStatus: { time: 3 * 1000, autostart: true, repeat: false },
+      fetchUpdateLog: { time: 100, autostart: false, repeat: true },
+      fetchStorageStatus: { time: 0, autostart: true, repeat: false },
     },
   };
 </script>

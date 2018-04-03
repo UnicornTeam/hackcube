@@ -3,9 +3,9 @@
     <cube-nav/>
 
     <h1 class="text-center">Cube HID Manage</h1>
-    <h3 class="text-center">用Cube模拟成键盘、鼠标、HID等设备</h3>
+    <h3 class="text-center">Using Cube to simulate keyboard, mouse, HID and other devices</h3>
     <br/>
-    <h5>要输出的键值</h5>
+    <h5>Key to output:</h5>
     <b-form-input v-model="Key"
                   type="text"
                   placeholder="Key">
@@ -20,7 +20,7 @@
     <h5>Script</h5>
     <b-table :items="items" :fields="fields">
       <div slot="Run" slot-scope="data">
-        <b-button size="sm" variant="success" @click="onClick(data.index)">Run</b-button>
+        <b-button size="sm" variant="primary" @click="onClick(data.index)">Run</b-button>
       </div>
     </b-table>
   </div>
@@ -42,8 +42,8 @@
           extraData: { type: 'HID-Script' },
           fields: ['Info', 'Name', 'Run'],
           items: [
-            { Index: 0, Info: '29d172a6', Name: '锁屏', Run: false },
-            { Index: 1, Info: 'd2f392f1', Name: '添加用户', Run: false },
+            { Index: 0, Info: '29d172a6', Name: 'Lock screen', Run: false },
+            { Index: 1, Info: 'd2f392f1', Name: 'Add User', Run: false },
             { Index: 2, Info: '9209993f', Name: 'ShellCode', Run: false },
           ],
         };
@@ -53,13 +53,15 @@
           axios
             .get(`${process.env.BACKEND_HOST}/serial_send/${parameter}`)
             .then((response) => {
-              const result = response.data;
-              console.log(result);
-              this.$Message.success('Execute success.');
+              const message = response.data.message;
+              this.$Message.success(message);
             })
             .catch((err) => {
-              console.log(err.response);
-              this.$Message.error('Execute fail.');
+              if (err.response) {
+                this.$Message.error(err.response.data.message);
+              } else {
+                this.$Message.error('Request fail');
+              }
             });
         },
         onClickSubmit() {
@@ -69,16 +71,7 @@
             this.$Message.error('Please input Key before submit.');
           }
         },
-        onRead(file, content) {
-          console.log(file);
-          console.log(content);
-          console.log(Buffer.from(file.content, 'base64').toString('utf-8'));
-          // TODO: Send result to backend
-          // TODO: Add upload success prompt
-        },
-        // TODO: Deal with onClick logic.
         onClick(index) {
-          console.log(index);
           switch (index) {
             case 0:
               this.serialSend('ha');
@@ -93,22 +86,12 @@
               break;
           }
         },
-        beforeUpload(file) {
-          // TODO: Add more feature argument
-          console.log(file);
-        },
-        onUploadSuccess(response) {
-          console.log(response);
+        onUploadSuccess() {
           this.$Message.success('Upload success');
         },
-        onUploadFail(err) {
-          console.log(err);
+        onUploadFail() {
           this.$Message.error('Upload fail');
         },
-      },
-      created() {
-        // TODO: 初始化数据
-        console.log(`items is: ${this.items}`);
       },
     };
 </script>
