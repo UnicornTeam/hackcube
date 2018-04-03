@@ -20,6 +20,7 @@ class ProductionConfig(Config):
     CRF_DATA_FILE = '/root/serial_file/data/cRF_24l01_data'
     FIRMWARE_UPDATE_LOG_FILE = '/root/user_file/INFO/update_firmware_log'
     HD_INFO_FILE = '/etc/HD_info'
+    ATTACK_PROGRESS_FILE = '/root/serial_file/attack_progress_bar'
 
     STA_BLOCK_SHELL = "/root/monitor_file/STA_block.sh"
     WIFI_SCAN_SHELL = "/root/monitor_file/wifi_scan.sh"
@@ -42,6 +43,7 @@ class DevelopmentConfig(Config):
     CRF_DATA_FILE = 'data/example_source/cRF_24l01_data'
     FIRMWARE_UPDATE_LOG_FILE = 'data/example_source/update_firmware_log'
     HD_INFO_FILE = 'data/example_source/HD_info'
+    ATTACK_PROGRESS_FILE = '/root/serial_file/attack_progress_bar'
 
     STA_BLOCK_SHELL = "data/example_bash/test_success.sh"
     WIFI_SCAN_SHELL = "data/example_bash/test_success.sh"

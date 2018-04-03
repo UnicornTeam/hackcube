@@ -144,10 +144,10 @@ def get_all_rf_item(msg_type):
                                      }), status.HTTP_404_NOT_FOUND
         result_item = {
             'freq': s[0].split(':')[-1],
-            'protocol': s[1].split(':')[-1],
-            'modulation': s[2].split(':')[-1],
+            'prot': s[1].split(':')[-1],
+            'MOD': s[2].split(':')[-1],
             'data': s[3].split(':')[-1],
-            'playback': False,
+            'play': False,
             'msg_type': msg_type
         }
         result_items.append(result_item)
@@ -157,6 +157,54 @@ def get_all_rf_item(msg_type):
                              'message': 'Get all_rf_item success.',
                              data_key: result_items,
                              'data_key': data_key
+                             })
+
+
+@app.route("/attack_status", methods=['GET'])
+def get_attack_status():
+    # TODO: Finish it.
+    attack_status = None
+    file_path = app.config['ATTACK_PROGRESS_FILE']
+    if not os.path.exists(file_path):
+        return simplejson.dumps({'status': 'fail',
+                                 'api': 'attack_status',
+                                 'parameter': None,
+                                 'message': 'Get attack_status fail, file not found.',
+                                 'data_key': 'attack_status',
+                                 'attack_status': attack_status
+                                 }), status.HTTP_404_NOT_FOUND
+
+    with open(file_path, 'r') as f:
+        lines = f.readlines()
+        for i in range(len(lines)):
+            if not lines[i]:
+                del lines[i]
+
+    if len(lines) != 1:
+        return simplejson.dumps({'status': 'fail',
+                                 'api': 'attack_status',
+                                 'parameter': None,
+                                 'message': 'Get attack_status fail,log file format error.',
+                                 'data_key': 'attack_status',
+                                 'attack_status': attack_status
+                                 }), status.HTTP_500_INTERNAL_SERVER_ERROR
+    try:
+        attack_status = int(lines[0])
+    except ValueError as e:
+        print(e)
+        return simplejson.dumps({'status': 'fail',
+                                 'api': 'attack_status',
+                                 'parameter': None,
+                                 'message': 'Get attack_status fail,log file format error.',
+                                 'data_key': 'attack_status',
+                                 'attack_status': attack_status
+                                 }), status.HTTP_500_INTERNAL_SERVER_ERROR
+    return simplejson.dumps({'status': 'success',
+                             'api': 'attack_status',
+                             'parameter': None,
+                             'message': 'Get attack_status success.',
+                             'data_key': 'attack_status',
+                             'attack_status': attack_status
                              })
 
 
@@ -217,10 +265,10 @@ def get_rf_item(msg_type):
                                  }), status.HTTP_404_NOT_FOUND
     result_item = {
         'freq': s[0].split(':')[-1],
-        'protocol': s[1].split(':')[-1],
-        'modulation': s[2].split(':')[-1],
+        'prot': s[1].split(':')[-1],
+        'MOD': s[2].split(':')[-1],
         'data': s[3].split(':')[-1],
-        'playback': False,
+        'play': False,
         'msg_type': msg_type
     }
     return simplejson.dumps({'status': 'success',
@@ -322,6 +370,8 @@ def get_sta_list():
             'RSSI': l[1],
             'BSSID': l[3]
         }
+        if 'not' in i['BSSID']:
+            i['BSSID'] = 'None'
         sta_list.append(i)
     return simplejson.dumps({'status': 'success',
                              'api': 'sta_list',
@@ -344,7 +394,8 @@ def ap_block(bssid, action):
                                  }), status.HTTP_400_BAD_REQUEST
     try:
         subprocess.call("{} {} {}".format(app.config['AP_BLOCK_SHELL'], bssid, action), shell=True)
-    except CalledProcessError:
+    except CalledProcessError as e:
+        print(e)
         return simplejson.dumps({'status': 'fail',
                                  'api': 'ap_block',
                                  'parameter': [bssid, action],
@@ -370,7 +421,8 @@ def sta_block(mac, action):
                                  }), status.HTTP_400_BAD_REQUEST
     try:
         subprocess.call("{} {} {}".format(app.config['STA_BLOCK_SHELL'], mac, action), shell=True)
-    except CalledProcessError:
+    except CalledProcessError as e:
+        print(e)
         return simplejson.dumps({'status': 'fail',
                                  'api': 'sta_block',
                                  'parameter': [mac, action],
@@ -395,7 +447,8 @@ def wifi_scan(action, channel):
                                  }), status.HTTP_400_BAD_REQUEST
     try:
         subprocess.call("{} {} {}".format(app.config['WIFI_SCAN_SHELL'], action, channel), shell=True)
-    except CalledProcessError:
+    except CalledProcessError as e:
+        print(e)
         return simplejson.dumps({'status': 'fail',
                                  'api': 'wifi_scan',
                                  'parameter': [action, channel],
@@ -414,7 +467,8 @@ def wifi_scan(action, channel):
 def serial_send(parameter):
     try:
         subprocess.call("{} {}".format(app.config['SERIAL_SEND_SHELL'], parameter), shell=True)
-    except CalledProcessError:
+    except CalledProcessError as e:
+        print(e)
         return simplejson.dumps({'status': 'fail',
                                  'api': 'serial_send',
                                  'parameter': parameter,
@@ -519,7 +573,8 @@ def update_firmware():
 
     try:
         subprocess.call("{} {}".format(app.config['UPDATE_FIRMWARE_SHELL'], uploaded_file_path), shell=True)
-    except CalledProcessError:
+    except CalledProcessError as e:
+        print(e)
         return simplejson.dumps({'status': 'fail',
                                  'api': 'update_firmware',
                                  'parameter': uploaded_file_path,
