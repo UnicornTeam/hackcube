@@ -26,10 +26,10 @@ div.van-switch {
   font-size: 25px!important;
 }
 
-.ivu-select-selection{
-  height: 27px!important;
-  padding-top: 2px!important;
-}
+/*.ivu-select-selection{*/
+  /*height: 27px!important;*/
+  /*padding-top: 2px!important;*/
+/*}*/
 
 div.board {
   margin-left: 10px;margin-right: 10px;
@@ -45,7 +45,3 @@ div.board {
   /*text-align:center;*/
   /*vertical-align:middle;*/
 /*}*/
-
-td[aria-colindex] > div {
-  min-width: 40px;
-}

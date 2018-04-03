@@ -62,8 +62,8 @@
       <div slot="pressure" slot-scope="data">
         <b-form-input v-model="tpmsItems[data.index].pressure" type="text"></b-form-input>
       </div>
-      <div slot="temperature" slot-scope="data">
-        <b-form-input v-model="tpmsItems[data.index].temperature" type="text"></b-form-input>
+      <div slot="TMP" slot-scope="data">
+        <b-form-input v-model="tpmsItems[data.index].TMP" type="text"></b-form-input>
       </div>
       <div slot='valve' slot-scope="data">
         <b-form-input v-model="tpmsItems[data.index].valve" type="text"></b-form-input>
@@ -83,8 +83,24 @@
       </b-row>
     </b-container>
 
-    <b-progress :value="70" variant="danger" :animated="animate" class="mb-3"/>
-
+    <b-progress :value="attackProgress" variant="danger" :animated="animate" class="mb-3"/>
+    <Select size="large" v-model="protocol" placeholder="Protocol">
+      <Option value="PT224X">PT224X</Option>
+      <Option value="PT226X" disabled>PT226X</Option>
+      <!--<Option v-for="item in protocolList" :value="item.value" :key="item.value">{{ item.label }}</Option>-->
+    </Select>
+    <br/><br/>
+    <b-container>
+      <b-row align-h="between">
+        <b-col cols="6" style="padding-left: 0">
+          <b-form-input v-model="attackValueLeft" type="text"></b-form-input>
+        </b-col>
+        <b-col cols="6" style="padding-right: 0">
+          <b-form-input v-model="attackValueRight" type="text"></b-form-input>
+        </b-col>
+      </b-row>
+    </b-container>
+    <br/><br/><br/><br/>
   </div>
 </template>
 
@@ -102,7 +118,11 @@
     },
     data() {
       return {
+        attackProgress: 0,
+        attackValueLeft: '1755',
+        attackValueRight: '17a5',
         spinShow: true,
+        protocol: 'PT224X',
         latest_nfc_item: '',
         showNFCAlert: false,
         latest_arf_item: '',
@@ -115,13 +135,25 @@
         // if continue animate
         animate: true,
         fields_show: ['data', 'freq', 'prot', 'MOD', 'play'],
-        fields_input: ['ID', 'voltage', 'pressure', 'temperature', 'valve'],
+        fields_input: ['ID', 'voltage', 'pressure', 'TMP', 'valve'],
         rfItems: [],
         tpmsItems: [
-          { ID: '20959185', voltage: '', pressure: '', temperature: '', valve: '' },
-          { ID: 'eb107f85', voltage: '', pressure: '', temperature: '', valve: '' },
-          { ID: 'F0FB2385', voltage: '', pressure: '', temperature: '', valve: '' },
-          { ID: '2093ef85', voltage: '', pressure: '', temperature: '', valve: '' },
+          { ID: '20959185', voltage: 'a0', pressure: '20', TMP: '60', valve: '08' },
+          { ID: 'eb107f85', voltage: 'a0', pressure: '20', TMP: '60', valve: '08' },
+          { ID: 'F0FB2385', voltage: 'a0', pressure: '20', TMP: '60', valve: '08' },
+          { ID: '2093ef85', voltage: 'a0', pressure: '20', TMP: '60', valve: '08' },
+        ],
+        protocolList: [
+          {
+            value: 'PT226X',
+            label: 'PT226X',
+            disabled: true,
+          },
+          {
+            value: 'PT224X',
+            label: 'PT224X',
+            disabled: false,
+          },
         ],
       };
     },
@@ -240,7 +272,32 @@
           });
         }
       },
+      getAttackProgress() {
+        const that = this;
+        axios
+          .get(`${process.env.BACKEND_HOST}/attack_status`)
+          .then((response) => {
+            const result = response.data;
+            // todo: write test code
+            const dataKey = result.data_key;
+            that.$Message.success(result.message);
+            // TODO: Check if need to translate to integer
+            that.attackProgress = parseInt(result[dataKey], 0);
+            if (that.attackProgress === 100) {
+              that.$timer.stop('getAttackProgress');
+            }
+          })
+          .catch((err) => {
+            this.spinShow = false;
+            if (err.response) {
+              this.$Message.error(err.response.data.message);
+            } else {
+              this.$Message.error('Request fail');
+            }
+          });
+      },
       onSwitch(switchType) {
+        // let parameter = '';
         switch (switchType) {
           case 'sniffer':
             if (this.snifferSwitch) {
@@ -257,10 +314,10 @@
             }
             for (const item of this.tpmsItems) {
               // todo: write test code
-              if (!item.voltage && !item.pressure && !item.temperature && !item.valve) {
+              if (!item.voltage && !item.pressure && !item.TMP && !item.valve) {
                 return;
               }
-              const parameter = `t${item.ID}${item.voltage}${item.pressure}${item.temperature}${item.valve}`;
+              const parameter = `t${item.ID}${item.voltage}${item.pressure}${item.TMP}${item.valve}`;
               // this.serialSend(parameter);
               const that = this;
               setTimeout(() => {
@@ -271,7 +328,25 @@
             this.$Message.success('Send all valid item to process!');
             break;
           case 'attack':
-            // 暂不实现
+            if (!this.attackSwitch) {
+              return;
+            }
+            if (!this.attackValueLeft && this.attackValueRight) {
+              this.$message.error('Please input at least on parameter.');
+              this.attackSwitch = false;
+              return;
+            }
+            if (this.protocol === 'PT224X') {
+              const parameter = `rc2start${this.attackValueLeft}end${this.this.attackValueRight}`;
+              this.serialSend(parameter);
+            } else if (this.protocol === 'PT224X') {
+              const parameter = `rc1start${this.attackValueLeft}end${this.this.attackValueRight}`;
+              this.serialSend(parameter);
+            } else {
+              this.$message.error('Please select right protocol.');
+              return;
+            }
+            this.$timer.start('getAttackProgress');
             break;
           default:
             break;
@@ -293,19 +368,12 @@
       fetchAllRFItems: { time: 0, autostart: true, repeat: false },
       fetchRFItem: { time: 3000, autostart: false, repeat: true },
       fetchNFCData: { time: 3000, autostart: false, repeat: true },
+      getAttackProgress: { time: 500, autostart: false, repeat: true },
     },
   };
 </script>
 
 <style>
-  /*td[aria-colindex] {*/
-    /*max-width: 30px!important;*/
-    /*word-wrap: break-word;*/
-    /*padding-right: 4px!important;*/
-    /*padding-left: 4px!important;*/
-    /*text-align:center;*/
-    /*vertical-align:middle;*/
-  /*}*/
   td[aria-colindex] {
     max-width: 6em;
     word-wrap: break-word;
@@ -313,5 +381,8 @@
     padding-left: 4px;
     text-align:center;
     vertical-align:middle;
+  }
+  td[aria-colindex] > div {
+    width: 3.5em;
   }
 </style>
