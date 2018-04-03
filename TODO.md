@@ -80,3 +80,33 @@ axios.get('/user/12345', {
 ```
 
 
+- v-model怎么触发action和Mutation去修改
+- 怎么映射model模块的status action 和 compute到view里面
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

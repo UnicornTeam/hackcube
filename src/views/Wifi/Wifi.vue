@@ -23,14 +23,14 @@
       </b-row>
     </b-container>
     <div>
-      <b-table :items="ap_items" :fields="fields" :per-page="apPerPage" :current-page="apCurrentPage">
+      <b-table :items="apList" :fields="fields" :per-page="apPerPage" :current-page="apCurrentPage">
         <div slot="JAM" slot-scope="data">
-          <van-switch v-model="ap_items[(apCurrentPage-1) * apPerPage + data.index].JAM"
-                      @change="onSwitch('ap_block', ap_items[(apCurrentPage-1) * apPerPage + data.index].BSSID,
-                      data.index, ap_items[(apCurrentPage-1) * apPerPage + data.index].JAM)" />
+          <van-switch v-model="apList[(apCurrentPage-1) * apPerPage + data.index].JAM"
+                      @change="onSwitch('ap_block', apList[(apCurrentPage-1) * apPerPage + data.index].BSSID,
+                      data.index, apList[(apCurrentPage-1) * apPerPage + data.index].JAM)" />
         </div>
       </b-table>
-      <b-pagination align="center" v-if="ap_items.length" size="sm" :total-rows="ap_items.length" v-model="apCurrentPage" :per-page="apPerPage">
+      <b-pagination align="center" v-if="apCount" size="sm" :total-rows="apCount" v-model="apCurrentPage" :per-page="apPerPage">
       </b-pagination>
       <Spin fix v-if="apSpinShow"></Spin>
     </div>
@@ -39,16 +39,18 @@
     <!-- Client list -->
     <h5>Client List</h5>
     <div>
-      <b-table :items="sta_items" :fields="fields2" :per-page="staPerPage" :current-page="staCurrentPage">
+      <b-table :items="staList" :fields="fields2" :per-page="staPerPage" :current-page="staCurrentPage">
         <div slot="JAM" slot-scope="data">
-          <van-switch v-model="sta_items[(staCurrentPage-1) * staPerPage + data.index].JAM"
-                      @change="onSwitch('sta_block', sta_items[(staCurrentPage-1) * staPerPage + data.index].MAC,
-                      data.index, sta_items[(staCurrentPage-1) * staPerPage + data.index].JAM)" />
+          <van-switch v-model="staList[(staCurrentPage-1) * staPerPage + data.index].JAM"
+                      @click="onClickSwitch"
+                      @input="onInputSwitch"
+                      @change="onSwitch('sta_block', staList[(staCurrentPage-1) * staPerPage + data.index].MAC,
+                      data.index, staList[(staCurrentPage-1) * staPerPage + data.index].JAM)" />
         </div>
       </b-table>
       <Spin fix v-if="staSpinShow"></Spin>
     </div>
-    <b-pagination align="center" v-if="sta_items.length" size="sm" :total-rows="sta_items.length" v-model="staCurrentPage" :per-page="staPerPage">
+    <b-pagination align="center" v-if="staCount" size="sm" :total-rows="staCount" v-model="staCurrentPage" :per-page="staPerPage">
     </b-pagination>
   </div>
 </template>
@@ -58,6 +60,8 @@
 
 import CubeNav from '@/components/CubeNav';
 import axios from 'axios';
+import { mapState, mapGetters, mapActions } from 'vuex';
+import { Dialog } from 'vant';
 
 export default {
   name: 'Wifi',
@@ -66,23 +70,19 @@ export default {
   },
   data() {
     return {
-      apSpinShow: false,
-      staSpinShow: false,
-      scanStatus: 'off',
       fields: ['SSID', 'BSSID', 'RSSI', 'JAM'],
-      ap_items: [],
       fields2: ['MAC', 'BSSID', 'RSSI', 'JAM'],
-      sta_items: [],
-      channel: 6,
       defaultChannel: 6,
       channelList: [],
       apPerPage: 6,
-      apCurrentPage: 1,
       staPerPage: 6,
+      channel: 6,
+      apCurrentPage: 1,
       staCurrentPage: 1,
     };
   },
   methods: {
+    ...mapActions('WIFI', ['getAPList', 'getSTAList', 'getStarted', 'setScanStatus', 'setChannel', 'setAPSpinShow', 'setSTASpinShow']),
     onSwitch(api, value, index, isOpen) {
       this.$timer.stop('fetchWifiList');
       const action = isOpen ? 'on' : 'off';
@@ -102,9 +102,8 @@ export default {
     },
     onClickScan() {
       // send request with action to backend
-      this.scanStatus = this.scanStatus === 'on' ? 'off' : 'on';
-      const channel =
-        this.channel === null ? this.defaultChannel : this.channel;
+      this.setScanStatus(this.scanStatus === 'on' ? 'off' : 'on');
+      const channel = this.channel === null ? this.defaultChannel : this.channel;
       axios
         .get(
           `${process.env.BACKEND_HOST}/wifi_scan/${this.scanStatus}/${channel}`,
@@ -113,8 +112,8 @@ export default {
           if (this.scanStatus === 'on') {
             this.$timer.start('fetchWifiList');
             this.$Message.info('Start scan WiFi.');
-            this.apSpinShow = true;
-            this.staSpinShow = true;
+            this.setAPSpinShow(true);
+            this.setSTASpinShow(true);
           } else if (this.scanStatus === 'off') {
             this.$timer.stop('fetchWifiList');
             this.$Message.info('Stop scan WiFi.');
@@ -129,83 +128,28 @@ export default {
         });
     },
     fetchWifiList() {
-      if (this.scanStatus === 'on') {
-        const apiList = ['ap_list', 'sta_list'];
-        for (const api of apiList) {
-          axios
-            .get(`${process.env.BACKEND_HOST}/${api}`, {
-              validateStatus(status) {
-                return status < 400;
-              },
-            })
-            .then((response) => {
-              const result = response.data;
-              if (response.status === 304) {
-                this.apSpinShow = false;
-                this.staSpinShow = false;
-                return;
-              }
-              // this.$Message.success('Fetch wifi list success.');
-              if (api === 'ap_list') {
-                this.ap_items = result[result.data_key];
-                this.apSpinShow = false;
-              } else {
-                this.sta_items = result[result.data_key];
-                this.staSpinShow = false;
-              }
-            })
-            .catch((err) => {
-              this.apSpinShow = false;
-              this.staSpinShow = false;
-              if (err.response) {
-                this.$Message.error(err.response.data.message);
-              } else {
-                this.$Message.error('Request fail');
-              }
-            });
+      // console.log(this.getAPList);
+      this.getAPList().catch((err) => {
+        if (err.response) {
+          this.$Message.error(err.response.data.message);
+        } else {
+          this.$Message.error('Request fail');
         }
-      }
+      });
+      this.getSTAList().catch((err) => {
+        if (err.response) {
+          this.$Message.error(err.response.data.message);
+        } else {
+          this.$Message.error('Request fail');
+        }
+      });
     },
     getChannelList() {
       const channelList = [];
       const numList = [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10,
-        11,
-        12,
-        13,
-        36,
-        40,
-        44,
-        48,
-        52,
-        56,
-        60,
-        64,
-        100,
-        104,
-        108,
-        112,
-        115,
-        120,
-        124,
-        128,
-        132,
-        136,
-        140,
-        149,
-        153,
-        157,
-        161,
-        165,
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 36, 40, 44, 48,
+        52, 56, 60, 64, 100, 104, 108, 112, 115, 120, 124, 128, 132,
+        136, 140, 149, 153, 157, 161, 165,
       ];
       for (const num of numList) {
         const channel = {
@@ -216,6 +160,22 @@ export default {
       }
       this.channelList = channelList;
     },
+    onInputSwitch(checked) {
+      Dialog.confirm({
+        title: '提醒',
+        message: '是否切换开关？',
+      }).then(() => {
+        console.log('I am been input!', checked);
+      });
+    },
+    onClickSwitch() {
+      Dialog.confirm({
+        title: '提醒',
+        message: '被点击了！',
+      }).then(() => {
+        console.log('I am been click!');
+      });
+    },
   },
   created() {
     // TODO: Save the final fresh wifi list when leave page
@@ -225,6 +185,35 @@ export default {
   timers: {
     fetchWifiList: { time: 3000, autostart: false, repeat: true },
   },
+  computed: {
+    ...mapState(
+      'WIFI',
+      ['apList',
+        // 'staList',
+        'apSpinShow',
+        'staSpinShow',
+        'scanStatus',
+      ]),
+    ...mapGetters('WIFI', ['staCount', 'apCount']),
+    staList: {
+      get() {
+        return this.$store.state.WIFI.staList;
+      },
+      set(value) {
+        console.log(value);
+        // this.$store.commit('updateMessage', value);
+      },
+    },
+  },
+  // watch: {
+  //   staList: {
+  //     handler(val, oldVal) {
+  //       console.log('a thing changed');
+  //       console.log(val, oldVal, val === oldVal);
+  //     },
+  //     deep: true,
+  //   },
+  // },
 };
 </script>
 
