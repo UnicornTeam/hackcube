@@ -4,26 +4,26 @@
     <b-alert :show="showARFAlert" variant="primary" dismissible>
       <h4 class="alert-heading">RF</h4>
       <p>
-        频率{{latest_arf_item.频率}}发现协议为{{latest_arf_item.协议}}.数据内容为{{latest_arf_item.数据}}信号.<a href="#content">点击查看</a>
+        In frequency {{latest_arf_item.freq}} found protocol: {{latest_arf_item.protocol}}, data: {{latest_arf_item.data}} signal.<a href="#content">Learn More.</a>
       </p>
     </b-alert>
 
     <b-alert :show="showCRFAlert" variant="primary" dismissible>
       <h4 class="alert-heading">RF</h4>
       <p>
-        频率{{latest_crf_item.频率}}发现协议为{{latest_crf_item.协议}}.数据内容为{{latest_crf_item.数据}}信号.<a href="#content">点击查看</a>
+        In frequency {{latest_crf_item.freq}} found protocol: {{latest_crf_item.protocol}}, data: {{latest_crf_item.data}} signal.<a href="#content">Learn More.</a>
       </p>
     </b-alert>
 
     <b-alert :show="showNFCAlert" variant="success" dismissible>
       <h4 class="alert-heading">NFC</h4>
       <p>
-        捕获卡号:{{latest_nfc_item.ID}}, <u @click="clickNFC">点击查看</u>
+        Found NFC card ID: {{latest_nfc_item.ID}}, <u @click="clickNFC">Learn More.</u>
       </p>
     </b-alert>
 
     <h1 class="text-center">Cube RF Manage</h1>
-    <h3 class="text-center">对工作在433Mhz,315Mhz的设备进行安全风险检测</h3>
+    <h3 class="text-center">Security Risk Detection on 433Mhz,315Mhz Devices</h3>
     <br/><br/>
     <b-container>
       <b-row align-h="between">
@@ -35,13 +35,13 @@
         </b-col>
       </b-row>
     </b-container>
-
-    <b-table id='content' :items="rfItems" :fields="fields_show">
-      <div slot="重放" slot-scope="data">
-        <b-button size="sm" variant="primary" @click="onClick(data.index)">Run</b-button>
-      </div>
-    </b-table>
-
+    <!--<div id='content'>-->
+      <b-table responsive :items="rfItems" :fields="fields_show">
+        <div slot="playback" slot-scope="data">
+          <b-button size="sm" variant="primary" @click="onClick(data.index)">Run</b-button>
+        </div>
+      </b-table>
+    <!--</div>-->
 
     <b-container>
       <b-row align-h="between">
@@ -54,18 +54,18 @@
       </b-row>
     </b-container>
 
-    <b-table :items="tpmsItems" :fields="fields_input">
-      <div slot="电压" slot-scope="data">
-        <b-form-input v-model="tpmsItems[data.index].电压" type="text"></b-form-input>
+    <b-table responsive :items="tpmsItems" :fields="fields_input">
+      <div slot="voltage" slot-scope="data">
+        <b-form-input v-model="tpmsItems[data.index].voltage" type="text"></b-form-input>
       </div>
-      <div slot="压力" slot-scope="data">
-        <b-form-input v-model="tpmsItems[data.index].压力" type="text"></b-form-input>
+      <div slot="pressure" slot-scope="data">
+        <b-form-input v-model="tpmsItems[data.index].pressure" type="text"></b-form-input>
       </div>
-      <div slot="温度" slot-scope="data">
-        <b-form-input v-model="tpmsItems[data.index].温度" type="text"></b-form-input>
+      <div slot="temperature" slot-scope="data">
+        <b-form-input v-model="tpmsItems[data.index].temperature" type="text"></b-form-input>
       </div>
-      <div slot='气阀' slot-scope="data">
-        <b-form-input v-model="tpmsItems[data.index].气阀" type="text"></b-form-input>
+      <div slot='valve' slot-scope="data">
+        <b-form-input v-model="tpmsItems[data.index].valve" type="text"></b-form-input>
       </div>
     </b-table>
 
@@ -112,18 +112,14 @@
         attackSwitch: false,
         // if continue animate
         animate: true,
-        fields_show: ['数据', '频率', '协议', '调制', '重放'],
-        fields_input: ['ID', '电压', '压力', '温度', '气阀'],
-        rfItems: [
-          { 频率: '315.00Mhz', 协议: 'PT226X', 调制: 'ASK', 重放: false, 数据: 'hfgh34h' },
-          { 频率: '433.92Mhz', 协议: 'Keeloq', 调制: 'ASK', 重放: false, 数据: 'hfgd3fd' },
-          { 频率: '433.92Mhz', 协议: 'PT224X', 调制: 'FSK', 重放: false, 数据: 'sa29f9w' },
-        ],
+        fields_show: ['data', 'freq', 'protocol', 'modulation', 'playback'],
+        fields_input: ['ID', 'voltage', 'pressure', 'temperature', 'valve'],
+        rfItems: [],
         tpmsItems: [
-          { ID: '20959185', 电压: '', 压力: '', 温度: '', 气阀: '' },
-          { ID: 'eb107f85', 电压: '', 压力: '', 温度: '', 气阀: '' },
-          { ID: 'F0FB2385', 电压: '', 压力: '', 温度: '', 气阀: '' },
-          { ID: '2093ef85', 电压: '', 压力: '', 温度: '', 气阀: '' },
+          { ID: '20959185', voltage: '', pressure: '', temperature: '', valve: '' },
+          { ID: 'eb107f85', voltage: '', pressure: '', temperature: '', valve: '' },
+          { ID: 'F0FB2385', voltage: '', pressure: '', temperature: '', valve: '' },
+          { ID: '2093ef85', voltage: '', pressure: '', temperature: '', valve: '' },
         ],
       };
     },
@@ -172,7 +168,7 @@
             this.$Message.error('Execute fail.');
           });
       },
-      fetchData() {
+      fetchRFItem() {
         const dataAPIs = ['arf', 'crf'];
         const that = this;
         for (const api of dataAPIs) {
@@ -210,14 +206,37 @@
             });
         }
       },
+      fetchAllRFItems() {
+        const dataAPIs = ['arf', 'crf'];
+        const that = this;
+        for (const api of dataAPIs) {
+          axios
+          .get(`${process.env.BACKEND_HOST}/all_rf_item/${api}`)
+          .then((response) => {
+            const result = response.data;
+            // todo: write test code
+            console.log(result);
+            const dataKey = result.data_key;
+            // todo: add Transition animation
+            that.$Message.success(`Detect new ${dataKey} data.`);
+            that.rfItems = that.rfItems.concat(result[dataKey]);
+          })
+          .catch((err) => {
+            console.log(err.response);
+            that.$Message.error(`Fetch ${api} data fail.`);
+          });
+        }
+      },
       onSwitch(switchType) {
         console.log(switchType);
         switch (switchType) {
           case 'sniffer':
             if (this.snifferSwitch) {
-              this.$timer.start('fetchData');
+              this.$timer.start('fetchRFItem');
+              this.$message.info('Start detect new RF item.');
             } else {
-              this.$timer.stop('fetchData');
+              this.$timer.stop('fetchRFItem');
+              this.$message.info('Stop detect new RF item.');
             }
             break;
           case 'tpms':
@@ -226,12 +245,12 @@
             }
             for (const item of this.tpmsItems) {
               // todo: write test code
-              if (!item.电压 && !item.压力 && !item.温度 && !item.气阀) {
+              if (!item.voltage && !item.pressure && !item.temperature && !item.valve) {
                 console.log('continue tpmsItem');
                 // this.$Message.error('You need input one or more.');
                 return;
               }
-              const parameter = `t${item.ID}${item.电压}${item.压力}${item.温度}${item.气阀}`;
+              const parameter = `t${item.ID}${item.voltage}${item.pressure}${item.temperature}${item.valve}`;
               // this.serialSend(parameter);
               const that = this;
               setTimeout(() => {
@@ -251,18 +270,20 @@
       onClick(index) {
         console.log(index);
         const item = this.rfItems[index];
-        const parameter = `"rfreq:${item.频率};protocol:${item.协议};modulation:${item.调制};data:${item.数据}"`;
+        const parameter = `"rfreq:${item.freq};protocol:${item.protocol};modulation:${item.modulation};data:${item.data}"`;
         this.serialSend(parameter);
       },
     },
     created() {
       if (this.snifferSwitch) {
-        this.$timer.start('fetchData');
+        this.$timer.start('fetchAllRFItems');
+        this.$timer.start('fetchRFItem');
         this.$timer.start('fetchNFCData');
       }
     },
     timers: {
-      fetchData: { time: 3000, autostart: false, repeat: true },
+      fetchAllRFItems: { time: 3000, autostart: false, repeat: false },
+      fetchRFItem: { time: 3000, autostart: false, repeat: true },
       fetchNFCData: { time: 3000, autostart: false, repeat: true },
     },
   };

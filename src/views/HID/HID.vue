@@ -3,9 +3,9 @@
     <cube-nav/>
 
     <h1 class="text-center">Cube HID Manage</h1>
-    <h3 class="text-center">用Cube模拟成键盘、鼠标、HID等设备</h3>
+    <h3 class="text-center">Using Cube to simulate keyboard, mouse, HID and other devices</h3>
     <br/>
-    <h5>要输出的键值</h5>
+    <h5>Key to output:</h5>
     <b-form-input v-model="Key"
                   type="text"
                   placeholder="Key">
@@ -42,8 +42,8 @@
           extraData: { type: 'HID-Script' },
           fields: ['Info', 'Name', 'Run'],
           items: [
-            { Index: 0, Info: '29d172a6', Name: '锁屏', Run: false },
-            { Index: 1, Info: 'd2f392f1', Name: '添加用户', Run: false },
+            { Index: 0, Info: '29d172a6', Name: 'Lock screen', Run: false },
+            { Index: 1, Info: 'd2f392f1', Name: 'Add User', Run: false },
             { Index: 2, Info: '9209993f', Name: 'ShellCode', Run: false },
           ],
         };

@@ -3,20 +3,20 @@
     <cube-nav/>
 
     <h1 class="text-center">Cube Status Manage</h1>
-    <h3 class="text-center">显示Cube设备状态</h3>
+    <h3 class="text-center">Display Cube device status</h3>
     <br/>
-    <h5 class="text-center">电量</h5>
+    <h5 class="text-center">Electricity</h5>
     <b-progress :value="energyPercent"
                 variant="dark"
     ></b-progress>
     <br/>
-    <h5 class="text-center">硬盘</h5>
+    <h5 class="text-center">Hard driver</h5>
     <b-progress :value="storePercent"
                 variant="dark"
     ></b-progress>
     <br/><br/>
 
-    <h5>上传arduino固件</h5>
+    <h5>Upload arduino firmware</h5>
     <Upload
       :data="extraDataArdu"
       :on-success="onUploadSuccess"

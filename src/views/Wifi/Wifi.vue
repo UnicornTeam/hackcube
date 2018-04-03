@@ -3,11 +3,11 @@
     <cube-nav/>
 
     <h1 class="text-center">Cube Wifi Manage</h1>
-    <h3 class="text-center">对工作在2.4Ghz 5Ghz设备进行安全风险检测</h3>
+    <h3 class="text-center">Security Risk Detection on 2.4Ghz 5Ghz Devices</h3>
     <br/>
     <b-container>
       <b-row >
-        <b-col cols="5">
+        <b-col cols="5" style="padding-left: 0;">
           <h5>WiFi List</h5>
         </b-col>
         <b-col cols="1"></b-col>

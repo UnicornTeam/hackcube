@@ -3,7 +3,7 @@
     <cube-nav/>
 
     <h1 class="text-center">Cube NFC Manage</h1>
-    <h3 class="text-center">对工作在125Khz, 13.5Mhz的卡片进行安全风险检测</h3>
+    <h3 class="text-center">Safety Risk Detection for Cards Working at 125Khz, 13.5Mhz.</h3>
     <br/>
     <!-- Read List -->
     <b-container>
@@ -11,7 +11,7 @@
         <b-col cols="4">
           <h5>Read</h5>
         </b-col>
-        <b-col cols="3">
+        <b-col cols="2">
           <van-switch v-model="readSwitch" @change="onSwitchRead" size="25px"/>
         </b-col>
       </b-row>
@@ -171,10 +171,10 @@
         switch (actionType) {
           case 'nw':
             if (!(this.writeVid && this.writeId)) {
-              this.$Message.error('请输入ID和VID');
+              this.$Message.error('Please input ID and VID');
               this.writeSwitch = !this.writeSwitch;
             } else if (!(isValidIds(this.writeVid, this.writeId))) {
-              this.$Message.error('请输入规范的ID和VID');
+              this.$Message.error('Please input the right ID and VID');
               this.writeSwitch = !this.writeSwitch;
             } else {
               const parameter = `${actionType}${this.writeVid}${this.writeId}`;
@@ -183,10 +183,10 @@
             break;
           case 'ns':
             if (!(this.simulateVid && this.simulateId)) {
-              this.$Message.error('请输入ID和VID');
+              this.$Message.error('Please input the right ID and VID');
               this.simulateSwitch = !this.simulateSwitch;
             } else if (!(isValidIds(this.simulateVid, this.simulateId))) {
-              this.$Message.error('请输入规范的ID和VID');
+              this.$Message.error('Please input the right ID and VID');
               this.simulateSwitch = !this.simulateSwitch;
             } else {
               const parameter = `${actionType}${this.simulateVid}${this.simulateId}`;
@@ -194,7 +194,7 @@
             }
             break;
           default:
-            this.$Message.error('请输入正确的API');
+            this.$Message.error('Please input the right API');
             break;
         }
       },
