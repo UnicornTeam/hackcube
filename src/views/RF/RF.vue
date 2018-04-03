@@ -148,7 +148,7 @@
             }
             this.latest_nfc_item = result[result.data_key];
             this.showNFCAlert = true;
-            this.$Message.success('Detect new nfc data.');
+            this.$Message.info('Detect new nfc data.');
           })
           .catch((err) => {
             console.log(err.response);

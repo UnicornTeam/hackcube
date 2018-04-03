@@ -106,10 +106,10 @@ export default {
           console.log(result);
           if (this.scanStatus === 'on') {
             this.$timer.start('fetchWifiList');
-            this.$Message.success('Start scan WiFi.');
+            this.$Message.info('Start scan WiFi.');
           } else if (this.scanStatus === 'off') {
             this.$timer.stop('fetchWifiList');
-            this.$Message.success('Stop scan WiFi.');
+            this.$Message.info('Stop scan WiFi.');
           }
         })
         .catch((err) => {

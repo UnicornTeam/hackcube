@@ -131,7 +131,7 @@
               return;
             }
             this.items = [result[result.data_key]];
-            this.$Message.success('Detect new nfc data.');
+            this.$Message.info('Detect new nfc data.');
           })
           .catch((err) => {
             console.log(err.response);

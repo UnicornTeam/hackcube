@@ -82,7 +82,7 @@
             const result = response.data;
             if (response.status === 304) {
               this.$timer.stop('fetchUpdateLog');
-              this.$Message.success('Update finish.');
+              this.$Message.info('Update finish.');
               return;
             }
             this.updateLog = result[result.data_key];

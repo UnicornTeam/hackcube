@@ -16,7 +16,7 @@ DONE: 导航的UI改进
 DONE: 进入RF页面时读取/root/serial_file/data/aRF_Keeloq_data 和 cRF_24l01_data全部内容来初始化表格
 DONE: Pagination 居中
 TODO: success => this.$message.info
-TODO: Server add all_rf_item
+DONE: Server add all_rf_item
 TODO: 完善error消息客户端显示 后端记录
 
 Done WIFI 和 Client List
