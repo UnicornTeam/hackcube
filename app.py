@@ -57,7 +57,7 @@ def get_nfc_item():
         return simplejson.dumps({'status': 'fail',
                                  'api': 'nfc_item',
                                  'parameter': None,
-                                 'message': 'Call get_nfc_item fail.FILE NOT FOUND',
+                                 'message': 'Get nfc_item fail.FILE NOT FOUND',
                                  'nfc_item': nfc_item,
                                  'data_key': 'nfc_item'
                                  }), status.HTTP_404_NOT_FOUND
@@ -67,7 +67,7 @@ def get_nfc_item():
         return simplejson.dumps({'status': 'success',
                                  'api': 'nfc_item',
                                  'parameter': None,
-                                 'message': 'Call get_nfc_item success.But no new NFC item',
+                                 'message': 'Get nfc_item success.But no new NFC item',
                                  'nfc_item': nfc_item,
                                  'data_key': 'nfc_item'
                                  }), status.HTTP_304_NOT_MODIFIED
@@ -80,7 +80,7 @@ def get_nfc_item():
         return simplejson.dumps({'status': 'fail',
                                  'api': 'nfc_item',
                                  'parameter': None,
-                                 'message': 'Call get_nfc_item fail.Item NOT FOUND',
+                                 'message': 'Get nfc_item fail.Item NOT FOUND',
                                  'nfc_item': nfc_item,
                                  'data_key': 'nfc_item'
                                  }), status.HTTP_404_NOT_FOUND
@@ -96,7 +96,7 @@ def get_nfc_item():
         return simplejson.dumps({'status': 'success',
                                  'api': 'nfc_item',
                                  'parameter': None,
-                                 'message': 'Call get_nfc_item success.',
+                                 'message': 'Get nfc_item success.',
                                  'nfc_item': nfc_item,
                                  'data_key': 'nfc_item'
                                  })
@@ -114,7 +114,7 @@ def get_all_rf_item(msg_type):
         return simplejson.dumps({'status': 'fail',
                                  'api': 'all_rf_item',
                                  'parameter': msg_type,
-                                 'message': 'Call all_rf_item fail.parameter msg_type error.',
+                                 'message': 'Get all_rf_item fail.parameter msg_type error.',
                                  data_key: result_items,
                                  'data_key': data_key
                                  }), status.HTTP_400_BAD_REQUEST
@@ -127,7 +127,7 @@ def get_all_rf_item(msg_type):
         return simplejson.dumps({'status': 'fail',
                                  'api': 'all_rf_item',
                                  'parameter': msg_type,
-                                 'message': 'Call all_rf_item fail.Item not exist.',
+                                 'message': 'Get all_rf_item fail.Item not exist.',
                                  data_key: result_items,
                                  'data_key': data_key
                                  }), status.HTTP_404_NOT_FOUND
@@ -138,7 +138,7 @@ def get_all_rf_item(msg_type):
             return simplejson.dumps({'status': 'fail',
                                      'api': 'all_rf_item',
                                      'parameter': msg_type,
-                                     'message': 'Call all_rf_item fail.Item format error.',
+                                     'message': 'Get all_rf_item fail.Item format error.',
                                      data_key: result_items,
                                      'data_key': data_key
                                      }), status.HTTP_404_NOT_FOUND
@@ -154,7 +154,7 @@ def get_all_rf_item(msg_type):
     return simplejson.dumps({'status': 'success',
                              'api': 'all_rf_item',
                              'parameter': msg_type,
-                             'message': 'Call all_rf_item success.',
+                             'message': 'Get all_rf_item success.',
                              data_key: result_items,
                              'data_key': data_key
                              })
@@ -180,7 +180,7 @@ def get_rf_item(msg_type):
         return simplejson.dumps({'status': 'fail',
                                  'api': 'rf_item',
                                  'parameter': msg_type,
-                                 'message': 'Call rf_item fail.parameter msg_type error.',
+                                 'message': 'Get rf_item fail.parameter msg_type error.',
                                  data_key: result_item,
                                  'data_key': data_key
                                  }), status.HTTP_400_BAD_REQUEST
@@ -189,7 +189,7 @@ def get_rf_item(msg_type):
         return simplejson.dumps({'status': 'success',
                                  'api': 'rf_item',
                                  'parameter': msg_type,
-                                 'message': 'Call rf_item success, but NOT MODIFIED.',
+                                 'message': 'Get rf_item success, but NOT MODIFIED.',
                                  data_key: result_item,
                                  'data_key': data_key
                                  }), status.HTTP_304_NOT_MODIFIED
@@ -201,7 +201,7 @@ def get_rf_item(msg_type):
         return simplejson.dumps({'status': 'fail',
                                  'api': 'rf_item',
                                  'parameter': msg_type,
-                                 'message': 'Call rf_item fail.Item not exist.',
+                                 'message': 'Get rf_item fail.Item not exist.',
                                  data_key: result_item,
                                  'data_key': data_key
                                  }), status.HTTP_404_NOT_FOUND
@@ -211,7 +211,7 @@ def get_rf_item(msg_type):
         return simplejson.dumps({'status': 'fail',
                                  'api': 'rf_item',
                                  'parameter': msg_type,
-                                 'message': 'Call rf_item fail.Item format error.',
+                                 'message': 'Get rf_item fail.Item format error.',
                                  data_key: result_item,
                                  'data_key': data_key
                                  }), status.HTTP_404_NOT_FOUND
@@ -226,7 +226,7 @@ def get_rf_item(msg_type):
     return simplejson.dumps({'status': 'success',
                              'api': 'get_rf_item',
                              'parameter': msg_type,
-                             'message': 'Call rf_item success.',
+                             'message': 'Get rf_item success.',
                              data_key: result_item,
                              'data_key': data_key
                              })
@@ -239,7 +239,7 @@ def get_ap_list():
         return simplejson.dumps({'status': 'fail',
                                  'api': 'ap_list',
                                  'parameter': None,
-                                 'message': 'Call ap_list fail.File not found.',
+                                 'message': 'Get ap_list fail.File not found.',
                                  'ap_list': ap_list,
                                  'data_key': 'ap_list'
                                  }), status.HTTP_404_NOT_FOUND
@@ -249,7 +249,7 @@ def get_ap_list():
         return simplejson.dumps({'status': 'success',
                                  'api': 'ap_list',
                                  'parameter': None,
-                                 'message': 'Call ap_list success.But file NOT MODIFIED.',
+                                 'message': 'Get ap_list success.But file NOT MODIFIED.',
                                  'ap_list': ap_list,
                                  'data_key': 'ap_list'
                                  }), status.HTTP_304_NOT_MODIFIED
@@ -279,7 +279,7 @@ def get_ap_list():
     return simplejson.dumps({'status': 'success',
                              'api': 'ap_list',
                              'parameter': None,
-                             'message': 'Call ap_list success.',
+                             'message': 'Get ap_list success.',
                              'ap_list': ap_list,
                              'data_key': 'ap_list'
                              })
@@ -292,7 +292,7 @@ def get_sta_list():
         return simplejson.dumps({'status': 'fail',
                                  'api': 'sta_list',
                                  'parameter': app.config['STA_LIST_FILE'],
-                                 'message': 'Call sta_list error.File not found.',
+                                 'message': 'Get sta_list error.File not found.',
                                  'sta_list': sta_list,
                                  'data_key': 'sta_list'
                                  }), status.HTTP_404_NOT_FOUND
@@ -304,7 +304,7 @@ def get_sta_list():
         return simplejson.dumps({'status': 'success',
                                  'api': 'sta_list',
                                  'parameter': None,
-                                 'message': 'Call sta_list success.But file NOT MODIFIED.',
+                                 'message': 'Get sta_list success.But file NOT MODIFIED.',
                                  'sta_list': sta_list,
                                  'data_key': 'sta_list'
                                  }), status.HTTP_304_NOT_MODIFIED
@@ -326,7 +326,7 @@ def get_sta_list():
     return simplejson.dumps({'status': 'success',
                              'api': 'sta_list',
                              'parameter': None,
-                             'message': 'Call sta_list success.',
+                             'message': 'Get sta_list success.',
                              'sta_list': sta_list,
                              'data_key': 'sta_list'
                              })
@@ -437,7 +437,7 @@ def get_hd_info():
         return simplejson.dumps({'status': 'fail',
                                  'api': 'hd_info',
                                  'parameter': None,
-                                 'message': 'Call hd_info fail, file not found.',
+                                 'message': 'Get hd_info fail, file not found.',
                                  'data_key': 'hd_info',
                                  'hd_info': hd_info
                                  }), status.HTTP_404_NOT_FOUND
@@ -452,7 +452,7 @@ def get_hd_info():
         return simplejson.dumps({'status': 'fail',
                                  'api': 'hd_info',
                                  'parameter': None,
-                                 'message': 'Call hd_info fail,log file format error.',
+                                 'message': 'Get hd_info fail,log file format error.',
                                  'data_key': 'hd_info',
                                  'hd_info': hd_info
                                  }), status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -463,7 +463,7 @@ def get_hd_info():
     return simplejson.dumps({'status': 'success',
                              'api': 'hd_info',
                              'parameter': None,
-                             'message': 'Call hd_info success.',
+                             'message': 'Get hd_info success.',
                              'data_key': 'hd_info',
                              'hd_info': hd_info
                              })
@@ -477,7 +477,7 @@ def update_firmware_log():
         return simplejson.dumps({'status': 'fail',
                                  'api': 'update_firmware_log',
                                  'parameter': None,
-                                 'message': 'Call update_firmware_log fail, file not found.',
+                                 'message': 'Get update_firmware_log fail, file not found.',
                                  'data_key': 'update_log',
                                  'update_log': update_log
                                  }), status.HTTP_404_NOT_FOUND
@@ -488,7 +488,7 @@ def update_firmware_log():
         return simplejson.dumps({'status': 'success',
                                  'api': 'update_firmware_log',
                                  'parameter': None,
-                                 'message': 'Call update_firmware_log success.',
+                                 'message': 'Get update_firmware_log success.',
                                  'data_key': 'update_log',
                                  'update_log': update_log
                                  }), status.HTTP_304_NOT_MODIFIED
@@ -499,7 +499,7 @@ def update_firmware_log():
         return simplejson.dumps({'status': 'success',
                                  'api': 'update_firmware_log',
                                  'parameter': None,
-                                 'message': 'Call update_firmware_log success.',
+                                 'message': 'Get update_firmware_log success.',
                                  'data_key': 'update_log',
                                  'update_log': update_log
                                  })
