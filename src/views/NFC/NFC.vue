@@ -84,6 +84,8 @@
       </b-row>
     </b-container>
 
+    <br/>
+    <Input readonly v-model="updateLog" type="textarea" :autosize="{minRows: 6,maxRows: 14}" placeholder="Upload log..."></Input>
   </div>
 </template>
 
@@ -101,6 +103,7 @@
     },
     data() {
       return {
+        updateLog: '',
         switchSize: '25px',
         readSwitch: true,
         // TODO: Confirm if necessary to disable input when false
@@ -117,6 +120,28 @@
       };
     },
     methods: {
+      fetchNFCLog() {
+        axios
+          .get(`${process.env.BACKEND_HOST}/nfc_log`, {
+            validateStatus(status) {
+              return status < 400;
+            },
+          })
+          .then((response) => {
+            const result = response.data;
+            if (response.status === 304) {
+              return;
+            }
+            this.updateLog = result[result.data_key];
+          })
+          .catch((err) => {
+            if (err.response) {
+              this.$Message.error(err.response.data.message);
+            } else {
+              this.$Message.error('Request fail');
+            }
+          });
+      },
       fetchNFCData() {
         axios
           .get(`${process.env.BACKEND_HOST}/nfc_item`, {
@@ -216,6 +241,7 @@
     },
     timers: {
       fetchNFCData: { time: 3000, autostart: false, repeat: true },
+      fetchNFCLog: { time: 5000, autostart: true, repeat: true },
     },
   };
 </script>
