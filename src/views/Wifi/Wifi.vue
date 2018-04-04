@@ -100,7 +100,6 @@ export default {
     ...mapActions('WIFI', ['getAPList', 'getSTAList', 'getStarted', 'setScanStatus', 'setChannel',
       'setAPSpinShow', 'setSTASpinShow', 'changeAPJAMByIndex', 'changeSTAJAMByIndex']),
     onClickJAM(api, value, index, isRunning) {
-      console.log('on click switch button', index, isRunning);
       this.setScanStatus('off');
       const action = isRunning ? 'off' : 'on';
       if (api === 'ap_block') {
@@ -153,7 +152,6 @@ export default {
         });
     },
     fetchWifiList() {
-      // console.log(this.getAPList);
       this.getAPList().catch((err) => {
         if (err.response) {
           this.$Message.error(err.response.data.message);

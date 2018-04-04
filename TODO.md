@@ -82,6 +82,8 @@ axios.get('/user/12345', {
 
 - v-model怎么触发action和Mutation去修改
 - 怎么映射model模块的status action 和 compute到view里面
+- [笔记]为什么这么用 代码减少重复 提高可维护性
+
 
 
 

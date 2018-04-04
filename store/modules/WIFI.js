@@ -4,7 +4,7 @@ import { SET_API_ITEMS, SET_STA_ITEMS, SET_AP_SPIN_SHOW, SET_STA_SPIN_SHOW,
   SET_SCAN_STATUS, SET_CHANNEL, SET_STA_JAM_BY_INDEX, SET_AP_JAM_BY_INDEX } from '../mutation-types';
 
 const namespaced = true;
-  // initial state
+// initial state
 const state = {
   apList: [],
   staList: [],
@@ -13,18 +13,13 @@ const state = {
   scanStatus: 'off',
 };
 
-  // getters
+// getters
 const getters = {
-    // apList: state => state.apList,
-    // staList: state => state.staList,
-    // apSpinShow: state => state.apSpinShow,
-    // staSpinShow: state => state.staSpinShow,
-    // scanStatus: state => state.scanStatus,
   apCount: state => state.apList.length,
   staCount: state => state.staList.length,
 };
 
-  // actions
+// actions
 const actions = {
   getAPList({ commit }) {
     // commit(SET_AP_SPIN_SHOW, true);
@@ -78,8 +73,7 @@ const actions = {
 };
 
 
-  // mutations
-  // todo: does it need {items} to unpack?
+// mutations
 const mutations = {
   [SET_API_ITEMS](state, items) {
       // state.apList = items;
@@ -111,10 +105,6 @@ const mutations = {
     apList[index].JAM = apList[index].JAM === false;
     Vue.set(state, 'apList', apList);
   },
-    // decrementProductInventory(state, { id }) {
-    //   const product = state.all.find(product => product.id === id);
-    //   product.inventory--;
-    // },
 };
 
 export default {
