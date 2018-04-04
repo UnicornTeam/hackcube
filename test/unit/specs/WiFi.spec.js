@@ -33,11 +33,4 @@ describe('WiFi.vue', () => {
     });
     expect(wrapper.find('.board h1').text()).to.equal('Cube Wifi Manage');
   });
-
-  // it('should render correct contents', () => {
-  //   const Constructor = Vue.extend(Wifi);
-  //   const vm = new Constructor().$mount();
-  //   expect(vm.$el.querySelector('.board h1').textContent)
-  //     .to.equal('Cube Wifi Manage');
-  // });
 });
