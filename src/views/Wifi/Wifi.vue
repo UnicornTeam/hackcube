@@ -235,9 +235,9 @@ export default {
 
 <style>
   td[aria-colindex] {
-    overflow: hidden!important;
-    text-overflow:ellipsis!important;
-    white-space: nowrap!important;
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap;
     max-width: 6em;
     padding-right: 4px;
     padding-left: 4px;
