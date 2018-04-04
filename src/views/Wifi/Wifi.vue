@@ -26,10 +26,10 @@
       <b-table :items="apList" :fields="fields" :per-page="apPerPage" :current-page="apCurrentPage">
         <div slot="JAM" slot-scope="data">
           <b-button size="sm" variant="primary" v-if="!apList[((apCurrentPage-1) * apPerPage) + data.index].JAM"
-                    @click="onClickJAM('ap_block', data.index)">
+                    @click="controlBlock('ap_block', data.index)">
             Run</b-button>
           <b-button size="sm" variant="danger" v-if="apList[((apCurrentPage-1) * apPerPage) + data.index].JAM"
-                    @click="onClickJAM('ap_block', data.index)">
+                    @click="controlBlock('ap_block', data.index)">
             Stop</b-button>
         </div>
       </b-table>
@@ -45,10 +45,10 @@
       <b-table :items="staList" :fields="fields2" :per-page="staPerPage" :current-page="staCurrentPage">
         <div slot="JAM" slot-scope="data">
           <b-button size="sm" variant="primary" v-if="!staList[((staCurrentPage-1) * staPerPage) + data.index].JAM"
-                    @click="onClickJAM('sta_block', data.index)">
+                    @click="controlBlock('sta_block', data.index)">
             Run</b-button>
           <b-button size="sm" variant="danger" v-if="staList[((staCurrentPage-1) * staPerPage) + data.index].JAM"
-                    @click="onClickJAM('sta_block', data.index)">
+                    @click="controlBlock('sta_block', data.index)">
             Stop</b-button>
         </div>
       </b-table>
@@ -82,12 +82,15 @@ export default {
       channel: 6,
       apCurrentPage: 1,
       staCurrentPage: 1,
+      // keep a list of element which is active
+      apActiveList: new Set(),
+      staActiveList: new Set(),
     };
   },
   methods: {
     ...mapActions('WIFI', ['getAPList', 'getSTAList', 'getStarted', 'setScanStatus', 'setChannel',
       'setAPSpinShow', 'setSTASpinShow', 'changeAPJAMByIndex', 'changeSTAJAMByIndex']),
-    onClickJAM(api, index) {
+    controlBlock(api, index) {
       let actualIndex;
       let value;
       let isRunning;
@@ -98,11 +101,21 @@ export default {
         value = this.apList[actualIndex].BSSID;
         isRunning = this.apList[actualIndex].JAM;
         this.changeAPJAMByIndex(actualIndex);
+        if (isRunning) {
+          this.apActiveList.delete(actualIndex);
+        } else {
+          this.apActiveList.add(actualIndex);
+        }
       } else if (api === apis.STA_BLOCK) {
         actualIndex = ((this.staCurrentPage - 1) * this.staPerPage) + index;
         value = this.staList[actualIndex].MAC;
         isRunning = this.staList[actualIndex].JAM;
         this.changeSTAJAMByIndex(actualIndex);
+        if (isRunning) {
+          this.staActiveList.delete(actualIndex);
+        } else {
+          this.staActiveList.add(actualIndex);
+        }
       } else {
         this.$message.error('Please input the right api');
         return;
@@ -206,6 +219,15 @@ export default {
   beforeRouteLeave(to, from, next) {
     this.setScanStatus('off');
     this.controlScan('off', this.channel);
+    // close all element still active
+    // eslint-disable-next-line no-restricted-syntax
+    for (const i of this.apActiveList) {
+      this.controlBlock(apis.AP_BLOCK, i);
+    }
+    // eslint-disable-next-line no-restricted-syntax
+    for (const i of this.staActiveList) {
+      this.controlBlock(apis.STA_BLOCK, i);
+    }
     next();
   },
 };
