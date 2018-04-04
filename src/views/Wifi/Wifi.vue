@@ -64,6 +64,7 @@
 import CubeNav from '@/components/CubeNav';
 import axios from 'axios';
 import { mapState, mapGetters, mapActions } from 'vuex';
+import apis from '@/../services/api/WIFI';
 
 export default {
   name: 'Wifi',
@@ -92,12 +93,12 @@ export default {
       let isRunning;
       this.setScanStatus('off');
       this.$timer.stop('fetchWifiList');
-      if (api === 'ap_block') {
+      if (api === apis.AP_BLOCK) {
         actualIndex = ((this.apCurrentPage - 1) * this.apPerPage) + index;
         value = this.apList[actualIndex].BSSID;
         isRunning = this.apList[actualIndex].JAM;
         this.changeAPJAMByIndex(actualIndex);
-      } else if (api === 'sta_block') {
+      } else if (api === apis.STA_BLOCK) {
         actualIndex = ((this.staCurrentPage - 1) * this.staPerPage) + index;
         value = this.staList[actualIndex].MAC;
         isRunning = this.staList[actualIndex].JAM;
