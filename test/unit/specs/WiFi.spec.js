@@ -31,7 +31,7 @@ describe('WiFi.vue', () => {
       },
       localVue,
     });
-    expect(wrapper.find('.board').exists());
+    expect(wrapper.find('.board h1').text()).to.equal('Cube Wifi Manage');
   });
 
   // it('should render correct contents', () => {
