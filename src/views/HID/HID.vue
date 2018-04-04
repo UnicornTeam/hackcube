@@ -66,7 +66,7 @@
         },
         onClickSubmit() {
           if (this.Key) {
-            this.serialSend(this.Key);
+            this.serialSend(`h${this.Key}`);
           } else {
             this.$Message.error('Please input Key before submit.');
           }

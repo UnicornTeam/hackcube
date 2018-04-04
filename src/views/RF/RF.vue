@@ -101,18 +101,19 @@
       </b-row>
     </b-container>
     <br/><br/>
-    <b-container>
-      <b-row class="justify-content-md-center">
-        <b-col col lg="2">
-          <!-- TODO: Finish onclick and long tap -->
-          <b-button variant="ghost">A</b-button>
-        </b-col>
-        <b-col cols="4" md="auto">Center</b-col>
-        <b-col col lg="2">
-          <b-button variant="ghost">D</b-button>
-        </b-col>
-      </b-row>
-    </b-container>
+
+    <Row type="flex" justify="center" class="code-row-bg">
+      <Col span="4"><b-button size="lg" variant="outline-primary">W</b-button></Col>
+    </Row>
+    <Row type="flex" justify="space-between" class="code-row-bg">
+      <Col span="1"></Col>
+      <Col span="4"><b-button size="lg" variant="outline-primary">A</b-button></Col>
+      <Col span="4"><b-button size="lg" variant="outline-primary">D</b-button></Col>
+      <Col span="1"></Col>
+    </Row>
+    <Row type="flex" justify="center" class="code-row-bg">
+      <Col span="4"><b-button size="lg" variant="outline-primary">S</b-button></Col>
+    </Row>
     <br/><br/>
   </div>
 </template>
@@ -399,5 +400,16 @@
   }
   td[aria-colindex] > div {
     width: 3.5em;
+  }
+
+  .code-row-bg {
+    padding-top: 1.2em;
+  }
+
+  .btn-outline-primary {
+    width: 2.5em;
+    height: 2.5em;
+    font-size: 1.5em;
+    text-align: center;
   }
 </style>
