@@ -105,7 +105,7 @@
       <Row type="flex" justify="center" class="code-row-bg">
           <Col span="4">
             <b-button @mouseover="sendDirection('w', 1)" @mouseout="sendDirection('w', 0)"
-                        size="lg" variant="outline-primary">W</b-button>
+                        size="lg" variant="outline-primary">&and;</b-button>
           </Col>
       </Row>
 
@@ -113,18 +113,18 @@
       <Col span="1"></Col>
       <Col span="4">
         <b-button size="lg" variant="outline-primary"
-                              @mouseover="sendDirection('a', 1)" @mouseout="sendDirection('a', 0)" >A</b-button>
+                              @mouseover="sendDirection('a', 1)" @mouseout="sendDirection('a', 0)" id="rotateLeft">&and;</b-button>
       </Col>
       <Col span="4">
         <b-button size="lg" variant="outline-primary"
-                  @mouseover="sendDirection('d', 1)" @mouseout="sendDirection('d', 0)" >D</b-button>
+                  @mouseover="sendDirection('d', 1)" @mouseout="sendDirection('d', 0)" id="rotateRight">&and;</b-button>
       </Col>
       <Col span="1"></Col>
     </Row>
     <Row type="flex" justify="center" class="code-row-bg">
       <Col span="4">
         <b-button size="lg" variant="outline-primary"
-                  @mouseover="sendDirection('s', 1)" @mouseout="sendDirection('s', 0)" >S</b-button>
+                  @mouseover="sendDirection('s', 1)" @mouseout="sendDirection('s', 0)" >&or;</b-button>
       </Col>
     </Row>
     <br/><br/>
@@ -437,5 +437,30 @@
     font-size: 1.5em;
     text-align: center;
     display: inline-block;
+  }
+
+  #rotateRight {
+    /* Safari */
+    -webkit-transform: rotate(90deg);
+    /* Firefox */
+    -moz-transform: rotate(90deg);
+    /* IE */
+    -ms-transform: rotate(90deg);
+    /* Opera */
+    -o-transform: rotate(90deg);
+    /* Internet Explorer */
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1);
+  }
+  #rotateLeft {
+    /* Safari */
+    -webkit-transform: rotate(-90deg);
+    /* Firefox */
+    -moz-transform: rotate(-90deg);
+    /* IE */
+    -ms-transform: rotate(-90deg);
+    /* Opera */
+    -o-transform: rotate(-90deg);
+    /* Internet Explorer */
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
   }
 </style>
