@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import services from '../../services';
-import { SET_API_ITEMS, SET_STA_ITEMS, SET_AP_SPIN_SHOW,
-  SET_STA_SPIN_SHOW, SET_SCAN_STATUS, SET_CHANNEL } from '../mutation-types';
+import { SET_API_ITEMS, SET_STA_ITEMS, SET_AP_SPIN_SHOW, SET_STA_SPIN_SHOW,
+  SET_SCAN_STATUS, SET_CHANNEL, SET_STA_JAM_BY_INDEX, SET_AP_JAM_BY_INDEX } from '../mutation-types';
 
 const namespaced = true;
   // initial state
@@ -52,7 +52,6 @@ const actions = {
           commit('setSTAItems', items);
         }
         commit(SET_STA_SPIN_SHOW, false);
-        return true;
       }).catch((err) => {
         commit('setSTASpinShow', false);
         return Promise.reject(err);
@@ -69,6 +68,12 @@ const actions = {
   },
   setSTASpinShow({ commit }, status) {
     commit(SET_STA_SPIN_SHOW, status);
+  },
+  changeSTAJAMByIndex({ commit }, index) {
+    commit(SET_STA_JAM_BY_INDEX, index);
+  },
+  changeAPJAMByIndex({ commit }, index) {
+    commit(SET_AP_JAM_BY_INDEX, index);
   },
 };
 
@@ -95,6 +100,16 @@ const mutations = {
   },
   [SET_CHANNEL](state, channel) {
     Vue.set(state, 'channel', channel);
+  },
+  [SET_STA_JAM_BY_INDEX](state, index) {
+    const staList = state.staList;
+    staList[index].JAM = staList[index].JAM === false;
+    Vue.set(state, 'staList', staList);
+  },
+  [SET_AP_JAM_BY_INDEX](state, index) {
+    const apList = state.apList;
+    apList[index].JAM = apList[index].JAM === false;
+    Vue.set(state, 'apList', apList);
   },
     // decrementProductInventory(state, { id }) {
     //   const product = state.all.find(product => product.id === id);

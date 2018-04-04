@@ -25,9 +25,18 @@
     <div>
       <b-table :items="apList" :fields="fields" :per-page="apPerPage" :current-page="apCurrentPage">
         <div slot="JAM" slot-scope="data">
-          <van-switch v-model="apList[(apCurrentPage-1) * apPerPage + data.index].JAM"
-                      @change="onSwitch('ap_block', apList[(apCurrentPage-1) * apPerPage + data.index].BSSID,
-                      data.index, apList[(apCurrentPage-1) * apPerPage + data.index].JAM)" />
+          <b-button size="sm" variant="primary" v-if="!apList[(apCurrentPage-1) * apPerPage + data.index].JAM"
+                    @click="onClickJAM('ap_block',
+                      apList[(apCurrentPage-1) * apPerPage + data.index].BSSID,
+                      (apCurrentPage-1) * apPerPage + data.index,
+                      apList[(apCurrentPage-1) * apPerPage + data.index].JAM)">
+            Run</b-button>
+          <b-button size="sm" variant="danger" v-if="apList[(apCurrentPage-1) * apPerPage + data.index].JAM"
+                    @click="onClickJAM('ap_block',
+                      apList[(apCurrentPage-1) * apPerPage + data.index].BSSID,
+                      (apCurrentPage-1) * apPerPage + data.index,
+                      apList[(apCurrentPage-1) * apPerPage + data.index].JAM)">
+            Stop</b-button>
         </div>
       </b-table>
       <b-pagination align="center" v-if="apCount" size="sm" :total-rows="apCount" v-model="apCurrentPage" :per-page="apPerPage">
@@ -41,11 +50,18 @@
     <div>
       <b-table :items="staList" :fields="fields2" :per-page="staPerPage" :current-page="staCurrentPage">
         <div slot="JAM" slot-scope="data">
-          <van-switch v-model="staList[(staCurrentPage-1) * staPerPage + data.index].JAM"
-                      @click="onClickSwitch"
-                      @input="onInputSwitch"
-                      @change="onSwitch('sta_block', staList[(staCurrentPage-1) * staPerPage + data.index].MAC,
-                      data.index, staList[(staCurrentPage-1) * staPerPage + data.index].JAM)" />
+          <b-button size="sm" variant="primary" v-if="!staList[(staCurrentPage-1) * staPerPage + data.index].JAM"
+                    @click="onClickJAM('sta_block',
+                      staList[(staCurrentPage-1) * staPerPage + data.index].MAC,
+                      (staCurrentPage-1) * staPerPage + data.index,
+                      staList[(staCurrentPage-1) * staPerPage + data.index].JAM)">
+            Run</b-button>
+          <b-button size="sm" variant="danger" v-if="staList[(staCurrentPage-1) * staPerPage + data.index].JAM"
+                    @click="onClickJAM('sta_block',
+                      staList[(staCurrentPage-1) * staPerPage + data.index].MAC,
+                      (staCurrentPage-1) * staPerPage + data.index,
+                      staList[(staCurrentPage-1) * staPerPage + data.index].JAM)">
+            Stop</b-button>
         </div>
       </b-table>
       <Spin fix v-if="staSpinShow"></Spin>
@@ -61,7 +77,6 @@
 import CubeNav from '@/components/CubeNav';
 import axios from 'axios';
 import { mapState, mapGetters, mapActions } from 'vuex';
-import { Dialog } from 'vant';
 
 export default {
   name: 'Wifi',
@@ -82,10 +97,19 @@ export default {
     };
   },
   methods: {
-    ...mapActions('WIFI', ['getAPList', 'getSTAList', 'getStarted', 'setScanStatus', 'setChannel', 'setAPSpinShow', 'setSTASpinShow']),
-    onSwitch(api, value, index, isOpen) {
+    ...mapActions('WIFI', ['getAPList', 'getSTAList', 'getStarted', 'setScanStatus', 'setChannel',
+      'setAPSpinShow', 'setSTASpinShow', 'changeAPJAMByIndex', 'changeSTAJAMByIndex']),
+    onClickJAM(api, value, index, isRunning) {
+      console.log('on click switch button', index, isRunning);
+      this.setScanStatus('off');
+      const action = isRunning ? 'off' : 'on';
+      if (api === 'ap_block') {
+        this.changeAPJAMByIndex(index);
+      } else if (api === 'sta_block') {
+        this.changeSTAJAMByIndex(index);
+      }
+
       this.$timer.stop('fetchWifiList');
-      const action = isOpen ? 'on' : 'off';
       axios
         .get(`${process.env.BACKEND_HOST}/${api}/${value}/${action}`)
         .then((response) => {
@@ -102,6 +126,7 @@ export default {
     },
     onClickScan() {
       // send request with action to backend
+      // todo: 转移到vuex
       this.setScanStatus(this.scanStatus === 'on' ? 'off' : 'on');
       const channel = this.channel === null ? this.defaultChannel : this.channel;
       axios
@@ -160,22 +185,6 @@ export default {
       }
       this.channelList = channelList;
     },
-    onInputSwitch(checked) {
-      Dialog.confirm({
-        title: '提醒',
-        message: '是否切换开关？',
-      }).then(() => {
-        console.log('I am been input!', checked);
-      });
-    },
-    onClickSwitch() {
-      Dialog.confirm({
-        title: '提醒',
-        message: '被点击了！',
-      }).then(() => {
-        console.log('I am been click!');
-      });
-    },
   },
   created() {
     // TODO: Save the final fresh wifi list when leave page
@@ -189,31 +198,13 @@ export default {
     ...mapState(
       'WIFI',
       ['apList',
-        // 'staList',
+        'staList',
         'apSpinShow',
         'staSpinShow',
         'scanStatus',
       ]),
     ...mapGetters('WIFI', ['staCount', 'apCount']),
-    staList: {
-      get() {
-        return this.$store.state.WIFI.staList;
-      },
-      set(value) {
-        console.log(value);
-        // this.$store.commit('updateMessage', value);
-      },
-    },
   },
-  // watch: {
-  //   staList: {
-  //     handler(val, oldVal) {
-  //       console.log('a thing changed');
-  //       console.log(val, oldVal, val === oldVal);
-  //     },
-  //     deep: true,
-  //   },
-  // },
 };
 </script>
 
