@@ -368,7 +368,8 @@ def get_sta_list():
         i = {
             'MAC': l[0],
             'RSSI': l[1],
-            'BSSID': l[3]
+            'BSSID': l[3],
+            'JAM': False,
         }
         if 'not' in i['BSSID']:
             i['BSSID'] = 'None'
@@ -389,7 +390,7 @@ def ap_block(bssid, action):
         return simplejson.dumps({'status': 'fail',
                                  'api': 'ap_block',
                                  'parameter': [bssid, action],
-                                 'message': 'Call AP_block fail, parameter error',
+                                 'message': 'StartAP_block {} fail, parameter error'.format(action),
                                  'data_key': None
                                  }), status.HTTP_400_BAD_REQUEST
     try:
@@ -399,13 +400,13 @@ def ap_block(bssid, action):
         return simplejson.dumps({'status': 'fail',
                                  'api': 'ap_block',
                                  'parameter': [bssid, action],
-                                 'message': 'Call AP_block error.',
+                                 'message': 'StartAP_block {} error.'.format(action),
                                  'data_key': None
                                  }), status.HTTP_500_INTERNAL_SERVER_ERROR
     return simplejson.dumps({'status': 'success',
                              'api': 'ap_block',
                              'parameter': [bssid, action],
-                             'message': 'Call AP_block success.',
+                             'message': 'StartAP_block {} success.'.format(action),
                              'data_key': None
                              })
 
@@ -416,7 +417,7 @@ def sta_block(mac, action):
         return simplejson.dumps({'status': 'fail',
                                  'api': 'sta_block',
                                  'parameter': [mac, action],
-                                 'message': 'Call STA_block fail, parameter error',
+                                 'message': 'StartSTA_block {} fail, parameter error'.format(action),
                                  'data_key': None
                                  }), status.HTTP_400_BAD_REQUEST
     try:
@@ -426,13 +427,13 @@ def sta_block(mac, action):
         return simplejson.dumps({'status': 'fail',
                                  'api': 'sta_block',
                                  'parameter': [mac, action],
-                                 'message': 'Call STA_block error.',
+                                 'message': 'StartSTA_block {} error.'.format(action),
                                  'data_key': None
                                  }), status.HTTP_500_INTERNAL_SERVER_ERROR
     return simplejson.dumps({'status': 'success',
                              'api': 'sta_block',
                              'parameter': [mac, action],
-                             'message': 'Call STA_block success.'
+                             'message': 'StartSTA_block {} success.'.format(action)
                              })
 
 
@@ -442,7 +443,7 @@ def wifi_scan(action, channel):
         return simplejson.dumps({'status': 'fail',
                                  'api': 'wifi_scan',
                                  'parameter': [action, channel],
-                                 'message': 'Call wifi_scan fail, parameter error',
+                                 'message': 'Startwifi_scan {} {} fail, parameter error'.format(action, channel),
                                  'data_key': None
                                  }), status.HTTP_400_BAD_REQUEST
     try:
@@ -452,13 +453,13 @@ def wifi_scan(action, channel):
         return simplejson.dumps({'status': 'fail',
                                  'api': 'wifi_scan',
                                  'parameter': [action, channel],
-                                 'message': 'Call wifi_scan error.',
+                                 'message': 'Startwifi_scan {} {} error.'.format(action, channel),
                                  'data_key': None
                                  }), status.HTTP_500_INTERNAL_SERVER_ERROR
     return simplejson.dumps({'status': 'success',
                              'api': 'wifi_scan',
                              'parameter': [action, channel],
-                             'message': 'Call wifi_scan success.',
+                             'message': 'Startwifi_scan {} {} success.'.format(action, channel),
                              'data_key': None
                              })
 
@@ -472,13 +473,13 @@ def serial_send(parameter):
         return simplejson.dumps({'status': 'fail',
                                  'api': 'serial_send',
                                  'parameter': parameter,
-                                 'message': 'Call serial_send error.',
+                                 'message': 'Start serial_send {} error.'.format(parameter),
                                  'data_key': None
                                  }), status.HTTP_500_INTERNAL_SERVER_ERROR
     return simplejson.dumps({'status': 'success',
                              'api': 'serial_send',
                              'parameter': parameter,
-                             'message': 'Call serial_send success.',
+                             'message': 'Startserial_send {} success.'.format(parameter),
                              'data_key': None
                              })
 
@@ -521,6 +522,41 @@ def get_hd_info():
                              'data_key': 'hd_info',
                              'hd_info': hd_info
                              })
+
+
+@app.route("/nfc_log", methods=['GET'])
+def get_nfc_log():
+    nfc_log = None
+    file_path = app.config['FIRMWARE_NFC_LOG_FILE']
+    if not os.path.exists(file_path):
+        return simplejson.dumps({'status': 'fail',
+                                 'api': 'nfc_log',
+                                 'parameter': None,
+                                 'message': 'Get nfc_log fail, file not found.',
+                                 'data_key': 'nfc_log',
+                                 'nfc_log': nfc_log
+                                 }), status.HTTP_404_NOT_FOUND
+    with open(file_path, 'rb') as f:
+        new_MD5 = hashlib.md5(file_as_bytes(f)).hexdigest()
+    if new_MD5 == app.config['FIRMWARE_NFC_LOG_MD5']:
+        return simplejson.dumps({'status': 'success',
+                                 'api': 'nfc_log',
+                                 'parameter': None,
+                                 'message': 'Get nfc_log success.',
+                                 'data_key': 'nfc_log',
+                                 'nfc_log': nfc_log
+                                 }), status.HTTP_304_NOT_MODIFIED
+    else:
+        app.config['FIRMWARE_NFC_LOG_MD5'] = new_MD5
+        with open(file_path, 'r') as f:
+            nfc_log = f.read()
+        return simplejson.dumps({'status': 'success',
+                                 'api': 'nfc_log',
+                                 'parameter': None,
+                                 'message': 'Get nfc_log success.',
+                                 'data_key': 'nfc_log',
+                                 'nfc_log': nfc_log
+                                 })
 
 
 @app.route("/update_firmware_log", methods=['GET'])
@@ -567,7 +603,7 @@ def update_firmware():
         return simplejson.dumps({'status': 'fail',
                                  'api': 'update_firmware',
                                  'parameter': uploaded_file_path,
-                                 'message': 'Call update_firmware fail, parameter error',
+                                 'message': 'Start update_firmware fail, parameter error',
                                  'data_key': None
                                  }), status.HTTP_400_BAD_REQUEST
 
@@ -578,13 +614,13 @@ def update_firmware():
         return simplejson.dumps({'status': 'fail',
                                  'api': 'update_firmware',
                                  'parameter': uploaded_file_path,
-                                 'message': 'Call update_firmware fail',
+                                 'message': 'Start update_firmware fail',
                                  'data_key': None
                                  }), status.HTTP_500_INTERNAL_SERVER_ERROR
     return simplejson.dumps({'status': 'success',
                              'api': 'update_firmware',
                              'parameter': uploaded_file_path,
-                             'message': 'Call update_firmware success',
+                             'message': 'Start update_firmware success',
                              'data_key': None
                              })
 

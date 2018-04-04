@@ -10,7 +10,7 @@ class Config(object):
     FIRMWARE_UPDATE_LOG_MD5 = None
     AP_LIST_FILE_MD5 = None
     STA_LIST_FILE_MD5 = None
-
+    FIRMWARE_NFC_LOG_MD5 = None
 
 class ProductionConfig(Config):
     AP_LIST_FILE = '/root/monitor_file/AP_list_tmp'
@@ -21,6 +21,7 @@ class ProductionConfig(Config):
     FIRMWARE_UPDATE_LOG_FILE = '/root/user_file/INFO/update_firmware_log'
     HD_INFO_FILE = '/etc/HD_info'
     ATTACK_PROGRESS_FILE = '/root/serial_file/attack_progress_bar'
+    FIRMWARE_NFC_LOG_FILE = '/root/serial_file/data/NFC_log'
 
     STA_BLOCK_SHELL = "/root/monitor_file/STA_block.sh"
     WIFI_SCAN_SHELL = "/root/monitor_file/wifi_scan.sh"
@@ -44,6 +45,7 @@ class DevelopmentConfig(Config):
     FIRMWARE_UPDATE_LOG_FILE = 'data/example_source/update_firmware_log'
     HD_INFO_FILE = 'data/example_source/HD_info'
     ATTACK_PROGRESS_FILE = 'data/example_source/attack_progress_bar'
+    FIRMWARE_NFC_LOG_FILE = 'data/example_source/NFC_log'
 
     STA_BLOCK_SHELL = "data/example_bash/test_success.sh"
     WIFI_SCAN_SHELL = "data/example_bash/test_success.sh"
