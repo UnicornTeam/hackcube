@@ -1,5 +1,7 @@
 import Vue from 'vue';
 
+// require('babel-polyfill');
+
 Vue.config.productionTip = false;
 
 // require all test files (files that ends with .spec.js)
