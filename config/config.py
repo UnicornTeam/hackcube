@@ -28,6 +28,7 @@ class ProductionConfig(Config):
     AP_BLOCK_SHELL = "/root/monitor_file/AP_block.sh"
     SERIAL_SEND_SHELL = "/root/serial_file/serial_send.sh"
     UPDATE_FIRMWARE_SHELL = "/root/user_file/INFO/update.sh"
+    SEND_DIRECTION_SHELL = "/root/Cube_GPIO/direction.sh"
     UPLOAD_FOLDERS = {
         'HID-Script': "/root/user_file/HID/",
         'INFO-Pie': "/root/user_file/INFO/raspberrypi/",
@@ -52,6 +53,7 @@ class DevelopmentConfig(Config):
     AP_BLOCK_SHELL = "data/example_bash/test_success.sh"
     SERIAL_SEND_SHELL = "data/example_bash/test_success.sh"
     UPDATE_FIRMWARE_SHELL = "data/example_bash/test_success.sh"
+    SEND_DIRECTION_SHELL = "data/example_bash/test_success.sh"
     UPLOAD_FOLDERS = {
         'HID-Script': "data/example_dir/HID/",
         'INFO-Pie': "data/example_dir/raspberrypi/",
