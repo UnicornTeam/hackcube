@@ -121,21 +121,18 @@ export default {
           }
         });
     },
-    onClickScan() {
-      // send request with action to backend
-      this.setScanStatus(this.scanStatus === 'on' ? 'off' : 'on');
-      const channel = this.channel === null ? this.defaultChannel : this.channel;
+    controlScan(status, channel) {
       axios
         .get(
-          `${process.env.BACKEND_HOST}/wifi_scan/${this.scanStatus}/${channel}`,
+          `${process.env.BACKEND_HOST}/wifi_scan/${status}/${channel}`,
         )
         .then(() => {
-          if (this.scanStatus === 'on') {
+          if (status === 'on') {
             this.$timer.start('fetchWifiList');
             this.$Message.info('Start scan WiFi.');
             this.setAPSpinShow(true);
             this.setSTASpinShow(true);
-          } else if (this.scanStatus === 'off') {
+          } else if (status === 'off') {
             this.$timer.stop('fetchWifiList');
             this.$Message.info('Stop scan WiFi.');
           }
@@ -147,6 +144,12 @@ export default {
             this.$Message.error('Request fail');
           }
         });
+    },
+    onClickScan() {
+      // send request with action to backend
+      this.setScanStatus(this.scanStatus === 'on' ? 'off' : 'on');
+      const channel = this.channel === null ? this.defaultChannel : this.channel;
+      this.controlScan(this.scanStatus, channel);
     },
     fetchWifiList() {
       this.getAPList().catch((err) => {
@@ -198,6 +201,11 @@ export default {
         'scanStatus',
       ]),
     ...mapGetters('WIFI', ['staCount', 'apCount']),
+  },
+  beforeRouteLeave(to, from, next) {
+    this.setScanStatus('off');
+    this.controlScan('off', this.channel);
+    next();
   },
 };
 </script>

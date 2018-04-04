@@ -86,6 +86,7 @@
 
     <br/>
     <Input readonly v-model="updateLog" type="textarea" :autosize="{minRows: 6,maxRows: 14}" placeholder="Upload log..."></Input>
+    <br/><br/>
   </div>
 </template>
 

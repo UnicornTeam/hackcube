@@ -87,6 +87,10 @@ axios.get('/user/12345', {
 - 怎么测试
 — How to unittest namespace vuex
 
+- Do something before leave page/redirect to another router
+
+- Dispatch 异步 同步
+
 
 
 

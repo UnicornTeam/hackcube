@@ -1,4 +1,4 @@
-Release 2018.4.3 Note:
+# Release 2018.4.3 Note:
 
 - 在WIFI获取、等待固件更新日志、获取RF初始列表时添加过渡动画
 - UI改为全英文，包括提示消息、表头、描述信息等
@@ -9,3 +9,9 @@ Release 2018.4.3 Note:
 - WIFI页面表格Pagination改为居中显示
 - 改进错误提示信息
 - 修改sta_list 中的not associate 为None
+
+
+
+# Release 2018.4.4 Note:
+- [RF]增加AttackUI和相关逻辑;
+- [WIFI]离开WiFi页面后再回来，可以看到之前扫描的结果;
