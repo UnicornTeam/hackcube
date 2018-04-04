@@ -390,7 +390,7 @@ def ap_block(bssid, action):
         return simplejson.dumps({'status': 'fail',
                                  'api': 'ap_block',
                                  'parameter': [bssid, action],
-                                 'message': 'StartAP_block {} fail, parameter error'.format(action),
+                                 'message': 'Start AP_block {} fail, parameter error'.format(action),
                                  'data_key': None
                                  }), status.HTTP_400_BAD_REQUEST
     try:
@@ -400,13 +400,13 @@ def ap_block(bssid, action):
         return simplejson.dumps({'status': 'fail',
                                  'api': 'ap_block',
                                  'parameter': [bssid, action],
-                                 'message': 'StartAP_block {} error.'.format(action),
+                                 'message': 'Start AP_block {} error.'.format(action),
                                  'data_key': None
                                  }), status.HTTP_500_INTERNAL_SERVER_ERROR
     return simplejson.dumps({'status': 'success',
                              'api': 'ap_block',
                              'parameter': [bssid, action],
-                             'message': 'StartAP_block {} success.'.format(action),
+                             'message': 'Start AP_block {} success.'.format(action),
                              'data_key': None
                              })
 
@@ -417,7 +417,7 @@ def sta_block(mac, action):
         return simplejson.dumps({'status': 'fail',
                                  'api': 'sta_block',
                                  'parameter': [mac, action],
-                                 'message': 'StartSTA_block {} fail, parameter error'.format(action),
+                                 'message': 'Start STA_block {} fail, parameter error'.format(action),
                                  'data_key': None
                                  }), status.HTTP_400_BAD_REQUEST
     try:
@@ -427,13 +427,13 @@ def sta_block(mac, action):
         return simplejson.dumps({'status': 'fail',
                                  'api': 'sta_block',
                                  'parameter': [mac, action],
-                                 'message': 'StartSTA_block {} error.'.format(action),
+                                 'message': 'Start STA_block {} error.'.format(action),
                                  'data_key': None
                                  }), status.HTTP_500_INTERNAL_SERVER_ERROR
     return simplejson.dumps({'status': 'success',
                              'api': 'sta_block',
                              'parameter': [mac, action],
-                             'message': 'StartSTA_block {} success.'.format(action)
+                             'message': 'Start STA_block {} success.'.format(action)
                              })
 
 
@@ -443,7 +443,7 @@ def wifi_scan(action, channel):
         return simplejson.dumps({'status': 'fail',
                                  'api': 'wifi_scan',
                                  'parameter': [action, channel],
-                                 'message': 'Startwifi_scan {} {} fail, parameter error'.format(action, channel),
+                                 'message': 'Start wifi_scan {} {} fail, parameter error'.format(action, channel),
                                  'data_key': None
                                  }), status.HTTP_400_BAD_REQUEST
     try:
@@ -453,13 +453,33 @@ def wifi_scan(action, channel):
         return simplejson.dumps({'status': 'fail',
                                  'api': 'wifi_scan',
                                  'parameter': [action, channel],
-                                 'message': 'Startwifi_scan {} {} error.'.format(action, channel),
+                                 'message': 'Start wifi_scan {} {} error.'.format(action, channel),
                                  'data_key': None
                                  }), status.HTTP_500_INTERNAL_SERVER_ERROR
     return simplejson.dumps({'status': 'success',
                              'api': 'wifi_scan',
                              'parameter': [action, channel],
-                             'message': 'Startwifi_scan {} {} success.'.format(action, channel),
+                             'message': 'Start wifi_scan {} {} success.'.format(action, channel),
+                             'data_key': None
+                             })
+
+
+@app.route("/send_direction/<string:direction>/<string:value>", methods=['GET'])
+def send_direction(direction, value):
+    try:
+        subprocess.call("{} {} {}".format(app.config['SEND_DIRECTION_SHELL'], direction, value), shell=True)
+    except CalledProcessError as e:
+        print(e)
+        return simplejson.dumps({'status': 'fail',
+                                 'api': 'send_direction',
+                                 'parameter': [direction, value],
+                                 'message': 'Start send_direction {} {} error.'.format(direction, value),
+                                 'data_key': None
+                                 }), status.HTTP_500_INTERNAL_SERVER_ERROR
+    return simplejson.dumps({'status': 'success',
+                             'api': 'send_direction',
+                             'parameter': [direction, value],
+                             'message': 'Start send_direction {} {} success.'.format(direction, value),
                              'data_key': None
                              })
 
@@ -479,7 +499,7 @@ def serial_send(parameter):
     return simplejson.dumps({'status': 'success',
                              'api': 'serial_send',
                              'parameter': parameter,
-                             'message': 'Startserial_send {} success.'.format(parameter),
+                             'message': 'Start serial_send {} success.'.format(parameter),
                              'data_key': None
                              })
 
