@@ -25,17 +25,11 @@
     <div>
       <b-table :items="apList" :fields="fields" :per-page="apPerPage" :current-page="apCurrentPage">
         <div slot="JAM" slot-scope="data">
-          <b-button size="sm" variant="primary" v-if="!apList[(apCurrentPage-1) * apPerPage + data.index].JAM"
-                    @click="onClickJAM('ap_block',
-                      apList[(apCurrentPage-1) * apPerPage + data.index].BSSID,
-                      (apCurrentPage-1) * apPerPage + data.index,
-                      apList[(apCurrentPage-1) * apPerPage + data.index].JAM)">
+          <b-button size="sm" variant="primary" v-if="!apList[((apCurrentPage-1) * apPerPage) + data.index].JAM"
+                    @click="onClickJAM('ap_block', data.index)">
             Run</b-button>
-          <b-button size="sm" variant="danger" v-if="apList[(apCurrentPage-1) * apPerPage + data.index].JAM"
-                    @click="onClickJAM('ap_block',
-                      apList[(apCurrentPage-1) * apPerPage + data.index].BSSID,
-                      (apCurrentPage-1) * apPerPage + data.index,
-                      apList[(apCurrentPage-1) * apPerPage + data.index].JAM)">
+          <b-button size="sm" variant="danger" v-if="apList[((apCurrentPage-1) * apPerPage) + data.index].JAM"
+                    @click="onClickJAM('ap_block', data.index)">
             Stop</b-button>
         </div>
       </b-table>
@@ -50,17 +44,11 @@
     <div>
       <b-table :items="staList" :fields="fields2" :per-page="staPerPage" :current-page="staCurrentPage">
         <div slot="JAM" slot-scope="data">
-          <b-button size="sm" variant="primary" v-if="!staList[(staCurrentPage-1) * staPerPage + data.index].JAM"
-                    @click="onClickJAM('sta_block',
-                      staList[(staCurrentPage-1) * staPerPage + data.index].MAC,
-                      (staCurrentPage-1) * staPerPage + data.index,
-                      staList[(staCurrentPage-1) * staPerPage + data.index].JAM)">
+          <b-button size="sm" variant="primary" v-if="!staList[((staCurrentPage-1) * staPerPage) + data.index].JAM"
+                    @click="onClickJAM('sta_block', data.index)">
             Run</b-button>
-          <b-button size="sm" variant="danger" v-if="staList[(staCurrentPage-1) * staPerPage + data.index].JAM"
-                    @click="onClickJAM('sta_block',
-                      staList[(staCurrentPage-1) * staPerPage + data.index].MAC,
-                      (staCurrentPage-1) * staPerPage + data.index,
-                      staList[(staCurrentPage-1) * staPerPage + data.index].JAM)">
+          <b-button size="sm" variant="danger" v-if="staList[((staCurrentPage-1) * staPerPage) + data.index].JAM"
+                    @click="onClickJAM('sta_block', data.index)">
             Stop</b-button>
         </div>
       </b-table>
@@ -72,7 +60,6 @@
 </template>
 
 <script>
-/* eslint-disable no-restricted-syntax */
 
 import CubeNav from '@/components/CubeNav';
 import axios from 'axios';
@@ -99,16 +86,27 @@ export default {
   methods: {
     ...mapActions('WIFI', ['getAPList', 'getSTAList', 'getStarted', 'setScanStatus', 'setChannel',
       'setAPSpinShow', 'setSTASpinShow', 'changeAPJAMByIndex', 'changeSTAJAMByIndex']),
-    onClickJAM(api, value, index, isRunning) {
+    onClickJAM(api, index) {
+      let actualIndex;
+      let value;
+      let isRunning;
       this.setScanStatus('off');
-      const action = isRunning ? 'off' : 'on';
-      if (api === 'ap_block') {
-        this.changeAPJAMByIndex(index);
-      } else if (api === 'sta_block') {
-        this.changeSTAJAMByIndex(index);
-      }
-
       this.$timer.stop('fetchWifiList');
+      if (api === 'ap_block') {
+        actualIndex = ((this.apCurrentPage - 1) * this.apPerPage) + index;
+        value = this.apList[actualIndex].BSSID;
+        isRunning = this.apList[actualIndex].JAM;
+        this.changeAPJAMByIndex(actualIndex);
+      } else if (api === 'sta_block') {
+        actualIndex = ((this.staCurrentPage - 1) * this.staPerPage) + index;
+        value = this.staList[actualIndex].MAC;
+        isRunning = this.staList[actualIndex].JAM;
+        this.changeSTAJAMByIndex(actualIndex);
+      } else {
+        this.$message.error('Please input the right api');
+        return;
+      }
+      const action = isRunning ? 'off' : 'on';
       axios
         .get(`${process.env.BACKEND_HOST}/${api}/${value}/${action}`)
         .then((response) => {
@@ -125,7 +123,6 @@ export default {
     },
     onClickScan() {
       // send request with action to backend
-      // todo: 转移到vuex
       this.setScanStatus(this.scanStatus === 'on' ? 'off' : 'on');
       const channel = this.channel === null ? this.defaultChannel : this.channel;
       axios
@@ -174,6 +171,7 @@ export default {
         52, 56, 60, 64, 100, 104, 108, 112, 115, 120, 124, 128, 132,
         136, 140, 149, 153, 157, 161, 165,
       ];
+      // eslint-disable-next-line no-restricted-syntax
       for (const num of numList) {
         const channel = {
           value: num,
@@ -185,8 +183,6 @@ export default {
     },
   },
   created() {
-    // TODO: Save the final fresh wifi list when leave page
-    // TODO: And restore it when back to this page.
     this.getChannelList();
   },
   timers: {
