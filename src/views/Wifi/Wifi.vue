@@ -117,7 +117,7 @@ export default {
           this.staActiveList.add(actualIndex);
         }
       } else {
-        this.$message.error('Please input the right api');
+        this.$Message.error('Please input the right api');
         return;
       }
       const action = isRunning ? 'off' : 'on';

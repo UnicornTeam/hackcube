@@ -26,22 +26,6 @@ div.van-switch {
   font-size: 25px!important;
 }
 
-/*.ivu-select-selection{*/
-  /*height: 27px!important;*/
-  /*padding-top: 2px!important;*/
-/*}*/
-
 div.board {
   margin-left: 10px;margin-right: 10px;
 }
-
-/*td[aria-colindex] {*/
-  /*overflow: hidden!important;*/
-  /*text-overflow:ellipsis!important;*/
-  /*white-space: nowrap!important;*/
-  /*max-width: 8em!important;*/
-  /*padding-right: 4px!important;*/
-  /*padding-left: 4px!important;*/
-  /*text-align:center;*/
-  /*vertical-align:middle;*/
-/*}*/

@@ -317,10 +317,10 @@
           case 'sniffer':
             if (this.snifferSwitch) {
               this.$timer.start('fetchRFItem');
-              this.$message.info('Start detect new RF item.');
+              this.$Message.info('Start detect new RF item.');
             } else {
               this.$timer.stop('fetchRFItem');
-              this.$message.info('Stop detect new RF item.');
+              this.$Message.info('Stop detect new RF item.');
             }
             break;
           case 'tpms':
@@ -348,7 +348,7 @@
               return;
             }
             if (!this.attackValueLeft && this.attackValueRight) {
-              this.$message.error('Please input at least on parameter.');
+              this.$Message.error('Please input at least on parameter.');
               this.attackSwitch = false;
               return;
             }
@@ -359,7 +359,7 @@
               const parameter = `rc1start${this.attackValueLeft}end${this.attackValueRight}`;
               this.serialSend(parameter, false);
             } else {
-              this.$message.error('Please select right protocol.');
+              this.$Message.error('Please select right protocol.');
               return;
             }
             this.$timer.start('getAttackProgress');
@@ -399,7 +399,7 @@
     vertical-align:middle;
   }
   td[aria-colindex] > div {
-    width: 3.5em;
+    width: 3.8em;
   }
 
   .code-row-bg {

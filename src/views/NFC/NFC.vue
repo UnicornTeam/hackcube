@@ -85,7 +85,7 @@
     </b-container>
 
     <br/>
-    <Input readonly v-model="updateLog" type="textarea" :autosize="{minRows: 6,maxRows: 14}" placeholder="Upload log..."></Input>
+    <Input readonly v-model="updateLog" type="textarea" :autosize="{minRows: 6,maxRows: 14}" placeholder="NFC card information"></Input>
     <br/><br/>
   </div>
 </template>
