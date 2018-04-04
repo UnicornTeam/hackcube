@@ -102,17 +102,30 @@
     </b-container>
     <br/><br/>
 
-    <Row type="flex" justify="center" class="code-row-bg">
-      <Col span="4"><b-button size="lg" variant="outline-primary">W</b-button></Col>
-    </Row>
+      <Row type="flex" justify="center" class="code-row-bg">
+          <Col span="4">
+            <b-button @mouseover="sendDirection('w', 1)" @mouseout="sendDirection('w', 0)"
+                        size="lg" variant="outline-primary">W</b-button>
+          </Col>
+      </Row>
+
     <Row type="flex" justify="space-between" class="code-row-bg">
       <Col span="1"></Col>
-      <Col span="4"><b-button size="lg" variant="outline-primary">A</b-button></Col>
-      <Col span="4"><b-button size="lg" variant="outline-primary">D</b-button></Col>
+      <Col span="4">
+        <b-button size="lg" variant="outline-primary"
+                              @mouseover="sendDirection('a', 1)" @mouseout="sendDirection('a', 0)" >A</b-button>
+      </Col>
+      <Col span="4">
+        <b-button size="lg" variant="outline-primary"
+                  @mouseover="sendDirection('d', 1)" @mouseout="sendDirection('d', 0)" >D</b-button>
+      </Col>
       <Col span="1"></Col>
     </Row>
     <Row type="flex" justify="center" class="code-row-bg">
-      <Col span="4"><b-button size="lg" variant="outline-primary">S</b-button></Col>
+      <Col span="4">
+        <b-button size="lg" variant="outline-primary"
+                  @mouseover="sendDirection('s', 1)" @mouseout="sendDirection('s', 0)" >S</b-button>
+      </Col>
     </Row>
     <br/><br/>
   </div>
@@ -172,6 +185,18 @@
       };
     },
     methods: {
+      sendDirection(direction, value) {
+        console.log('sendDirection', direction, value);
+        axios
+          .get(`${process.env.BACKEND_HOST}/send_direction/${direction}/${value}`)
+          .catch((err) => {
+            if (err.response) {
+              this.$Message.error(err.response.data.message);
+            } else {
+              this.$Message.error('Request fail');
+            }
+          });
+      },
       clickNFC() {
         router.push({
           path: '/nfc',
@@ -407,9 +432,10 @@
   }
 
   .btn-outline-primary {
-    width: 2.5em;
-    height: 2.5em;
+    width: 2.8em;
+    height: 2.6em;
     font-size: 1.5em;
     text-align: center;
+    display: inline-block;
   }
 </style>
