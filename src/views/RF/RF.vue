@@ -107,7 +107,7 @@
           <div v-finger:touch-start="sendDirection.bind(this, ['w', 1])"
                v-finger:long-tap="sendDirection.bind(this, ['w', 1])"
                v-finger:touch-end="sendDirection.bind(this, ['w', 0])">
-            <van-button type="default" size="lg" variant="outline-primary">&and;</van-button>
+            <van-button type="default">&and;</van-button>
           </div>
         </Col>
     </Row>
@@ -118,14 +118,14 @@
         <div v-finger:touch-start="sendDirection.bind(this, ['a', 1])"
              v-finger:long-tap="sendDirection.bind(this, ['a', 1])"
              v-finger:touch-end="sendDirection.bind(this, ['a', 0])">
-          <van-button type="default" size="lg" variant="outline-primary" id="rotateLeft">&and;</van-button>
+          <van-button type="default" id="rotateLeft">&and;</van-button>
         </div>
       </Col>
       <Col span="4">
         <div v-finger:touch-start="sendDirection.bind(this, ['d', 1])"
              v-finger:long-tap="sendDirection.bind(this, ['d', 1])"
              v-finger:touch-end="sendDirection.bind(this, ['d', 0])">
-          <van-button type="default" size="lg" variant="outline-primary" id="rotateRight">&and;</van-button>
+          <van-button type="default" id="rotateRight">&and;</van-button>
         </div>
       </Col>
       <Col span="1"></Col>
@@ -136,7 +136,7 @@
         <div v-finger:touch-start="sendDirection.bind(this, ['s', 1])"
              v-finger:long-tap="sendDirection.bind(this, ['s', 1])"
             v-finger:touch-end="sendDirection.bind(this, ['s', 0])">
-          <van-button type="default" size="lg" variant="outline-primary">&or;</van-button>
+          <van-button type="default">&or;</van-button>
         </div>
       </Col>
     </Row>
