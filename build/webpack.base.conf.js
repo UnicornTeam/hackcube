@@ -1,10 +1,8 @@
-var path = require('path');
-var os = require('os');
-var HappyPack = require('happypack');
-var happyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length });
+var path = require('path')
 var utils = require('./utils')
 var config = require('../config')
 var vueLoaderConfig = require('./vue-loader.conf')
+var HappyPack = require('happypack')
 
 function resolve (dir) {
   return path.join(__dirname, '..', dir)
@@ -23,67 +21,67 @@ module.exports = {
   },
   resolve: {
     extensions: ['.js', '.vue', '.json'],
+    modules: [
+      resolve('src'),
+      resolve('node_modules')
+    ],
     alias: {
-      'vue$': 'vue/dist/vue.esm.js',
+      'vue$': 'vue/dist/vue.common.js',
       '@': resolve('src'),
+      'src': resolve('src'),
+      'assets': resolve('src/assets'),
+      'components': resolve('src/components'),
+      'views': resolve('src/views'),
     }
   },
+  plugins: [
+    new HappyPack({
+      id: 'babel-loader',
+      threads: 8,
+      loaders: [ 'babel-loader' ]
+    }),
+    new HappyPack({
+      id: 'vue-loader',
+      threads: 8,
+      loaders: [ 'vue-loader' ]
+    }),
+    new HappyPack({
+      loaders: [{
+        path: 'vue-loader',
+        query: {
+          vueLoaderConfig
+        }
+      }]
+    })
+  ],
   module: {
     rules: [
       {
-        test: /\.(js|vue)$/,
-        loader:'eslint-loader',
-        enforce: 'pre',
-        include: [resolve('src'), resolve('test')],
-        // options: {
-        //   formatter: require('eslint-friendly-formatter')
-        // }
-      },
-      {
         test: /\.vue$/,
-        use: 'happypack/loader',
-        // options: vueLoaderConfig
+        loader: 'happypack/loader?id=vue-loader',
+        options: vueLoaderConfig
       },
       {
         test: /\.js$/,
-        use: 'happypack/loader',
+        loader: 'happypack/loader?id=babel-loader',
         include: [resolve('src'), resolve('test')]
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
         loader: 'url-loader',
-        options: {
+        query: {
           limit: 10000,
           name: utils.assetsPath('img/[name].[hash:7].[ext]')
         }
       },
       {
-        test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
-        loader: 'url-loader',
-        options: {
-          limit: 10000,
-          name: utils.assetsPath('media/[name].[hash:7].[ext]')
-        }
-      },
-      {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
         loader: 'url-loader',
-        options: {
+        query: {
           limit: 10000,
           name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
         }
       }
     ]
-  },
-  plugins: [
-    new HappyPack({
-      loaders: ['babel-loader',
-        {
-          loader: 'vue-loader',
-          options: vueLoaderConfig
-        }],
-      threadPool: happyThreadPool,
-      verbose: true
-    })
-  ]
+  }
 }

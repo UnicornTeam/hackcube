@@ -198,14 +198,7 @@
       };
     },
     methods: {
-      onPress() {
-        console.log('onPress');
-      },
-      onPressUp() {
-        console.log('onPressUp');
-      },
       sendDirection(values, event) {
-        console.log(event);
         const direction = values[0];
         const value = values[1];
         axios
