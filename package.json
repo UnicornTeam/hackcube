@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@sinonjs/formatio": "sinonjs/formatio",
+    "alloyfinger": "^0.1.13",
     "axios": "^0.18.0",
     "babel-preset-es2015": "^6.24.1",
     "bootstrap": "^4.0.0-beta.2",

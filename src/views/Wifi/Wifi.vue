@@ -23,7 +23,7 @@
       </b-row>
     </b-container>
     <div>
-      <b-table :items="apList" :fields="fields" :per-page="apPerPage" :current-page="apCurrentPage">
+      <b-table :items="apList" :fields="wifi_fields" :per-page="apPerPage" :current-page="apCurrentPage">
         <div slot="JAM" slot-scope="data">
           <b-button size="sm" variant="primary" v-if="!apList[((apCurrentPage-1) * apPerPage) + data.index].JAM"
                     @click="controlBlock('ap_block', data.index)">
@@ -42,7 +42,7 @@
     <!-- Client list -->
     <h5>Client List</h5>
     <div>
-      <b-table :items="staList" :fields="fields2" :per-page="staPerPage" :current-page="staCurrentPage">
+      <b-table :items="staList" :fields="client_fields" :per-page="staPerPage" :current-page="staCurrentPage">
         <div slot="JAM" slot-scope="data">
           <b-button size="sm" variant="primary" v-if="!staList[((staCurrentPage-1) * staPerPage) + data.index].JAM"
                     @click="controlBlock('sta_block', data.index)">
@@ -73,8 +73,8 @@ export default {
   },
   data() {
     return {
-      fields: ['SSID', 'BSSID', 'RSSI', 'JAM'],
-      fields2: ['MAC', 'BSSID', 'RSSI', 'JAM'],
+      wifi_fields: ['SSID', 'BSSID', 'RSSI', 'JAM'],
+      client_fields: ['MAC', 'BSSID', 'RSSI', 'JAM'],
       defaultChannel: 6,
       channelList: [],
       apPerPage: 6,

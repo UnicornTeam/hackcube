@@ -38,7 +38,7 @@
     <div>
       <b-table :items="rfItems" :fields="fields_show">
         <div slot="play" slot-scope="data">
-          <b-button size="sm" variant="primary" @click="onClick(data.index)">Run</b-button>
+          <b-button type="default" size="sm" variant="primary" @click="onClick(data.index)">Run</b-button>
         </div>
       </b-table>
       <Spin fix v-if="spinShow"></Spin>
@@ -102,29 +102,42 @@
     </b-container>
     <br/><br/>
 
-      <Row type="flex" justify="center" class="code-row-bg">
-          <Col span="4">
-            <b-button @mouseover="sendDirection('w', 1)" @mouseout="sendDirection('w', 0)"
-                        size="lg" variant="outline-primary">&and;</b-button>
-          </Col>
-      </Row>
+    <Row type="flex" justify="center" class="code-row-bg">
+        <Col span="4">
+          <div v-finger:touch-start="sendDirection.bind(this, ['w', 1])"
+               v-finger:long-tap="sendDirection.bind(this, ['w', 1])"
+               v-finger:touch-end="sendDirection.bind(this, ['w', 0])">
+            <van-button type="default" size="lg" variant="outline-primary">&and;</van-button>
+          </div>
+        </Col>
+    </Row>
 
     <Row type="flex" justify="space-between" class="code-row-bg">
       <Col span="1"></Col>
       <Col span="4">
-        <b-button size="lg" variant="outline-primary"
-                              @mouseover="sendDirection('a', 1)" @mouseout="sendDirection('a', 0)" id="rotateLeft">&and;</b-button>
+        <div v-finger:touch-start="sendDirection.bind(this, ['a', 1])"
+             v-finger:long-tap="sendDirection.bind(this, ['a', 1])"
+             v-finger:touch-end="sendDirection.bind(this, ['a', 0])">
+          <van-button type="default" size="lg" variant="outline-primary" id="rotateLeft">&and;</van-button>
+        </div>
       </Col>
       <Col span="4">
-        <b-button size="lg" variant="outline-primary"
-                  @mouseover="sendDirection('d', 1)" @mouseout="sendDirection('d', 0)" id="rotateRight">&and;</b-button>
+        <div v-finger:touch-start="sendDirection.bind(this, ['d', 1])"
+             v-finger:long-tap="sendDirection.bind(this, ['d', 1])"
+             v-finger:touch-end="sendDirection.bind(this, ['d', 0])">
+          <van-button type="default" size="lg" variant="outline-primary" id="rotateRight">&and;</van-button>
+        </div>
       </Col>
       <Col span="1"></Col>
     </Row>
+    <!--<a @mouseover="sendDirection(this, ['s', 1])" @mouseup="sendDirection(this, ['s', 1])">S</a>-->
     <Row type="flex" justify="center" class="code-row-bg">
       <Col span="4">
-        <b-button size="lg" variant="outline-primary"
-                  @mouseover="sendDirection('s', 1)" @mouseout="sendDirection('s', 0)" >&or;</b-button>
+        <div v-finger:touch-start="sendDirection.bind(this, ['s', 1])"
+             v-finger:long-tap="sendDirection.bind(this, ['s', 1])"
+            v-finger:touch-end="sendDirection.bind(this, ['s', 0])">
+          <van-button type="default" size="lg" variant="outline-primary">&or;</van-button>
+        </div>
       </Col>
     </Row>
     <br/><br/>
@@ -185,7 +198,16 @@
       };
     },
     methods: {
-      sendDirection(direction, value) {
+      onPress() {
+        console.log('onPress');
+      },
+      onPressUp() {
+        console.log('onPressUp');
+      },
+      sendDirection(values, event) {
+        console.log(event);
+        const direction = values[0];
+        const value = values[1];
         axios
           .get(`${process.env.BACKEND_HOST}/send_direction/${direction}/${value}`)
           .catch((err) => {

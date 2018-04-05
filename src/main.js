@@ -10,6 +10,8 @@ import 'iview/dist/styles/iview.css';
 import iView from 'iview';
 import Vuex from 'vuex';
 import VueTimers from 'vue-timers';
+import AlloyFinger from 'alloyfinger';
+import AlloyFingerPlugin from 'alloyfinger/vue/alloy_finger.vue';
 import App from './App';
 import router from './router';
 import '../static/global.css';
@@ -20,6 +22,9 @@ Vue.use(BootstrapVue);
 Vue.use(iView);
 Vue.use(VueTimers);
 Vue.use(Vuex);
+Vue.use(AlloyFingerPlugin, {
+  AlloyFinger,
+});
 Vue.config.productionTip = false;
 
 /* eslint-disable no-new */
