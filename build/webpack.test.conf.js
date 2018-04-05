@@ -8,7 +8,15 @@ var baseConfig = require('./webpack.base.conf')
 var webpackConfig = merge(baseConfig, {
   // use inline sourcemap for karma-sourcemap-loader
   module: {
-    rules: utils.styleLoaders()
+    rules: utils.styleLoaders(),
+    loaders: [
+      { test: /\.vue$/, loader: 'vue' },
+      { test: /\.js$/,
+        loader: 'babel-loader',
+        exclude: /node_modules/,
+        query: { presets: ['es2015'] }
+      },
+    ],
   },
   devtool: '#inline-source-map',
   resolveLoader: {

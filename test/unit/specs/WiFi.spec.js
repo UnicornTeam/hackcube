@@ -1,5 +1,5 @@
 import Vuex from 'vuex';
-import { shallow, createLocalVue } from 'vue-test-utils';
+import { shallow, createLocalVue } from '@vue/test-utils';
 import Wifi from '@/views/Wifi/Wifi';
 // import store from '@/../store';
 

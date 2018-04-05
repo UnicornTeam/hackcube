@@ -9,8 +9,8 @@
 - [TEST]初步添加测试代码
 - [WIFI]ap_list和client list中, 对过长的字符串采取省略号处理
 - [RF]对Sniffer列表中过长的字符串采取自动换行处理
-# TODO:
 - [RF]上下左右导航键UI及具体逻辑实现
+# TODO:
 - [TEST]添加更多自动测试代码
 
 

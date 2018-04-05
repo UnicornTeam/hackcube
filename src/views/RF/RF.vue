@@ -186,7 +186,6 @@
     },
     methods: {
       sendDirection(direction, value) {
-        console.log('sendDirection', direction, value);
         axios
           .get(`${process.env.BACKEND_HOST}/send_direction/${direction}/${value}`)
           .catch((err) => {
