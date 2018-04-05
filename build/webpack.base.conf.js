@@ -32,17 +32,17 @@ module.exports = {
     rules: [
       {
         test: /\.(js|vue)$/,
-        loader: 'eslint-loader',
+        loader:'eslint-loader',
         enforce: 'pre',
         include: [resolve('src'), resolve('test')],
-        options: {
-          formatter: require('eslint-friendly-formatter')
-        }
+        // options: {
+        //   formatter: require('eslint-friendly-formatter')
+        // }
       },
       {
         test: /\.vue$/,
-        loader: 'vue-loader',
-        options: vueLoaderConfig
+        use: 'happypack/loader',
+        // options: vueLoaderConfig
       },
       {
         test: /\.js$/,
@@ -77,7 +77,11 @@ module.exports = {
   },
   plugins: [
     new HappyPack({
-      loaders: ['babel-loader'],
+      loaders: ['babel-loader',
+        {
+          loader: 'vue-loader',
+          options: vueLoaderConfig
+        }],
       threadPool: happyThreadPool,
       verbose: true
     })
