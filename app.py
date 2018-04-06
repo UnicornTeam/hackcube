@@ -199,15 +199,15 @@ def get_all_rf_item(msg_type):
     while lines and not lines[-1].strip():
         del lines[-1]
     if not lines:
-        data = simplejson.dumps({'status': 'fail',
+        data = simplejson.dumps({'status': 'success',
                                  'api': 'all_rf_item',
                                  'parameter': msg_type,
-                                 'message': 'Get all_rf_item fail.Item not exist.',
+                                 'message': 'Get all_rf_item success.But none item found.',
                                  data_key: result_items,
                                  'data_key': data_key
                                  })
         logger.error(data)
-        return data, status.HTTP_404_NOT_FOUND
+        return data
 
     for line in lines:
         s = line.split(';')
