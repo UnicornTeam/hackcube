@@ -284,6 +284,8 @@
                 return;
               }
               that.rfItems.unshift(result[dataKey]);
+              // that.rfItems = new Set(that.rfItems).toJSON();
+              that.rfItems = [...(new Set(that.rfItems))];
               if (dataKey === 'arf_item') {
                 that.latest_arf_item = result[dataKey];
                 that.showARFAlert = true;
@@ -314,7 +316,11 @@
             const dataKey = result.data_key;
             // todo: add Transition animation
             that.$Message.success(result.message);
+            // for (const item of result[dataKey]) {
+            //   that.rfItems.add(item);
+            // }
             that.rfItems = that.rfItems.concat(result[dataKey]);
+            that.rfItems = [...(new Set(that.rfItems))];
             this.spinShow = false;
           })
           .catch((err) => {
@@ -421,7 +427,7 @@
       fetchAllRFItems: { time: 0, autostart: true, repeat: false },
       fetchRFItem: { time: 3000, autostart: false, repeat: true },
       fetchNFCData: { time: 3000, autostart: false, repeat: true },
-      getAttackProgress: { time: 500, autostart: false, repeat: true },
+      getAttackProgress: { time: 400, autostart: false, repeat: true },
     },
   };
 </script>

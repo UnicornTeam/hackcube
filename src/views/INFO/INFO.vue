@@ -11,9 +11,15 @@
     ></b-progress>
     <br/>
     <h5 class="text-center">Storage</h5>
-    <b-progress :value="storePercent"
+    <b-progress :value="storage.percent"
                 variant="dark"
     ></b-progress>
+    <div id="textbox">
+      <p class="alignleft">Used: {{storage.used}}GB</p>
+      <p class="alignright">Free: {{storage.free}}GB</p>
+      <div style="clear: both;"></div>
+    </div>
+
     <br/><br/>
 
     <h5>Upload arduino firmware</h5>
@@ -53,7 +59,11 @@
         uploadHost: process.env.UPLOAD_API,
         updateLog: '',
         energyPercent: 78,
-        storePercent: 30,
+        storage: {
+          percent: 50,
+          used: 10,
+          free: 10,
+        },
         extraDataPie: { type: 'INFO-Pie' },
         extraDataArdu: { type: 'INFO-Ardu' },
         uploadedFilePath: '',
@@ -65,7 +75,7 @@
           .get(`${process.env.BACKEND_HOST}/hd_info`)
           .then((response) => {
             const result = response.data;
-            this.storePercent = result[result.data_key];
+            this.storage = result[result.data_key][0];
           })
           .catch((err) => {
             if (err.response) {
@@ -154,11 +164,16 @@
     timers: {
       fetchUpdateLog: { time: 100, autostart: false, repeat: true },
       fetchStorageStatus: { time: 0, autostart: true, repeat: false },
-      getEnergyProgress: { time: 500, autostart: true, repeat: true },
+      getEnergyProgress: { time: 0, autostart: true, repeat: false },
     },
   };
 </script>
 
-<style scoped>
-
+<style>
+  .alignleft {
+    float: left;
+  }
+  .alignright {
+    float: right;
+  }
 </style>
