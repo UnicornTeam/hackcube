@@ -49,6 +49,7 @@ class DevelopmentConfig(Config):
     HD_INFO_FILE = 'data/example_source/HD_info'
     ATTACK_PROGRESS_FILE = 'data/example_source/attack_progress_bar'
     FIRMWARE_NFC_LOG_FILE = 'data/example_source/NFC_log'
+    ENERGY_PROGRESS_FILE = 'data/example_source/Power_info'
 
     STA_BLOCK_SHELL = "data/example_bash/test_success.sh"
     WIFI_SCAN_SHELL = "data/example_bash/test_success.sh"

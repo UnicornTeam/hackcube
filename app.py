@@ -47,6 +47,68 @@ def file_as_bytes(f):
         return f.read()
 
 
+def check_file(file_path, file_key):
+    if not os.path.exists(file_path):
+        print('{} in [{}] NOT FOUND, Please check it and then restart server.'.format(file_key, file_path))
+        exit(1)
+    return True
+
+
+def init_data():
+    if app.config['DEBUG']:
+        print(bcolors.WARNING + 'NOTE: You are running server in DEBUG mode, please make sure '
+                                'change to product mode before release.' + bcolors.ENDC)
+    elif app.config['TESTING']:
+        print(bcolors.WARNING + 'NOTE: You are running server in TESTING mode, please make sure '
+                                'change to product mode before release.' + bcolors.ENDC)
+    else:
+        print('NOTE: You are running server in PRODUCTION mode, If you want more'
+              'debug information, you can run in DEBUG or TESTING mode.')
+
+    for key, value in app.config.items():
+        if '_FILE' == key[-5:] or '_SHELL' == key[-6:]:
+            try:
+                check_file(value, key)
+            except TypeError as e:
+                print(e)
+
+    file_path = app.config['FIRMWARE_UPDATE_LOG_FILE']
+    with open(file_path, 'rb') as f:
+        app.config['FIRMWARE_UPDATE_LOG_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
+
+    file_path = app.config['NFC_DATA_FILE']
+    with open(file_path, 'rb') as f:
+        app.config['NFC_DATA_FILE_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
+
+    file_path = app.config['ARF_DATA_FILE']
+    with open(file_path, 'rb') as f:
+        app.config['ARF_DATA_FILE_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
+
+    file_path = app.config['CRF_DATA_FILE']
+    with open(file_path, 'rb') as f:
+        app.config['CRF_DATA_FILE_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
+
+    file_path = app.config['AP_LIST_FILE']
+    with open(file_path, 'rb') as f:
+        app.config['AP_LIST_FILE_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
+
+    file_path = app.config['STA_LIST_FILE']
+    with open(file_path, 'rb') as f:
+        app.config['STA_LIST_FILE_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
+
+    # TODO: Improve code to intelligent detection
+    folder_list = {
+        'HID-Script': app.config['UPLOAD_FOLDERS']['HID-Script'],
+        'INFO-Pie': app.config['UPLOAD_FOLDERS']['INFO-Pie'],
+        'INFO-Ardu': app.config['UPLOAD_FOLDERS']['INFO-Ardu'],
+    }
+    for folder_key, folder_path in folder_list.items():
+        check_file(folder_path, folder_key)
+
+
+init_data()
+
+
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -668,7 +730,12 @@ def get_hd_info():
     total = int(lines[0].split('G')[0])
     used = int(lines[1].split('G')[0])
     # get percentage
-    hd_info = used * 100 / total
+    percent = used * 100 / total
+    hd_info = {
+                  'percent': percent,
+                  'used': used,
+                  'free': total - used,
+              },
     data = simplejson.dumps({'status': 'success',
                              'api': 'hd_info',
                              'parameter': None,
@@ -909,65 +976,5 @@ def index():
     return render_template('index.html')
 
 
-def check_file(file_path, file_key):
-    if not os.path.exists(file_path):
-        print('{} in [{}] NOT FOUND, Please check it and then restart server.'.format(file_key, file_path))
-        exit(1)
-    return True
-
-
-def init_data():
-    if app.config['DEBUG']:
-        print(bcolors.WARNING + 'NOTE: You are running server in DEBUG mode, please make sure '
-                                'change to product mode before release.' + bcolors.ENDC)
-    elif app.config['TESTING']:
-        print(bcolors.WARNING + 'NOTE: You are running server in TESTING mode, please make sure '
-                                'change to product mode before release.' + bcolors.ENDC)
-    else:
-        print('NOTE: You are running server in PRODUCTION mode, If you want more'
-              'debug information, you can run in DEBUG or TESTING mode.')
-
-    for key, value in app.config.items():
-        if '_FILE' == key[-5:] or '_SHELL' == key[-6:]:
-            try:
-                check_file(value, key)
-            except TypeError as e:
-                print(e)
-
-    file_path = app.config['FIRMWARE_UPDATE_LOG_FILE']
-    with open(file_path, 'rb') as f:
-        app.config['FIRMWARE_UPDATE_LOG_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
-
-    file_path = app.config['NFC_DATA_FILE']
-    with open(file_path, 'rb') as f:
-        app.config['NFC_DATA_FILE_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
-
-    file_path = app.config['ARF_DATA_FILE']
-    with open(file_path, 'rb') as f:
-        app.config['ARF_DATA_FILE_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
-
-    file_path = app.config['CRF_DATA_FILE']
-    with open(file_path, 'rb') as f:
-        app.config['CRF_DATA_FILE_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
-
-    file_path = app.config['AP_LIST_FILE']
-    with open(file_path, 'rb') as f:
-        app.config['AP_LIST_FILE_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
-
-    file_path = app.config['STA_LIST_FILE']
-    with open(file_path, 'rb') as f:
-        app.config['STA_LIST_FILE_MD5'] = hashlib.md5(file_as_bytes(f)).hexdigest()
-
-    # TODO: Improve code to intelligent detection
-    folder_list = {
-        'HID-Script': app.config['UPLOAD_FOLDERS']['HID-Script'],
-        'INFO-Pie': app.config['UPLOAD_FOLDERS']['INFO-Pie'],
-        'INFO-Ardu': app.config['UPLOAD_FOLDERS']['INFO-Ardu'],
-    }
-    for folder_key, folder_path in folder_list.items():
-        check_file(folder_path, folder_key)
-
-
 if __name__ == '__main__':
-    init_data()
     app.run(host='0.0.0.0')
