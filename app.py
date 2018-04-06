@@ -105,6 +105,25 @@ def init_data():
     for folder_key, folder_path in folder_list.items():
         check_file(folder_path, folder_key)
 
+    # Note: Only calculate CRF's origin list
+    file_path = app.config['CRF_DATA_FILE']
+    with open(file_path, 'r') as f:
+        lines = f.readlines()
+    # appended_rf_set = set()
+    for line in lines:
+        s = line.split(';')
+        if len(s) != 4:
+            continue
+        result_items = {
+            'freq': s[0].split(':')[-1],
+            'prot': s[1].split(':')[-1],
+            'MOD': s[2].split(':')[-1],
+            'data': s[3].split(':')[-1],
+            'play': False,
+            'msg_type': 'crf'
+        }
+        app.config['ORIGIN_CRF_LIST'].append(result_items)
+
 
 init_data()
 
@@ -230,6 +249,8 @@ def get_all_rf_item(msg_type):
             'msg_type': msg_type
         }
         result_items.append(result_item)
+    # remove duplicate
+    result_items = [dict(t) for t in set([tuple(d.items()) for d in result_items])]
     data = simplejson.dumps({'status': 'success',
                              'api': 'all_rf_item',
                              'parameter': msg_type,
@@ -318,15 +339,16 @@ def get_attack_status():
                 del lines[i]
 
     if len(lines) == 0:
-        data = simplejson.dumps({'status': 'fail',
+        attack_status = 0
+        data = simplejson.dumps({'status': 'success',
                                  'api': 'attack_status',
                                  'parameter': None,
-                                 'message': 'Get attack_status fail,log file format error.',
+                                 'message': 'Get attack_status success.',
                                  'data_key': 'attack_status',
                                  'attack_status': attack_status
                                  })
-        logger.error(data)
-        return data, status.HTTP_500_INTERNAL_SERVER_ERROR
+        logger.info(data)
+        return data
     try:
         attack_status = int(lines[0])
     except ValueError as e:
@@ -353,7 +375,7 @@ def get_attack_status():
 
 @app.route("/rf_item/<string:msg_type>", methods=['GET'])
 def get_rf_item(msg_type):
-    result_item = {}
+    result_items = []
     data_key = msg_type + "_item"
     if msg_type == 'arf':
         file_path = app.config['ARF_DATA_FILE']
@@ -372,7 +394,7 @@ def get_rf_item(msg_type):
                                  'api': 'rf_item',
                                  'parameter': msg_type,
                                  'message': 'Get rf_item fail.parameter msg_type error.',
-                                 data_key: result_item,
+                                 data_key: result_items,
                                  'data_key': data_key
                                  })
         logger.error(data)
@@ -383,7 +405,7 @@ def get_rf_item(msg_type):
                                  'api': 'rf_item',
                                  'parameter': msg_type,
                                  'message': 'Get rf_item success, but NOT MODIFIED.',
-                                 data_key: result_item,
+                                 data_key: result_items,
                                  'data_key': data_key
                                  })
         logger.debug(data)
@@ -397,36 +419,39 @@ def get_rf_item(msg_type):
                                  'api': 'rf_item',
                                  'parameter': msg_type,
                                  'message': 'Get rf_item success.But no item found.',
-                                 data_key: result_item,
+                                 data_key: result_items,
                                  'data_key': data_key
                                  })
         logger.info(data)
         return data
-
-    s = lines[-1].split(';')
-    if len(s) != 4:
-        data = simplejson.dumps({'status': 'fail',
-                                 'api': 'rf_item',
-                                 'parameter': msg_type,
-                                 'message': 'Get rf_item fail.Item format error.',
-                                 data_key: result_item,
-                                 'data_key': data_key
-                                 })
-        logger.error(data)
-        return data, status.HTTP_404_NOT_FOUND
-    result_item = {
-        'freq': s[0].split(':')[-1],
-        'prot': s[1].split(':')[-1],
-        'MOD': s[2].split(':')[-1],
-        'data': s[3].split(':')[-1],
-        'play': False,
-        'msg_type': msg_type
-    }
+    new_rf_list = []
+    # appended_rf_set = set()
+    for line in lines:
+        s = line.split(';')
+        if len(s) != 4:
+            continue
+        result_items = {
+            'freq': s[0].split(':')[-1],
+            'prot': s[1].split(':')[-1],
+            'MOD': s[2].split(':')[-1],
+            'data': s[3].split(':')[-1],
+            'play': False,
+            'msg_type': msg_type
+        }
+        new_rf_list.append(result_items)
+        # TODO: 初始化RF_List
+    data1 = new_rf_list
+    data2 = app.config['ORIGIN_CRF_LIST']
+    # get different items
+    result_items = [x for x in data1 if x not in data2]
+    # remove duplicate
+    result_items = [dict(t) for t in set([tuple(d.items()) for d in result_items])]
+    app.config['ORIGIN_CRF_LIST'] = [dict(t) for t in set([tuple(d.items()) for d in new_rf_list])]
     data = simplejson.dumps({'status': 'success',
                              'api': 'get_rf_item',
                              'parameter': msg_type,
                              'message': 'Get rf_item success.',
-                             data_key: result_item,
+                             data_key: result_items,
                              'data_key': data_key
                              })
     logger.info(data)
@@ -674,6 +699,8 @@ def send_direction(direction, value):
 
 @app.route("/serial_send/<string:parameter>", methods=['GET'])
 def serial_send(parameter):
+    if any(prefix in parameter for prefix in ['rc1start', 'rc2start']):
+        open(app.config['ATTACK_PROGRESS_FILE'], 'w').close()
     try:
         subprocess.call("{} {}".format(app.config['SERIAL_SEND_SHELL'], parameter), shell=True)
     except CalledProcessError as e:

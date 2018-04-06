@@ -11,6 +11,7 @@ class Config(object):
     AP_LIST_FILE_MD5 = None
     STA_LIST_FILE_MD5 = None
     FIRMWARE_NFC_LOG_MD5 = None
+    ORIGIN_CRF_LIST = []
 
 
 class ProductionConfig(Config):
