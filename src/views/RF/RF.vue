@@ -1,27 +1,28 @@
 <template>
   <div class="board">
     <cube-nav/>
-    <b-alert :show="showARFAlert" variant="primary" dismissible>
-      <h4 class="alert-heading">RF</h4>
-      <p>
-        In frequency {{latest_arf_item.freq}} found prot: {{latest_arf_item.prot}}, data: {{latest_arf_item.data}} signal.<a href="#content">Learn More.</a>
-      </p>
-    </b-alert>
-
-    <b-alert :show="showCRFAlert" variant="primary" dismissible>
+    <div v-for="latest_arf_item in latest_arf_items" >
+      <b-alert show variant="primary" dismissible>
+        <h4 class="alert-heading">RF</h4>
+        <p>
+          In frequency {{latest_arf_item.freq}} found prot: {{latest_arf_item.prot}}, data: {{latest_arf_item.data}} signal.<a href="#content">Learn More.</a>
+        </p>
+      </b-alert>
+    </div>
+  <div v-for="latest_crf_item in latest_crf_items" >
+    <b-alert show variant="primary" dismissible>
       <h4 class="alert-heading">RF</h4>
       <p>
         In frequency {{latest_crf_item.freq}} found prot: {{latest_crf_item.prot}}, data: {{latest_crf_item.data}} signal.<a href="#content">Learn More.</a>
       </p>
     </b-alert>
-
+  </div>
     <b-alert :show="showNFCAlert" variant="success" dismissible>
       <h4 class="alert-heading">NFC</h4>
       <p>
         Found NFC card ID: {{latest_nfc_item.ID}}, <u @click="clickNFC">Learn More.</u>
       </p>
     </b-alert>
-
     <h1 class="text-center">Cube RF Manage</h1>
     <h3 class="text-center">Security Risk Detection on 433Mhz,315Mhz Devices</h3>
     <br/><br/>
@@ -36,11 +37,13 @@
       </b-row>
     </b-container>
     <div>
-      <b-table :items="rfItems" :fields="fields_show">
+      <b-table :items="rfItems" :fields="fields_show" :per-page="sniffPerPage" :current-page="sniffCurrentPage">
         <div slot="play" slot-scope="data">
           <b-button type="default" size="sm" variant="primary" @click="onClick(data.index)">Run</b-button>
         </div>
       </b-table>
+      <b-pagination align="center" v-if="rfItems.length" size="sm" :total-rows="rfItems.length" v-model="sniffCurrentPage" :per-page="sniffPerPage">
+      </b-pagination>
       <Spin fix v-if="spinShow"></Spin>
     </div>
 
@@ -159,16 +162,16 @@
     data() {
       return {
         attackProgress: 0,
+        sniffPerPage: 10,
+        sniffCurrentPage: 1,
         attackValueLeft: '1755',
         attackValueRight: '17a5',
         spinShow: true,
         protocol: 'PT224X',
         latest_nfc_item: '',
         showNFCAlert: false,
-        latest_arf_item: '',
-        showARFAlert: false,
-        latest_crf_item: '',
-        showCRFAlert: false,
+        latest_arf_items: [],
+        latest_crf_items: [],
         snifferSwitch: true,
         tpmsSwitch: false,
         attackSwitch: false,
@@ -262,7 +265,7 @@
           });
       },
       fetchRFItem() {
-        const dataAPIs = ['arf', 'crf'];
+        const dataAPIs = ['crf'];
         const that = this;
         for (const api of dataAPIs) {
           axios
@@ -278,20 +281,17 @@
                 return;
               }
               const dataKey = result.data_key;
-              that.$Message.success(result.message);
-              const isExist = that.rfItems.indexOf(result[dataKey]) !== -1;
-              if (isExist) {
-                return;
+              if (result[dataKey].length > 0) {
+                that.$Message.success(result.message);
               }
-              that.rfItems.unshift(result[dataKey]);
-              // that.rfItems = new Set(that.rfItems).toJSON();
-              that.rfItems = [...(new Set(that.rfItems))];
+              for (const item of result[dataKey]) {
+                that.rfItems.unshift(item);
+              }
+              // todo: change as for item of them :display notice
               if (dataKey === 'arf_item') {
-                that.latest_arf_item = result[dataKey];
-                that.showARFAlert = true;
+                that.latest_arf_items = result[dataKey];
               } else if (dataKey === 'crf_item') {
-                that.latest_crf_item = result[dataKey];
-                that.showCRFAlert = true;
+                that.latest_crf_items = result[dataKey];
               }
             })
             .catch((err) => {
@@ -305,7 +305,7 @@
       },
       fetchAllRFItems() {
         this.spinShow = true;
-        const dataAPIs = ['arf', 'crf'];
+        const dataAPIs = ['crf'];
         const that = this;
         for (const api of dataAPIs) {
           axios
@@ -320,7 +320,6 @@
             //   that.rfItems.add(item);
             // }
             that.rfItems = that.rfItems.concat(result[dataKey]);
-            that.rfItems = [...(new Set(that.rfItems))];
             this.spinShow = false;
           })
           .catch((err) => {
@@ -412,7 +411,8 @@
         }
       },
       onClick(index) {
-        const item = this.rfItems[index];
+        const actualIndex = ((this.sniffCurrentPage - 1) * this.sniffPerPage) + index;
+        const item = this.rfItems[actualIndex];
         const parameter = `"rfreq:${item.freq};protocol:${item.prot};modulation:${item.MOD};data:${item.data}"`;
         this.serialSend(parameter, true);
       },
