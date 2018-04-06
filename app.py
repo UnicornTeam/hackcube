@@ -75,7 +75,7 @@ def get_nfc_item():
                                  'nfc_item': nfc_item,
                                  'data_key': 'nfc_item'
                                  })
-        logger.info(data)
+        logger.debug(data)
         return data, status.HTTP_304_NOT_MODIFIED
     app.config['NFC_DATA_FILE_MD5'] = now_md5
     with open(file_path, 'r') as f:
@@ -269,7 +269,7 @@ def get_rf_item(msg_type):
                                  data_key: result_item,
                                  'data_key': data_key
                                  })
-        logger.info(data)
+        logger.debug(data)
         return data, status.HTTP_304_NOT_MODIFIED
     with open(file_path, 'r') as f:
         lines = f.readlines()
@@ -339,7 +339,7 @@ def get_ap_list():
                                  'ap_list': ap_list,
                                  'data_key': 'ap_list'
                                  })
-        logger.info(data)
+        logger.debug(data)
         return data, status.HTTP_304_NOT_MODIFIED
 
     app.config['AP_LIST_FILE_MD5'] = new_MD5
@@ -400,7 +400,7 @@ def get_sta_list():
                                  'sta_list': sta_list,
                                  'data_key': 'sta_list'
                                  })
-        logger.info(data)
+        logger.debug(data)
         return data, status.HTTP_304_NOT_MODIFIED
     app.config['STA_LIST_FILE_MD5'] = new_MD5
     with open(file_path, 'r') as f:
@@ -649,7 +649,7 @@ def get_nfc_log():
                                  'data_key': 'nfc_log',
                                  'nfc_log': nfc_log
                                  })
-        logger.info(data)
+        logger.debug(data)
         return data, status.HTTP_304_NOT_MODIFIED
     else:
         app.config['FIRMWARE_NFC_LOG_MD5'] = new_MD5
@@ -691,7 +691,7 @@ def update_firmware_log():
                                  'data_key': 'update_log',
                                  'update_log': update_log
                                  })
-        logger.info(data)
+        logger.debug(data)
         return data, status.HTTP_304_NOT_MODIFIED
     else:
         app.config['FIRMWARE_UPDATE_LOG_MD5'] = new_MD5
