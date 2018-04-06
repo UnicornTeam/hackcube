@@ -754,8 +754,9 @@ def get_hd_info():
                                  })
         logger.error(data)
         return data, status.HTTP_500_INTERNAL_SERVER_ERROR
-    total = int(lines[0].split('G')[0])
-    used = int(lines[1].split('G')[0])
+    used = int(lines[0])/1024/1024
+    free = int(lines[1])/1024/1024
+    total = used + free
     # get percentage
     percent = used * 100 / total
     hd_info = {
