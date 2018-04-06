@@ -45,7 +45,7 @@
       <b-pagination align="center" v-if="rfItems.length" size="sm" :total-rows="rfItems.length" v-model="sniffCurrentPage" :per-page="sniffPerPage">
       </b-pagination>
       <div>
-        <van-loading type="spinner" color="black" v-if="rfItems.length" id="aligncenter" />
+        <van-loading type="spinner" color="black" v-if="!rfItems.length&&snifferSwitch" id="aligncenter" />
         <div style="clear: both;"></div>
       </div>
       <!--<Spin fix v-if="spinShow"></Spin>-->

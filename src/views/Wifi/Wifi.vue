@@ -37,7 +37,7 @@
       </b-pagination>
       <!--<Spin fix v-if="apSpinShow"></Spin>-->
       <div>
-        <van-loading type="spinner" color="black" v-if="!apCount" id="aligncenter" />
+        <van-loading type="spinner" color="black" v-if="!apCount&&scanStatus==='on'" id="aligncenter" />
         <div style="clear: both;"></div>
       </div>
     </div>
@@ -58,7 +58,7 @@
       </b-table>
       <!--<Spin fix v-if="staSpinShow"></Spin>-->
       <div>
-        <van-loading type="spinner" color="black" v-if="!staCount" id="aligncenter" />
+        <van-loading type="spinner" color="black" v-if="!staCount&&scanStatus==='on'" id="aligncenter" />
         <div style="clear: both;"></div>
       </div>
     </div>
