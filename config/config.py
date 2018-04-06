@@ -12,6 +12,7 @@ class Config(object):
     STA_LIST_FILE_MD5 = None
     FIRMWARE_NFC_LOG_MD5 = None
 
+
 class ProductionConfig(Config):
     AP_LIST_FILE = '/root/monitor_file/AP_list_tmp'
     STA_LIST_FILE = '/root/monitor_file/STA_list_tmp'
@@ -22,6 +23,7 @@ class ProductionConfig(Config):
     HD_INFO_FILE = '/etc/HD_info'
     ATTACK_PROGRESS_FILE = '/root/serial_file/attack_progress_bar'
     FIRMWARE_NFC_LOG_FILE = '/root/serial_file/data/NFC_log'
+    ENERGY_PROGRESS_FILE = '/etc/Power_info'
 
     STA_BLOCK_SHELL = "/root/monitor_file/STA_block.sh"
     WIFI_SCAN_SHELL = "/root/monitor_file/wifi_scan.sh"

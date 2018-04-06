@@ -25,6 +25,7 @@ from lib.upload_file import uploadfile
 app = Flask(__name__)
 logger = get_logging('CUBE')
 CORS(app, supports_credentials=True)
+# TODO： 改为环境变量
 app.config['DEBUG'] = True
 app.config['TEST'] = False
 
@@ -178,9 +179,63 @@ def get_all_rf_item(msg_type):
     return data
 
 
+@app.route("/energy_status", methods=['GET'])
+def get_energy_status():
+    energy_status = None
+    file_path = app.config['ENERGY_PROGRESS_FILE']
+    if not os.path.exists(file_path):
+        data = simplejson.dumps({'status': 'fail',
+                                 'api': 'energy_status',
+                                 'parameter': None,
+                                 'message': 'Get energy_status fail, file not found.',
+                                 'data_key': 'energy_status',
+                                 'energy_status': energy_status
+                                 })
+        logger.error(data)
+        return data, status.HTTP_404_NOT_FOUND
+
+    with open(file_path, 'r') as f:
+        lines = f.readlines()
+        for i in range(len(lines)):
+            if not lines[i]:
+                del lines[i]
+
+    if len(lines) == 0:
+        data = simplejson.dumps({'status': 'fail',
+                                 'api': 'energy_status',
+                                 'parameter': None,
+                                 'message': 'Get energy_status fail,log file format error.',
+                                 'data_key': 'energy_status',
+                                 'energy_status': energy_status
+                                 })
+        logger.error(data)
+        return data, status.HTTP_500_INTERNAL_SERVER_ERROR
+    try:
+        energy_status = (int(lines[0].split('-')[0]) - 3200) / 10
+    except ValueError as e:
+        print(e)
+        data = simplejson.dumps({'status': 'fail',
+                                 'api': 'energy_status',
+                                 'parameter': None,
+                                 'message': 'Get energy_status fail,log file format error.',
+                                 'data_key': 'energy_status',
+                                 'energy_status': energy_status
+                                 })
+        logger.error(data)
+        return data, status.HTTP_500_INTERNAL_SERVER_ERROR
+    data = simplejson.dumps({'status': 'success',
+                             'api': 'energy_status',
+                             'parameter': None,
+                             'message': 'Get energy_status success.',
+                             'data_key': 'energy_status',
+                             'energy_status': energy_status
+                             })
+    logger.info(data)
+    return data
+
+
 @app.route("/attack_status", methods=['GET'])
 def get_attack_status():
-    # TODO: Finish it.
     attack_status = None
     file_path = app.config['ATTACK_PROGRESS_FILE']
     if not os.path.exists(file_path):
@@ -223,7 +278,7 @@ def get_attack_status():
                                  })
         logger.error(data)
         return data, status.HTTP_500_INTERNAL_SERVER_ERROR
-    data =simplejson.dumps({'status': 'success',
+    data = simplejson.dumps({'status': 'success',
                              'api': 'attack_status',
                              'parameter': None,
                              'message': 'Get attack_status success.',
@@ -276,15 +331,15 @@ def get_rf_item(msg_type):
     while lines and not lines[-1].strip():
         del lines[-1]
     if not lines:
-        data = simplejson.dumps({'status': 'fail',
+        data = simplejson.dumps({'status': 'success',
                                  'api': 'rf_item',
                                  'parameter': msg_type,
-                                 'message': 'Get rf_item fail.Item not exist.',
+                                 'message': 'Get rf_item success.But no item found.',
                                  data_key: result_item,
                                  'data_key': data_key
                                  })
-        logger.error(data)
-        return data, status.HTTP_404_NOT_FOUND
+        logger.info(data)
+        return data
 
     s = lines[-1].split(';')
     if len(s) != 4:
