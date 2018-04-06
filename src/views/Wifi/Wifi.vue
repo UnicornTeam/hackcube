@@ -33,7 +33,7 @@
             Stop</b-button>
         </div>
       </b-table>
-      <b-pagination align="center" v-if="apCount" size="sm" :total-rows="apCount" v-model="apCurrentPage" :per-page="apPerPage">
+      <b-pagination align="center" v-if="apList.length" size="sm" :total-rows="apCount" v-model="apCurrentPage" :per-page="apPerPage">
       </b-pagination>
       <!--<Spin fix v-if="apSpinShow"></Spin>-->
       <div>
@@ -58,7 +58,7 @@
       </b-table>
       <!--<Spin fix v-if="staSpinShow"></Spin>-->
       <div>
-        <van-loading type="spinner" color="black" v-if="staSpinShow" id="aligncenter" />
+        <van-loading type="spinner" color="black" v-if="staList.length" id="aligncenter" />
         <div style="clear: both;"></div>
       </div>
     </div>
