@@ -19,9 +19,11 @@ from flask_cors import CORS
 
 from config.bcolor import bcolors
 from config.config import DevelopmentConfig, TestingConfig, ProductionConfig
+from getlogging import get_logging
 from lib.upload_file import uploadfile
 
 app = Flask(__name__)
+logger = get_logging('CUBE')
 CORS(app, supports_credentials=True)
 app.config['DEBUG'] = True
 app.config['TEST'] = False
@@ -54,36 +56,42 @@ def get_nfc_item():
     nfc_item = {}
     file_path = app.config['NFC_DATA_FILE']
     if not os.path.exists(file_path):
-        return simplejson.dumps({'status': 'fail',
+        data = simplejson.dumps({'status': 'fail',
                                  'api': 'nfc_item',
                                  'parameter': None,
                                  'message': 'Get nfc_item fail.FILE NOT FOUND',
                                  'nfc_item': nfc_item,
                                  'data_key': 'nfc_item'
-                                 }), status.HTTP_404_NOT_FOUND
+                                 })
+        logger.error(data)
+        return data, status.HTTP_404_NOT_FOUND
     with open(file_path, 'rb') as f:
         now_md5 = hashlib.md5(file_as_bytes(f)).hexdigest()
     if now_md5 == app.config['NFC_DATA_FILE_MD5']:
-        return simplejson.dumps({'status': 'success',
+        data = simplejson.dumps({'status': 'success',
                                  'api': 'nfc_item',
                                  'parameter': None,
                                  'message': 'Get nfc_item success.But no new NFC item',
                                  'nfc_item': nfc_item,
                                  'data_key': 'nfc_item'
-                                 }), status.HTTP_304_NOT_MODIFIED
+                                 })
+        logger.info(data)
+        return data, status.HTTP_304_NOT_MODIFIED
     app.config['NFC_DATA_FILE_MD5'] = now_md5
     with open(file_path, 'r') as f:
         lines = f.readlines()
     while lines[-1].strip() == '':
         del lines[-1]
     if not lines:
-        return simplejson.dumps({'status': 'fail',
+        data = simplejson.dumps({'status': 'fail',
                                  'api': 'nfc_item',
                                  'parameter': None,
                                  'message': 'Get nfc_item fail.Item NOT FOUND',
                                  'nfc_item': nfc_item,
                                  'data_key': 'nfc_item'
-                                 }), status.HTTP_404_NOT_FOUND
+                                 })
+        logger.error(data)
+        return data, status.HTTP_404_NOT_FOUND
     else:
         id = lines[-1]
         vid = '050'
@@ -93,13 +101,15 @@ def get_nfc_item():
             'WRITE': False,
             'SIMULATE': False
         }
-        return simplejson.dumps({'status': 'success',
+        data = simplejson.dumps({'status': 'success',
                                  'api': 'nfc_item',
                                  'parameter': None,
                                  'message': 'Get nfc_item success.',
                                  'nfc_item': nfc_item,
                                  'data_key': 'nfc_item'
                                  })
+        logger.info(data)
+        return data
 
 
 @app.route("/all_rf_item/<string:msg_type>", methods=['GET'])
@@ -111,37 +121,43 @@ def get_all_rf_item(msg_type):
     elif msg_type == 'crf':
         file_path = app.config['CRF_DATA_FILE']
     else:
-        return simplejson.dumps({'status': 'fail',
+        data = simplejson.dumps({'status': 'fail',
                                  'api': 'all_rf_item',
                                  'parameter': msg_type,
                                  'message': 'Get all_rf_item fail.parameter msg_type error.',
                                  data_key: result_items,
                                  'data_key': data_key
-                                 }), status.HTTP_400_BAD_REQUEST
+                                 })
+        logger.error(data)
+        return data, status.HTTP_400_BAD_REQUEST
 
     with open(file_path, 'r') as f:
         lines = f.readlines()
     while lines and not lines[-1].strip():
         del lines[-1]
     if not lines:
-        return simplejson.dumps({'status': 'fail',
+        data = simplejson.dumps({'status': 'fail',
                                  'api': 'all_rf_item',
                                  'parameter': msg_type,
                                  'message': 'Get all_rf_item fail.Item not exist.',
                                  data_key: result_items,
                                  'data_key': data_key
-                                 }), status.HTTP_404_NOT_FOUND
+                                 })
+        logger.error(data)
+        return data, status.HTTP_404_NOT_FOUND
 
     for line in lines:
         s = line.split(';')
         if len(s) != 4:
-            return simplejson.dumps({'status': 'fail',
+            data = simplejson.dumps({'status': 'fail',
                                      'api': 'all_rf_item',
                                      'parameter': msg_type,
                                      'message': 'Get all_rf_item fail.Item format error.',
                                      data_key: result_items,
                                      'data_key': data_key
-                                     }), status.HTTP_404_NOT_FOUND
+                                     })
+            logger.error(data)
+            return data, status.HTTP_404_NOT_FOUND
         result_item = {
             'freq': s[0].split(':')[-1],
             'prot': s[1].split(':')[-1],
@@ -151,13 +167,15 @@ def get_all_rf_item(msg_type):
             'msg_type': msg_type
         }
         result_items.append(result_item)
-    return simplejson.dumps({'status': 'success',
+    data = simplejson.dumps({'status': 'success',
                              'api': 'all_rf_item',
                              'parameter': msg_type,
                              'message': 'Get all_rf_item success.',
                              data_key: result_items,
                              'data_key': data_key
                              })
+    logger.info(data)
+    return data
 
 
 @app.route("/attack_status", methods=['GET'])
@@ -166,13 +184,15 @@ def get_attack_status():
     attack_status = None
     file_path = app.config['ATTACK_PROGRESS_FILE']
     if not os.path.exists(file_path):
-        return simplejson.dumps({'status': 'fail',
+        data = simplejson.dumps({'status': 'fail',
                                  'api': 'attack_status',
                                  'parameter': None,
                                  'message': 'Get attack_status fail, file not found.',
                                  'data_key': 'attack_status',
                                  'attack_status': attack_status
-                                 }), status.HTTP_404_NOT_FOUND
+                                 })
+        logger.error(data)
+        return data, status.HTTP_404_NOT_FOUND
 
     with open(file_path, 'r') as f:
         lines = f.readlines()
@@ -180,32 +200,38 @@ def get_attack_status():
             if not lines[i]:
                 del lines[i]
 
-    if len(lines) != 1:
-        return simplejson.dumps({'status': 'fail',
+    if len(lines) == 0:
+        data = simplejson.dumps({'status': 'fail',
                                  'api': 'attack_status',
                                  'parameter': None,
                                  'message': 'Get attack_status fail,log file format error.',
                                  'data_key': 'attack_status',
                                  'attack_status': attack_status
-                                 }), status.HTTP_500_INTERNAL_SERVER_ERROR
+                                 })
+        logger.error(data)
+        return data, status.HTTP_500_INTERNAL_SERVER_ERROR
     try:
         attack_status = int(lines[0])
     except ValueError as e:
         print(e)
-        return simplejson.dumps({'status': 'fail',
+        data = simplejson.dumps({'status': 'fail',
                                  'api': 'attack_status',
                                  'parameter': None,
                                  'message': 'Get attack_status fail,log file format error.',
                                  'data_key': 'attack_status',
                                  'attack_status': attack_status
-                                 }), status.HTTP_500_INTERNAL_SERVER_ERROR
-    return simplejson.dumps({'status': 'success',
+                                 })
+        logger.error(data)
+        return data, status.HTTP_500_INTERNAL_SERVER_ERROR
+    data =simplejson.dumps({'status': 'success',
                              'api': 'attack_status',
                              'parameter': None,
                              'message': 'Get attack_status success.',
                              'data_key': 'attack_status',
                              'attack_status': attack_status
                              })
+    logger.info(data)
+    return data
 
 
 @app.route("/rf_item/<string:msg_type>", methods=['GET'])
@@ -225,44 +251,52 @@ def get_rf_item(msg_type):
             is_change = new_MD5 != app.config['CRF_DATA_FILE_MD5']
             app.config['CRF_DATA_FILE_MD5'] = new_MD5 if is_change else app.config['CRF_DATA_FILE_MD5']
     else:
-        return simplejson.dumps({'status': 'fail',
+        data = simplejson.dumps({'status': 'fail',
                                  'api': 'rf_item',
                                  'parameter': msg_type,
                                  'message': 'Get rf_item fail.parameter msg_type error.',
                                  data_key: result_item,
                                  'data_key': data_key
-                                 }), status.HTTP_400_BAD_REQUEST
+                                 })
+        logger.error(data)
+        return data, status.HTTP_400_BAD_REQUEST
 
     if not is_change:
-        return simplejson.dumps({'status': 'success',
+        data = simplejson.dumps({'status': 'success',
                                  'api': 'rf_item',
                                  'parameter': msg_type,
                                  'message': 'Get rf_item success, but NOT MODIFIED.',
                                  data_key: result_item,
                                  'data_key': data_key
-                                 }), status.HTTP_304_NOT_MODIFIED
+                                 })
+        logger.info(data)
+        return data, status.HTTP_304_NOT_MODIFIED
     with open(file_path, 'r') as f:
         lines = f.readlines()
     while lines and not lines[-1].strip():
         del lines[-1]
     if not lines:
-        return simplejson.dumps({'status': 'fail',
+        data = simplejson.dumps({'status': 'fail',
                                  'api': 'rf_item',
                                  'parameter': msg_type,
                                  'message': 'Get rf_item fail.Item not exist.',
                                  data_key: result_item,
                                  'data_key': data_key
-                                 }), status.HTTP_404_NOT_FOUND
+                                 })
+        logger.error(data)
+        return data, status.HTTP_404_NOT_FOUND
 
     s = lines[-1].split(';')
     if len(s) != 4:
-        return simplejson.dumps({'status': 'fail',
+        data = simplejson.dumps({'status': 'fail',
                                  'api': 'rf_item',
                                  'parameter': msg_type,
                                  'message': 'Get rf_item fail.Item format error.',
                                  data_key: result_item,
                                  'data_key': data_key
-                                 }), status.HTTP_404_NOT_FOUND
+                                 })
+        logger.error(data)
+        return data, status.HTTP_404_NOT_FOUND
     result_item = {
         'freq': s[0].split(':')[-1],
         'prot': s[1].split(':')[-1],
@@ -271,36 +305,42 @@ def get_rf_item(msg_type):
         'play': False,
         'msg_type': msg_type
     }
-    return simplejson.dumps({'status': 'success',
+    data = simplejson.dumps({'status': 'success',
                              'api': 'get_rf_item',
                              'parameter': msg_type,
                              'message': 'Get rf_item success.',
                              data_key: result_item,
                              'data_key': data_key
                              })
+    logger.info(data)
+    return data
 
 
 @app.route("/ap_list", methods=['GET'])
 def get_ap_list():
     ap_list = []
     if not os.path.exists(app.config['AP_LIST_FILE']):
-        return simplejson.dumps({'status': 'fail',
+        data = simplejson.dumps({'status': 'fail',
                                  'api': 'ap_list',
                                  'parameter': None,
                                  'message': 'Get ap_list fail.File not found.',
                                  'ap_list': ap_list,
                                  'data_key': 'ap_list'
-                                 }), status.HTTP_404_NOT_FOUND
+                                 })
+        logger.error(data)
+        return data, status.HTTP_404_NOT_FOUND
     with open(app.config['AP_LIST_FILE'], 'rb') as f:
         new_MD5 = hashlib.md5(file_as_bytes(f)).hexdigest()
     if new_MD5 == app.config['AP_LIST_FILE_MD5']:
-        return simplejson.dumps({'status': 'success',
+        data = simplejson.dumps({'status': 'success',
                                  'api': 'ap_list',
                                  'parameter': None,
                                  'message': 'Get ap_list success.But file NOT MODIFIED.',
                                  'ap_list': ap_list,
                                  'data_key': 'ap_list'
-                                 }), status.HTTP_304_NOT_MODIFIED
+                                 })
+        logger.info(data)
+        return data, status.HTTP_304_NOT_MODIFIED
 
     app.config['AP_LIST_FILE_MD5'] = new_MD5
     with open(app.config['AP_LIST_FILE'], 'r') as f:
@@ -324,38 +364,44 @@ def get_ap_list():
         else:
             continue
         ap_list.append(i)
-    return simplejson.dumps({'status': 'success',
+    data = simplejson.dumps({'status': 'success',
                              'api': 'ap_list',
                              'parameter': None,
                              'message': 'Get ap_list success.',
                              'ap_list': ap_list,
                              'data_key': 'ap_list'
                              })
+    logger.info(data)
+    return data
 
 
 @app.route("/sta_list", methods=['GET'])
 def get_sta_list():
     sta_list = []
     if not os.path.exists(app.config['STA_LIST_FILE']):
-        return simplejson.dumps({'status': 'fail',
+        data = simplejson.dumps({'status': 'fail',
                                  'api': 'sta_list',
                                  'parameter': app.config['STA_LIST_FILE'],
                                  'message': 'Get sta_list error.File not found.',
                                  'sta_list': sta_list,
                                  'data_key': 'sta_list'
-                                 }), status.HTTP_404_NOT_FOUND
+                                 })
+        logger.error(data)
+        return data, status.HTTP_404_NOT_FOUND
 
     file_path = app.config['STA_LIST_FILE']
     with open(file_path, 'rb') as f:
         new_MD5 = hashlib.md5(file_as_bytes(f)).hexdigest()
     if new_MD5 == app.config['STA_LIST_FILE_MD5']:
-        return simplejson.dumps({'status': 'success',
+        data = simplejson.dumps({'status': 'success',
                                  'api': 'sta_list',
                                  'parameter': None,
                                  'message': 'Get sta_list success.But file NOT MODIFIED.',
                                  'sta_list': sta_list,
                                  'data_key': 'sta_list'
-                                 }), status.HTTP_304_NOT_MODIFIED
+                                 })
+        logger.info(data)
+        return data, status.HTTP_304_NOT_MODIFIED
     app.config['STA_LIST_FILE_MD5'] = new_MD5
     with open(file_path, 'r') as f:
         lines = f.readlines()
@@ -374,114 +420,139 @@ def get_sta_list():
         if 'not' in i['BSSID']:
             i['BSSID'] = 'None'
         sta_list.append(i)
-    return simplejson.dumps({'status': 'success',
+    data = simplejson.dumps({'status': 'success',
                              'api': 'sta_list',
                              'parameter': None,
                              'message': 'Get sta_list success.',
                              'sta_list': sta_list,
                              'data_key': 'sta_list'
                              })
+    logger.info(data)
+    return data
 
 
 @app.route("/ap_block/<string:bssid>/<string:action>", methods=['GET'])
 def ap_block(bssid, action):
     # print("[ap_block] Receive parameter: ", bssid, action)
     if action not in ['on', 'off']:
-        return simplejson.dumps({'status': 'fail',
+        data = simplejson.dumps({'status': 'fail',
                                  'api': 'ap_block',
                                  'parameter': [bssid, action],
                                  'message': 'Start AP_block {} fail, parameter error'.format(action),
                                  'data_key': None
-                                 }), status.HTTP_400_BAD_REQUEST
+                                 })
+        logger.error(data)
+        return data, status.HTTP_400_BAD_REQUEST
     try:
         subprocess.call("{} {} {}".format(app.config['AP_BLOCK_SHELL'], bssid, action), shell=True)
     except CalledProcessError as e:
         print(e)
-        return simplejson.dumps({'status': 'fail',
+        data = simplejson.dumps({'status': 'fail',
                                  'api': 'ap_block',
                                  'parameter': [bssid, action],
                                  'message': 'Start AP_block {} error.'.format(action),
                                  'data_key': None
-                                 }), status.HTTP_500_INTERNAL_SERVER_ERROR
-    return simplejson.dumps({'status': 'success',
+                                 })
+        logger.error(data)
+        return data, status.HTTP_500_INTERNAL_SERVER_ERROR
+    data = simplejson.dumps({'status': 'success',
                              'api': 'ap_block',
                              'parameter': [bssid, action],
                              'message': 'Start AP_block {} success.'.format(action),
                              'data_key': None
                              })
+    logger.info(data)
+    return data
 
 
 @app.route("/sta_block/<string:mac>/<string:action>")
 def sta_block(mac, action):
     if action not in ['on', 'off']:
-        return simplejson.dumps({'status': 'fail',
+        data = simplejson.dumps({'status': 'fail',
                                  'api': 'sta_block',
                                  'parameter': [mac, action],
                                  'message': 'Start STA_block {} fail, parameter error'.format(action),
                                  'data_key': None
-                                 }), status.HTTP_400_BAD_REQUEST
+                                 })
+        logger.error(data)
+        return data, status.HTTP_400_BAD_REQUEST
     try:
         subprocess.call("{} {} {}".format(app.config['STA_BLOCK_SHELL'], mac, action), shell=True)
     except CalledProcessError as e:
         print(e)
-        return simplejson.dumps({'status': 'fail',
+        data = simplejson.dumps({'status': 'fail',
                                  'api': 'sta_block',
                                  'parameter': [mac, action],
                                  'message': 'Start STA_block {} error.'.format(action),
                                  'data_key': None
-                                 }), status.HTTP_500_INTERNAL_SERVER_ERROR
-    return simplejson.dumps({'status': 'success',
+                                 })
+        logger.error(data)
+        return data, status.HTTP_500_INTERNAL_SERVER_ERROR
+    data = simplejson.dumps({'status': 'success',
                              'api': 'sta_block',
                              'parameter': [mac, action],
                              'message': 'Start STA_block {} success.'.format(action)
                              })
+    logger.info(data)
+    return data
 
 
 @app.route("/wifi_scan/<string:action>/<string:channel>", methods=['GET'])
 def wifi_scan(action, channel):
     if action not in ['on', 'off']:
-        return simplejson.dumps({'status': 'fail',
+        data = simplejson.dumps({'status': 'fail',
                                  'api': 'wifi_scan',
                                  'parameter': [action, channel],
                                  'message': 'Start wifi_scan {} {} fail, parameter error'.format(action, channel),
                                  'data_key': None
-                                 }), status.HTTP_400_BAD_REQUEST
+                                 })
+        logger.error(data)
+        return data, status.HTTP_400_BAD_REQUEST
     try:
         subprocess.call("{} {} {}".format(app.config['WIFI_SCAN_SHELL'], action, channel), shell=True)
     except CalledProcessError as e:
         print(e)
-        return simplejson.dumps({'status': 'fail',
+        data = simplejson.dumps({'status': 'fail',
                                  'api': 'wifi_scan',
                                  'parameter': [action, channel],
                                  'message': 'Start wifi_scan {} {} error.'.format(action, channel),
                                  'data_key': None
-                                 }), status.HTTP_500_INTERNAL_SERVER_ERROR
-    return simplejson.dumps({'status': 'success',
+                                 })
+        logger.error(data)
+        return data, status.HTTP_500_INTERNAL_SERVER_ERROR
+    data = simplejson.dumps({'status': 'success',
                              'api': 'wifi_scan',
                              'parameter': [action, channel],
                              'message': 'Start wifi_scan {} {} success.'.format(action, channel),
                              'data_key': None
                              })
+    logger.info(data)
+    return data
 
 
 @app.route("/send_direction/<string:direction>/<string:value>", methods=['GET'])
 def send_direction(direction, value):
+    print(direction, value)
     try:
         subprocess.call("{} {} {}".format(app.config['SEND_DIRECTION_SHELL'], direction, value), shell=True)
     except CalledProcessError as e:
         print(e)
-        return simplejson.dumps({'status': 'fail',
+        data = simplejson.dumps({'status': 'fail',
                                  'api': 'send_direction',
                                  'parameter': [direction, value],
                                  'message': 'Start send_direction {} {} error.'.format(direction, value),
                                  'data_key': None
-                                 }), status.HTTP_500_INTERNAL_SERVER_ERROR
-    return simplejson.dumps({'status': 'success',
+                                 })
+        logger.error(data)
+        return data, status.HTTP_500_INTERNAL_SERVER_ERROR
+    data = simplejson.dumps({'status': 'success',
                              'api': 'send_direction',
                              'parameter': [direction, value],
                              'message': 'Start send_direction {} {} success.'.format(direction, value),
                              'data_key': None
                              })
+    logger.info(data)
+    return data
 
 
 @app.route("/serial_send/<string:parameter>", methods=['GET'])
@@ -490,18 +561,22 @@ def serial_send(parameter):
         subprocess.call("{} {}".format(app.config['SERIAL_SEND_SHELL'], parameter), shell=True)
     except CalledProcessError as e:
         print(e)
-        return simplejson.dumps({'status': 'fail',
+        data = simplejson.dumps({'status': 'fail',
                                  'api': 'serial_send',
                                  'parameter': parameter,
                                  'message': 'Start serial_send {} error.'.format(parameter),
                                  'data_key': None
-                                 }), status.HTTP_500_INTERNAL_SERVER_ERROR
-    return simplejson.dumps({'status': 'success',
+                                 })
+        logger.error(data)
+        return data, status.HTTP_500_INTERNAL_SERVER_ERROR
+    data = simplejson.dumps({'status': 'success',
                              'api': 'serial_send',
                              'parameter': parameter,
                              'message': 'Start serial_send {} success.'.format(parameter),
                              'data_key': None
                              })
+    logger.info(data)
+    return data
 
 
 @app.route('/hd_info', methods=['GET'])
@@ -509,13 +584,15 @@ def get_hd_info():
     hd_info = None
     file_path = app.config['HD_INFO_FILE']
     if not os.path.exists(file_path):
-        return simplejson.dumps({'status': 'fail',
+        data = simplejson.dumps({'status': 'fail',
                                  'api': 'hd_info',
                                  'parameter': None,
                                  'message': 'Get hd_info fail, file not found.',
                                  'data_key': 'hd_info',
                                  'hd_info': hd_info
-                                 }), status.HTTP_404_NOT_FOUND
+                                 })
+        logger.error(data)
+        return data, status.HTTP_404_NOT_FOUND
 
     with open(file_path, 'r') as f:
         lines = f.readlines()
@@ -524,24 +601,28 @@ def get_hd_info():
                 del lines[i]
 
     if len(lines) != 2:
-        return simplejson.dumps({'status': 'fail',
+        data = simplejson.dumps({'status': 'fail',
                                  'api': 'hd_info',
                                  'parameter': None,
                                  'message': 'Get hd_info fail,log file format error.',
                                  'data_key': 'hd_info',
                                  'hd_info': hd_info
-                                 }), status.HTTP_500_INTERNAL_SERVER_ERROR
+                                 })
+        logger.error(data)
+        return data, status.HTTP_500_INTERNAL_SERVER_ERROR
     total = int(lines[0].split('G')[0])
     used = int(lines[1].split('G')[0])
     # get percentage
     hd_info = used * 100 / total
-    return simplejson.dumps({'status': 'success',
+    data = simplejson.dumps({'status': 'success',
                              'api': 'hd_info',
                              'parameter': None,
                              'message': 'Get hd_info success.',
                              'data_key': 'hd_info',
                              'hd_info': hd_info
                              })
+    logger.info(data)
+    return data
 
 
 @app.route("/nfc_log", methods=['GET'])
@@ -549,34 +630,40 @@ def get_nfc_log():
     nfc_log = None
     file_path = app.config['FIRMWARE_NFC_LOG_FILE']
     if not os.path.exists(file_path):
-        return simplejson.dumps({'status': 'fail',
+        data = simplejson.dumps({'status': 'fail',
                                  'api': 'nfc_log',
                                  'parameter': None,
                                  'message': 'Get nfc_log fail, file not found.',
                                  'data_key': 'nfc_log',
                                  'nfc_log': nfc_log
-                                 }), status.HTTP_404_NOT_FOUND
+                                 })
+        logger.error(data)
+        return data, status.HTTP_404_NOT_FOUND
     with open(file_path, 'rb') as f:
         new_MD5 = hashlib.md5(file_as_bytes(f)).hexdigest()
     if new_MD5 == app.config['FIRMWARE_NFC_LOG_MD5']:
-        return simplejson.dumps({'status': 'success',
-                                 'api': 'nfc_log',
-                                 'parameter': None,
-                                 'message': 'Get nfc_log success.',
-                                 'data_key': 'nfc_log',
-                                 'nfc_log': nfc_log
-                                 }), status.HTTP_304_NOT_MODIFIED
-    else:
-        app.config['FIRMWARE_NFC_LOG_MD5'] = new_MD5
-        with open(file_path, 'r') as f:
-            nfc_log = f.read()
-        return simplejson.dumps({'status': 'success',
+        data = simplejson.dumps({'status': 'success',
                                  'api': 'nfc_log',
                                  'parameter': None,
                                  'message': 'Get nfc_log success.',
                                  'data_key': 'nfc_log',
                                  'nfc_log': nfc_log
                                  })
+        logger.info(data)
+        return data, status.HTTP_304_NOT_MODIFIED
+    else:
+        app.config['FIRMWARE_NFC_LOG_MD5'] = new_MD5
+        with open(file_path, 'r') as f:
+            nfc_log = f.read()
+        data = simplejson.dumps({'status': 'success',
+                                 'api': 'nfc_log',
+                                 'parameter': None,
+                                 'message': 'Get nfc_log success.',
+                                 'data_key': 'nfc_log',
+                                 'nfc_log': nfc_log
+                                 })
+        logger.info(data)
+        return data
 
 
 @app.route("/update_firmware_log", methods=['GET'])
@@ -584,35 +671,41 @@ def update_firmware_log():
     update_log = None
     file_path = app.config['FIRMWARE_UPDATE_LOG_FILE']
     if not os.path.exists(file_path):
-        return simplejson.dumps({'status': 'fail',
+        data = simplejson.dumps({'status': 'fail',
                                  'api': 'update_firmware_log',
                                  'parameter': None,
                                  'message': 'Get update_firmware_log fail, file not found.',
                                  'data_key': 'update_log',
                                  'update_log': update_log
-                                 }), status.HTTP_404_NOT_FOUND
+                                 })
+        logger.error(data)
+        return data, status.HTTP_404_NOT_FOUND
     # Check if update log is NOT MODIFIED by MD5
     with open(file_path, 'rb') as f:
         new_MD5 = hashlib.md5(file_as_bytes(f)).hexdigest()
     if new_MD5 == app.config['FIRMWARE_UPDATE_LOG_MD5']:
-        return simplejson.dumps({'status': 'success',
-                                 'api': 'update_firmware_log',
-                                 'parameter': None,
-                                 'message': 'Get update_firmware_log success.',
-                                 'data_key': 'update_log',
-                                 'update_log': update_log
-                                 }), status.HTTP_304_NOT_MODIFIED
-    else:
-        app.config['FIRMWARE_UPDATE_LOG_MD5'] = new_MD5
-        with open(file_path, 'r') as f:
-            update_log = f.read()
-        return simplejson.dumps({'status': 'success',
+        data = simplejson.dumps({'status': 'success',
                                  'api': 'update_firmware_log',
                                  'parameter': None,
                                  'message': 'Get update_firmware_log success.',
                                  'data_key': 'update_log',
                                  'update_log': update_log
                                  })
+        logger.info(data)
+        return data, status.HTTP_304_NOT_MODIFIED
+    else:
+        app.config['FIRMWARE_UPDATE_LOG_MD5'] = new_MD5
+        with open(file_path, 'r') as f:
+            update_log = f.read()
+        data = simplejson.dumps({'status': 'success',
+                                 'api': 'update_firmware_log',
+                                 'parameter': None,
+                                 'message': 'Get update_firmware_log success.',
+                                 'data_key': 'update_log',
+                                 'update_log': update_log
+                                 })
+        logger.info(data)
+        return data
 
 
 @app.route("/update_firmware", methods=['POST'])
@@ -620,29 +713,35 @@ def update_firmware():
     # TODO: Parse as dict and get data
     uploaded_file_path = request.data.split('"')[3]
     if not update_firmware:
-        return simplejson.dumps({'status': 'fail',
+        data = simplejson.dumps({'status': 'fail',
                                  'api': 'update_firmware',
                                  'parameter': uploaded_file_path,
                                  'message': 'Start update_firmware fail, parameter error',
                                  'data_key': None
-                                 }), status.HTTP_400_BAD_REQUEST
+                                 })
+        logger.error(data)
+        return data, status.HTTP_400_BAD_REQUEST
 
     try:
         subprocess.call("{} {}".format(app.config['UPDATE_FIRMWARE_SHELL'], uploaded_file_path), shell=True)
     except CalledProcessError as e:
         print(e)
-        return simplejson.dumps({'status': 'fail',
+        data = simplejson.dumps({'status': 'fail',
                                  'api': 'update_firmware',
                                  'parameter': uploaded_file_path,
                                  'message': 'Start update_firmware fail',
                                  'data_key': None
-                                 }), status.HTTP_500_INTERNAL_SERVER_ERROR
-    return simplejson.dumps({'status': 'success',
+                                 })
+        logger.error(data)
+        return data, status.HTTP_500_INTERNAL_SERVER_ERROR
+    data = simplejson.dumps({'status': 'success',
                              'api': 'update_firmware',
                              'parameter': uploaded_file_path,
                              'message': 'Start update_firmware success',
                              'data_key': None
                              })
+    logger.info(data)
+    return data
 
 
 @app.route("/upload", methods=['GET', 'POST'])
@@ -678,12 +777,14 @@ def upload():
                 files.save(uploaded_file_path)
             except IOError as e:
                 print(e)
-                return simplejson.dumps({'status': 'fail',
+                data = simplejson.dumps({'status': 'fail',
                                          'api': 'upload',
                                          'parameter': filename,
                                          'message': 'Upload file fail.Error raise while save file.',
                                          'data_key': None
-                                         }), status.HTTP_500_INTERNAL_SERVER_ERROR
+                                         })
+                logger.error(data)
+                return data, status.HTTP_500_INTERNAL_SERVER_ERROR
 
             mime_type = files.content_type
             # create thumbnail after saving
@@ -695,29 +796,31 @@ def upload():
 
             # return json for js call back
             result = uploadfile(name=filename, type=mime_type, size=size)
-
-            return simplejson.dumps({"files": [result.get_file()]})
+            data = simplejson.dumps({"files": [result.get_file()]})
+            logger.info(data)
+            return data
 
     if request.method == 'GET':
         # get all file in ./data directory
-        files = [f for f in os.listdir(app.config['UPLOAD_FOLDER']) if
-                 os.path.isfile(os.path.join(app.config['UPLOAD_FOLDER'], f)) and f not in IGNORED_FILES]
+        files = [f for f in os.listdir(app.config['UPLOAD_FOLDERS']) if
+                 os.path.isfile(os.path.join(app.config['UPLOAD_FOLDERS'], f)) and f not in IGNORED_FILES]
 
         file_display = []
 
         for f in files:
-            size = os.path.getsize(os.path.join(app.config['UPLOAD_FOLDER'], f))
+            size = os.path.getsize(os.path.join(app.config['UPLOAD_FOLDERS'], f))
             file_saved = uploadfile(name=f, size=size)
             file_display.append(file_saved.get_file())
-
-        return simplejson.dumps({"files": file_display})
+        data = simplejson.dumps({"files": file_display})
+        logger.info(data)
+        return data
 
     return redirect(url_for('index'))
 
 
 @app.route("/delete/<string:filename>", methods=['DELETE'])
 def delete(filename):
-    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    file_path = os.path.join(app.config['UPLOAD_FOLDERS'], filename)
     file_thumb_path = os.path.join(app.config['THUMBNAIL_FOLDER'], filename)
 
     if os.path.exists(file_path):
@@ -726,10 +829,13 @@ def delete(filename):
 
             if os.path.exists(file_thumb_path):
                 os.remove(file_thumb_path)
-
-            return simplejson.dumps({filename: 'True'})
+            data = simplejson.dumps({filename: 'True'})
+            logger.info(data)
+            return data
         except:
-            return simplejson.dumps({filename: 'False'})
+            data = simplejson.dumps({filename: 'False'})
+            logger.error(data)
+            return data
 
 
 # serve static files
@@ -740,7 +846,7 @@ def get_thumbnail(filename):
 
 @app.route("/data/<string:filename>", methods=['GET'])
 def get_file(filename):
-    return send_from_directory(os.path.join(app.config['UPLOAD_FOLDER']), filename=filename)
+    return send_from_directory(os.path.join(app.config['UPLOAD_FOLDERS']), filename=filename)
 
 
 @app.route('/', methods=['GET', 'POST'])
