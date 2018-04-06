@@ -506,6 +506,7 @@ def get_ap_list():
         else:
             continue
         ap_list.append(i)
+    ap_list = [dict(t) for t in set([tuple(d.items()) for d in ap_list])]
     data = simplejson.dumps({'status': 'success',
                              'api': 'ap_list',
                              'parameter': None,
@@ -562,6 +563,7 @@ def get_sta_list():
         if 'not' in i['BSSID']:
             i['BSSID'] = 'None'
         sta_list.append(i)
+    sta_list = [dict(t) for t in set([tuple(d.items()) for d in sta_list])]
     data = simplejson.dumps({'status': 'success',
                              'api': 'sta_list',
                              'parameter': None,
