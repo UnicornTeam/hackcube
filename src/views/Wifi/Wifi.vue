@@ -23,7 +23,7 @@
       </b-row>
     </b-container>
     <div>
-      <b-table :items="apList" :fields="wifi_fields" :per-page="apPerPage" :current-page="apCurrentPage">
+      <b-table id="ellipsis-list" :items="apList" :fields="wifi_fields" :per-page="apPerPage" :current-page="apCurrentPage">
         <div slot="JAM" slot-scope="data">
           <b-button size="sm" variant="primary" v-if="!apList[((apCurrentPage-1) * apPerPage) + data.index].JAM"
                     @click="controlBlock('ap_block', data.index)">
@@ -35,14 +35,18 @@
       </b-table>
       <b-pagination align="center" v-if="apCount" size="sm" :total-rows="apCount" v-model="apCurrentPage" :per-page="apPerPage">
       </b-pagination>
-      <Spin fix v-if="apSpinShow"></Spin>
+      <!--<Spin fix v-if="apSpinShow"></Spin>-->
+      <div>
+        <van-loading type="spinner" color="black" v-if="apSpinShow" id="aligncenter" />
+        <div style="clear: both;"></div>
+      </div>
     </div>
     <br/><br/>
 
     <!-- Client list -->
     <h5>Client List</h5>
     <div>
-      <b-table :items="staList" :fields="client_fields" :per-page="staPerPage" :current-page="staCurrentPage">
+      <b-table id="ellipsis-list" :items="staList" :fields="client_fields" :per-page="staPerPage" :current-page="staCurrentPage">
         <div slot="JAM" slot-scope="data">
           <b-button size="sm" variant="primary" v-if="!staList[((staCurrentPage-1) * staPerPage) + data.index].JAM"
                     @click="controlBlock('sta_block', data.index)">
@@ -52,7 +56,11 @@
             Stop</b-button>
         </div>
       </b-table>
-      <Spin fix v-if="staSpinShow"></Spin>
+      <!--<Spin fix v-if="staSpinShow"></Spin>-->
+      <div>
+        <van-loading type="spinner" color="black" v-if="staSpinShow" id="aligncenter" />
+        <div style="clear: both;"></div>
+      </div>
     </div>
     <b-pagination align="center" v-if="staCount" size="sm" :total-rows="staCount" v-model="staCurrentPage" :per-page="staPerPage">
     </b-pagination>
@@ -246,7 +254,7 @@ export default {
 </script>
 
 <style>
-  td[aria-colindex] {
+  #ellipsis-list td[aria-colindex] {
     overflow: hidden;
     text-overflow:ellipsis;
     white-space: nowrap;

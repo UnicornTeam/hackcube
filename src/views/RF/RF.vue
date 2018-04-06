@@ -37,14 +37,18 @@
       </b-row>
     </b-container>
     <div>
-      <b-table :items="rfItems" :fields="fields_show" :per-page="sniffPerPage" :current-page="sniffCurrentPage">
+      <b-table id="break-word-list" :items="rfItems" :fields="fields_show" :per-page="sniffPerPage" :current-page="sniffCurrentPage">
         <div slot="play" slot-scope="data">
           <b-button type="default" size="sm" variant="primary" @click="onClick(data.index)">Run</b-button>
         </div>
       </b-table>
       <b-pagination align="center" v-if="rfItems.length" size="sm" :total-rows="rfItems.length" v-model="sniffCurrentPage" :per-page="sniffPerPage">
       </b-pagination>
-      <Spin fix v-if="spinShow"></Spin>
+      <div>
+        <van-loading type="spinner" color="black" v-if="spinShow" id="aligncenter" />
+        <div style="clear: both;"></div>
+      </div>
+      <!--<Spin fix v-if="spinShow"></Spin>-->
     </div>
 
     <b-container>
@@ -58,7 +62,7 @@
       </b-row>
     </b-container>
 
-    <b-table responsive :items="tpmsItems" :fields="fields_input">
+    <b-table id="break-word-list" responsive :items="tpmsItems" :fields="fields_input">
       <div slot="VOL" slot-scope="data">
         <b-form-input v-model="tpmsItems[data.index].VOL" type="text"></b-form-input>
       </div>
@@ -433,7 +437,7 @@
 </script>
 
 <style>
-  td[aria-colindex] {
+  #break-word-list td[aria-colindex] {
     max-width: 6em;
     word-wrap: break-word;
     padding-right: 4px;

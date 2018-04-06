@@ -14,7 +14,7 @@
     <b-progress :value="storage.percent"
                 variant="dark"
     ></b-progress>
-    <div id="textbox">
+    <div>
       <p class="alignleft">Used: {{storage.used}}GB</p>
       <p class="alignright">Free: {{storage.free}}GB</p>
       <div style="clear: both;"></div>

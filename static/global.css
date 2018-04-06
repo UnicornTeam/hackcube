@@ -29,3 +29,10 @@ div.van-switch {
 div.board {
   margin-left: 10px;margin-right: 10px;
 }
+
+#aligncenter {
+  float: right;
+  position: relative;
+  left: -50%; /* or right 50% */
+  text-align: left;
+}
