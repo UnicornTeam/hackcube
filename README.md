@@ -27,5 +27,6 @@ $ python app.py
 
 Use gunicorn:
 ```
-gunicorn --reload -w 4 -b 127.0.0.1:5000 app:app --access-logfile log/access.log --error-logfile log/error.log
+pip install gunicorn
+gunicorn --reload -w 4 -b 0.0.0.0:5000 app:app --access-logfile log/access.log --error-logfile log/error.log
 ```
