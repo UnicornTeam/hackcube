@@ -10,7 +10,7 @@
                 variant="dark"
     ></b-progress>
     <br/>
-    <h5 class="text-center">Hard driver</h5>
+    <h5 class="text-center">Storage</h5>
     <b-progress :value="storePercent"
                 variant="dark"
     ></b-progress>
