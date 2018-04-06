@@ -17,7 +17,7 @@ export default {
     staCount: state => state.staList.length,
   },
   actions: {
-    getAPList({ commit }) {
+    getAPList({ state, commit }) {
       // commit(SET_AP_SPIN_SHOW, true);
       return services.WIFI.getAPList()
         .then((resp) => {
@@ -25,15 +25,16 @@ export default {
             const result = resp.data;
             const items = result[result.data_key];
             commit('setAPItems', items);
+            commit(SET_AP_SPIN_SHOW, false);
+          } else if (state.apSpinShow) {
+            commit(SET_AP_SPIN_SHOW, false);
           }
-          commit(SET_AP_SPIN_SHOW, false);
-          return true;
         }).catch((err) => {
           commit('setAPSpinShow', false);
           return Promise.reject(err);
         });
     },
-    getSTAList({ commit }) {
+    getSTAList({ state, commit }) {
       // commit(SET_STA_SPIN_SHOW, true);
       return services.WIFI.getSTAList()
         .then((resp) => {
@@ -41,8 +42,10 @@ export default {
             const result = resp.data;
             const items = result[result.data_key];
             commit('setSTAItems', items);
+            commit(SET_STA_SPIN_SHOW, false);
+          } else if (state.staSpinShow) {
+            commit(SET_STA_SPIN_SHOW, false);
           }
-          commit(SET_STA_SPIN_SHOW, false);
         }).catch((err) => {
           commit('setSTASpinShow', false);
           return Promise.reject(err);

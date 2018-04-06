@@ -198,7 +198,7 @@
       };
     },
     methods: {
-      sendDirection(values, event) {
+      sendDirection(values) {
         const direction = values[0];
         const value = values[1];
         axios
@@ -335,14 +335,12 @@
             const result = response.data;
             // todo: write test code
             const dataKey = result.data_key;
-            // TODO: Check if need to translate to integer
             that.attackProgress = parseInt(result[dataKey], 0);
             if (that.attackProgress === 100) {
               that.$timer.stop('getAttackProgress');
             }
           })
           .catch((err) => {
-            this.spinShow = false;
             if (err.response) {
               this.$Message.error(err.response.data.message);
             } else {

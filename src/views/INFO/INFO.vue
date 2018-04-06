@@ -75,6 +75,27 @@
             }
           });
       },
+      getEnergyProgress() {
+        const that = this;
+        axios
+          .get(`${process.env.BACKEND_HOST}/energy_status`)
+          .then((response) => {
+            const result = response.data;
+            // todo: write test code
+            const dataKey = result.data_key;
+            that.energyPercent = parseInt(result[dataKey], 0);
+            if (that.energyPercent === 100) {
+              that.$timer.stop('getEnergyProgress');
+            }
+          })
+          .catch((err) => {
+            if (err.response) {
+              this.$Message.error(err.response.data.message);
+            } else {
+              this.$Message.error('Request fail');
+            }
+          });
+      },
       fetchUpdateLog() {
         this.spinShow = true;
         axios
@@ -133,6 +154,7 @@
     timers: {
       fetchUpdateLog: { time: 100, autostart: false, repeat: true },
       fetchStorageStatus: { time: 0, autostart: true, repeat: false },
+      getEnergyProgress: { time: 500, autostart: true, repeat: true },
     },
   };
 </script>

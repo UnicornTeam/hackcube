@@ -144,8 +144,6 @@ export default {
           if (status === 'on') {
             this.$timer.start('fetchWifiList');
             this.$Message.info('Start scan WiFi.');
-            this.setAPSpinShow(true);
-            this.setSTASpinShow(true);
           } else if (status === 'off') {
             this.$timer.stop('fetchWifiList');
             this.$Message.info('Stop scan WiFi.');
@@ -157,11 +155,21 @@ export default {
           } else {
             this.$Message.error('Request fail');
           }
+          this.setAPSpinShow(false);
+          this.setSTASpinShow(false);
         });
     },
     onClickScan() {
       // send request with action to backend
-      this.setScanStatus(this.scanStatus === 'on' ? 'off' : 'on');
+      let newStatus;
+      if (this.scanStatus === 'on') {
+        newStatus = 'off';
+      } else if (this.scanStatus === 'off') {
+        newStatus = 'on';
+        this.setAPSpinShow(true);
+        this.setSTASpinShow(true);
+      }
+      this.setScanStatus(newStatus);
       const channel = this.channel === null ? this.defaultChannel : this.channel;
       this.controlScan(this.scanStatus, channel);
     },
@@ -173,6 +181,7 @@ export default {
           this.$Message.error('Request fail');
         }
       });
+
       this.getSTAList().catch((err) => {
         if (err.response) {
           this.$Message.error(err.response.data.message);
@@ -200,6 +209,9 @@ export default {
     },
   },
   created() {
+    if (this.scanStatus === 'on') {
+      this.$timer.start('fetchWifiList');
+    }
     this.getChannelList();
   },
   timers: {
@@ -216,20 +228,20 @@ export default {
       ]),
     ...mapGetters('WIFI', ['staCount', 'apCount']),
   },
-  beforeRouteLeave(to, from, next) {
-    this.setScanStatus('off');
-    this.controlScan('off', this.channel);
-    // close all element still active
-    // eslint-disable-next-line no-restricted-syntax
-    for (const i of this.apActiveList) {
-      this.controlBlock(apis.AP_BLOCK, i);
-    }
-    // eslint-disable-next-line no-restricted-syntax
-    for (const i of this.staActiveList) {
-      this.controlBlock(apis.STA_BLOCK, i);
-    }
-    next();
-  },
+  // beforeRouteLeave(to, from, next) {
+  //   this.setScanStatus('off');
+  //   this.controlScan('off', this.channel);
+  //   // close all element still active
+  //   // eslint-disable-next-line no-restricted-syntax
+  //   for (const i of this.apActiveList) {
+  //     this.controlBlock(apis.AP_BLOCK, i);
+  //   }
+  //   // eslint-disable-next-line no-restricted-syntax
+  //   for (const i of this.staActiveList) {
+  //     this.controlBlock(apis.STA_BLOCK, i);
+  //   }
+  //   next();
+  // },
 };
 </script>
 
