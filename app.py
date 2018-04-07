@@ -231,15 +231,7 @@ def get_all_rf_item(msg_type):
     for line in lines:
         s = line.split(';')
         if len(s) != 4:
-            data = simplejson.dumps({'status': 'fail',
-                                     'api': 'all_rf_item',
-                                     'parameter': msg_type,
-                                     'message': 'Get all_rf_item fail.Item format error.',
-                                     data_key: result_items,
-                                     'data_key': data_key
-                                     })
-            logger.error(data)
-            return data, status.HTTP_404_NOT_FOUND
+            continue
         result_item = {
             'freq': s[0].split(':')[-1],
             'prot': s[1].split(':')[-1],
@@ -471,20 +463,7 @@ def get_ap_list():
                                  })
         logger.error(data)
         return data, status.HTTP_404_NOT_FOUND
-    with open(app.config['AP_LIST_FILE'], 'rb') as f:
-        new_MD5 = hashlib.md5(file_as_bytes(f)).hexdigest()
-    if new_MD5 == app.config['AP_LIST_FILE_MD5']:
-        data = simplejson.dumps({'status': 'success',
-                                 'api': 'ap_list',
-                                 'parameter': None,
-                                 'message': 'Get ap_list success.But file NOT MODIFIED.',
-                                 'ap_list': ap_list,
-                                 'data_key': 'ap_list'
-                                 })
-        logger.debug(data)
-        return data, status.HTTP_304_NOT_MODIFIED
 
-    app.config['AP_LIST_FILE_MD5'] = new_MD5
     with open(app.config['AP_LIST_FILE'], 'r') as f:
         lines = f.readlines()
     for line in lines:
@@ -533,19 +512,6 @@ def get_sta_list():
         return data, status.HTTP_404_NOT_FOUND
 
     file_path = app.config['STA_LIST_FILE']
-    with open(file_path, 'rb') as f:
-        new_MD5 = hashlib.md5(file_as_bytes(f)).hexdigest()
-    if new_MD5 == app.config['STA_LIST_FILE_MD5']:
-        data = simplejson.dumps({'status': 'success',
-                                 'api': 'sta_list',
-                                 'parameter': None,
-                                 'message': 'Get sta_list success.But file NOT MODIFIED.',
-                                 'sta_list': sta_list,
-                                 'data_key': 'sta_list'
-                                 })
-        logger.debug(data)
-        return data, status.HTTP_304_NOT_MODIFIED
-    app.config['STA_LIST_FILE_MD5'] = new_MD5
     with open(file_path, 'r') as f:
         lines = f.readlines()
     for line in lines:
@@ -832,32 +798,18 @@ def update_firmware_log():
                                  })
         logger.error(data)
         return data, status.HTTP_404_NOT_FOUND
-    # Check if update log is NOT MODIFIED by MD5
-    with open(file_path, 'rb') as f:
-        new_MD5 = hashlib.md5(file_as_bytes(f)).hexdigest()
-    if new_MD5 == app.config['FIRMWARE_UPDATE_LOG_MD5']:
-        data = simplejson.dumps({'status': 'success',
-                                 'api': 'update_firmware_log',
-                                 'parameter': None,
-                                 'message': 'Get update_firmware_log success.',
-                                 'data_key': 'update_log',
-                                 'update_log': update_log
-                                 })
-        logger.debug(data)
-        return data, status.HTTP_304_NOT_MODIFIED
-    else:
-        app.config['FIRMWARE_UPDATE_LOG_MD5'] = new_MD5
-        with open(file_path, 'r') as f:
-            update_log = f.read()
-        data = simplejson.dumps({'status': 'success',
-                                 'api': 'update_firmware_log',
-                                 'parameter': None,
-                                 'message': 'Get update_firmware_log success.',
-                                 'data_key': 'update_log',
-                                 'update_log': update_log
-                                 })
-        logger.info(data)
-        return data
+
+    with open(file_path, 'r') as f:
+        update_log = f.read()
+    data = simplejson.dumps({'status': 'success',
+                             'api': 'update_firmware_log',
+                             'parameter': None,
+                             'message': 'Get update_firmware_log success.',
+                             'data_key': 'update_log',
+                             'update_log': update_log
+                             })
+    logger.info(data)
+    return data
 
 
 @app.route("/update_firmware", methods=['POST'])
@@ -1007,4 +959,4 @@ def index():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', threaded=True)

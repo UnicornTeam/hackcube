@@ -30,3 +30,8 @@ Use gunicorn:
 pip install gunicorn
 gunicorn --reload -w 4 -b 0.0.0.0:5000 app:app --access-logfile log/access.log --error-logfile log/error.log
 ```
+
+Use uwsgi:
+```
+uwsgi --socket 0.0.0.0:5000 --enable-threads --protocol=http -w app:app
+```
