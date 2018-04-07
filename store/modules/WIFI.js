@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import services from '../../services';
-import { SET_API_ITEMS, SET_STA_ITEMS, SET_AP_SPIN_SHOW, SET_STA_SPIN_SHOW,
+import { SET_AP_ITEMS, SET_STA_ITEMS, SET_AP_SPIN_SHOW, SET_STA_SPIN_SHOW,
   SET_SCAN_STATUS, SET_CHANNEL, SET_STA_JAM_BY_INDEX, SET_AP_JAM_BY_INDEX } from '../mutation-types';
 
 export default {
@@ -51,6 +51,12 @@ export default {
           return Promise.reject(err);
         });
     },
+    setAPList({ commit }, apList) {
+      commit(SET_AP_ITEMS, apList);
+    },
+    setSTAList({ commit }, staList) {
+      commit(SET_STA_ITEMS, staList);
+    },
     setScanStatus({ commit }, status) {
       commit(SET_SCAN_STATUS, status);
     },
@@ -71,7 +77,7 @@ export default {
     },
   },
   mutations: {
-    [SET_API_ITEMS](state, items) {
+    [SET_AP_ITEMS](state, items) {
       // state.apList = items;
       Vue.set(state, 'apList', items);
     },

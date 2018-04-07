@@ -97,7 +97,7 @@ export default {
   },
   methods: {
     ...mapActions('WIFI', ['getAPList', 'getSTAList', 'getStarted', 'setScanStatus', 'setChannel',
-      'setAPSpinShow', 'setSTASpinShow', 'changeAPJAMByIndex', 'changeSTAJAMByIndex']),
+      'setAPSpinShow', 'setSTASpinShow', 'changeAPJAMByIndex', 'changeSTAJAMByIndex', 'setAPList', 'setSTAList']),
     controlBlock(api, index) {
       let actualIndex;
       let value;
@@ -221,6 +221,9 @@ export default {
       this.$timer.start('fetchWifiList');
     }
     this.getChannelList();
+    // Empty apList and staList
+    this.setAPList([]);
+    this.setSTAList([]);
   },
   timers: {
     fetchWifiList: { time: 3000, autostart: false, repeat: true },

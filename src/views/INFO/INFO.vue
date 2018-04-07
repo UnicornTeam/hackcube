@@ -32,13 +32,13 @@
     </Upload>
 
     <div class="text-center">
-      <Button type="ghost" @click="onClick">Submit</Button>
+      <van-button :loading="spinShow" @click="onClick">Submit</van-button>
+      <!--<Button type="ghost" >Submit</Button>-->
     </div>
-
     <br/>
     <div>
+
       <Input readonly v-model="updateLog" type="textarea" :autosize="{minRows: 6,maxRows: 14}" placeholder="Upload log..."></Input>
-      <Spin fix v-if="spinShow"></Spin>
     </div>
 
   </div>
@@ -107,7 +107,6 @@
           });
       },
       fetchUpdateLog() {
-        this.spinShow = true;
         axios
           .get(`${process.env.BACKEND_HOST}/update_firmware_log`, {
             validateStatus(status) {
@@ -117,11 +116,9 @@
           .then((response) => {
             const result = response.data;
             if (response.status === 304) {
-              this.$timer.stop('fetchUpdateLog');
-              this.$Message.info('Update finish.');
-              this.spinShow = false;
               return;
             }
+            this.spinShow = false;
             this.updateLog = result[result.data_key];
           })
           .catch((err) => {
@@ -135,6 +132,7 @@
       },
       onClick() {
         if (this.uploadedFilePath) {
+          this.spinShow = true;
           axios
           .post(`${process.env.BACKEND_HOST}/update_firmware`, { uploadedFilePath: this.uploadedFilePath })
           .then((response) => {
@@ -162,7 +160,7 @@
       },
     },
     timers: {
-      fetchUpdateLog: { time: 100, autostart: false, repeat: true },
+      fetchUpdateLog: { time: 1000, autostart: false, repeat: true },
       fetchStorageStatus: { time: 0, autostart: true, repeat: false },
       getEnergyProgress: { time: 0, autostart: true, repeat: false },
     },
