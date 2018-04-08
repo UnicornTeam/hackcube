@@ -1,4 +1,4 @@
-import WIFI from './WIFI';
+import WIFI from './WiFi';
 
 export default {
   WIFI,

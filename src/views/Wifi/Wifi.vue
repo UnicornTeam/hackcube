@@ -72,7 +72,7 @@
 import CubeNav from '@/components/CubeNav';
 import axios from 'axios';
 import { mapState, mapGetters, mapActions } from 'vuex';
-import apis from '@/../services/api/WIFI';
+import apis from '@/../services/api/WiFi';
 
 export default {
   name: 'Wifi',
@@ -96,7 +96,7 @@ export default {
     };
   },
   methods: {
-    ...mapActions('WIFI', ['getAPList', 'getSTAList', 'getStarted', 'setScanStatus', 'setChannel',
+    ...mapActions('WiFi', ['getAPList', 'getSTAList', 'getStarted', 'setScanStatus', 'setChannel',
       'setAPSpinShow', 'setSTASpinShow', 'changeAPJAMByIndex', 'changeSTAJAMByIndex', 'setAPList', 'setSTAList']),
     controlBlock(api, index) {
       let actualIndex;
@@ -230,14 +230,14 @@ export default {
   },
   computed: {
     ...mapState(
-      'WIFI',
+      'WiFi',
       ['apList',
         'staList',
         'apSpinShow',
         'staSpinShow',
         'scanStatus',
       ]),
-    ...mapGetters('WIFI', ['staCount', 'apCount']),
+    ...mapGetters('WiFi', ['staCount', 'apCount']),
   },
   // beforeRouteLeave(to, from, next) {
   //   this.setScanStatus('off');
