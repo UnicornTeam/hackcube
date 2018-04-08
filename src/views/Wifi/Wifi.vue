@@ -18,7 +18,7 @@
         </b-col>
         <b-col cols="1">
           <van-button size="small" v-if="scanStatus==='off'" @click="onClickScan">Scan</van-button>
-          <van-button size="small" variant="danger" v-if="scanStatus==='on'" @click="onClickScan">Stop</van-button>
+          <van-button size="small" type="danger" v-if="scanStatus==='on'" @click="onClickScan">Stop</van-button>
         </b-col>
       </b-row>
     </b-container>
