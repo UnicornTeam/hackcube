@@ -133,12 +133,12 @@
       onClick() {
         if (this.uploadedFilePath) {
           this.spinShow = true;
+          this.$timer.start('fetchUpdateLog');
           axios
           .post(`${process.env.BACKEND_HOST}/update_firmware`, { uploadedFilePath: this.uploadedFilePath })
           .then((response) => {
             const result = response.data;
             this.$Message.success(result.message);
-            this.$timer.start('fetchUpdateLog');
           })
           .catch((err) => {
             if (err.response) {
