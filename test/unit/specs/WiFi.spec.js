@@ -3,7 +3,7 @@ import { shallow, createLocalVue } from '@vue/test-utils';
 // import bButton from 'bootstrap-vue/es/components/button/button';
 import Wifi from '@/views/Wifi/Wifi';
 import storeConfig from '@/../store/modules/WIFI';
-import { SET_SCAN_STATUS } from '../../../store/mutation-types';
+// import { SET_SCAN_STATUS } from '../../../store/mutation-types';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -62,30 +62,7 @@ describe('WiFi.vue', () => {
   before(() => {
     store = new Vuex.Store({
       modules: {
-        WIFI: {
-          namespaced: true,
-          state: {
-            apList: defaultAPList,
-            staList: defaultSTAList,
-            apSpinShow: false,
-            staSpinShow: false,
-            scanStatus: 'off',
-          },
-          getters: {
-            apCount: state => state.apList.length,
-            staCount: state => state.staList.length,
-          },
-          actions: {
-            setScanStatus({ commit }, status) {
-              commit(SET_SCAN_STATUS, status);
-            },
-          },
-          mutations: {
-            [SET_SCAN_STATUS](state, status) {
-              localVue.set(state, 'scanStatus', status);
-            },
-          },
-        },
+        WIFI: storeConfig,
       },
     });
     wrapper = shallow(Wifi, {
@@ -106,18 +83,20 @@ describe('WiFi.vue', () => {
     expect(wrapper.find('.board h1').text()).to.equal(defaultTitle);
   });
 
-  it('should renders wifi_fields from $store.state', () => {
-    expect(wrapper.vm.wifi_fields).deep.equal(defaultWiFiField);
+  it('should renders wifi_fields to first table from $store.state', () => {
+    expect(wrapper.findAll('b-table').wrappers[0].vnode.data.attrs.fields).deep.equal(defaultWiFiField);
   });
-  it('should renders client_fields from $store.state', () => {
-    expect(wrapper.vm.client_fields).deep.equal(defaultClientField);
+  it('should renders client_fields to second table from $store.state', () => {
+    expect(wrapper.findAll('b-table').wrappers[1].vnode.data.attrs.fields).deep.equal(defaultClientField);
   });
 
-  it('should renders apList from $store.state', () => {
-    expect(wrapper.vm.apList).deep.equal(defaultAPList);
+  it('should renders apList to first table from $store.state', () => {
+    expect(wrapper.findAll('b-table').wrappers[0].vnode.data.attrs.items)
+      .deep.equal([]);
   });
-  it('should renders staList from $store.state', () => {
-    expect(wrapper.vm.staList).deep.equal(defaultSTAList);
+  it('should renders staList to second table from $store.state', () => {
+    expect(wrapper.findAll('b-table').wrappers[1].vnode.data.attrs.items)
+      .deep.equal([]);
   });
 
   it('should renders Scan button before click', () => {
