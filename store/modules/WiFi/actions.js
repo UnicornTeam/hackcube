@@ -4,13 +4,13 @@ import {
   SET_SCAN_STATUS,
   SET_STA_ITEMS,
   SET_STA_JAM_BY_INDEX, SET_STA_SPIN_SHOW,
-} from '../../mutation-types';
-import services from '../../../services';
+} from '@/../store/mutation-types';
+import services from '@/../services';
 
 export default {
   getAPList({ state, commit }) {
       // commit(SET_AP_SPIN_SHOW, true);
-    return services.WIFI.getAPList()
+    return services.WiFi.getAPList()
         .then((resp) => {
           if (resp.status !== 304) {
             const result = resp.data;
@@ -27,7 +27,7 @@ export default {
   },
   getSTAList({ state, commit }) {
       // commit(SET_STA_SPIN_SHOW, true);
-    return services.WIFI.getSTAList()
+    return services.WiFi.getSTAList()
         .then((resp) => {
           if (resp.status !== 304) {
             const result = resp.data;
@@ -66,5 +66,5 @@ export default {
   changeAPJAMByIndex({ commit }, index) {
     commit(SET_AP_JAM_BY_INDEX, index);
   },
-}
+};
 

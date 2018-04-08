@@ -1,5 +1,5 @@
-import WIFI from './WiFi';
+import WiFi from './WiFi';
 
 export default {
-  WIFI,
+  WiFi,
 };
