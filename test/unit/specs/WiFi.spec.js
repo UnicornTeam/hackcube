@@ -1,9 +1,13 @@
 import Vuex from 'vuex';
 import { shallow, createLocalVue } from '@vue/test-utils';
+// import bButton from 'bootstrap-vue/es/components/button/button';
 import Wifi from '@/views/Wifi/Wifi';
+import storeConfig from '@/../store/modules/WIFI';
+import { SET_SCAN_STATUS } from '../../../store/mutation-types';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
+// localVue.component('b-button', bButton);
 
 describe('WiFi.vue', () => {
   const defaultAPList = [{
@@ -53,44 +57,78 @@ describe('WiFi.vue', () => {
   const defaultWiFiField = ['SSID', 'BSSID', 'RSSI', 'JAM'];
   const defaultClientField = ['MAC', 'BSSID', 'RSSI', 'JAM'];
 
-  const wrapper = shallow(Wifi, {
-    mocks: {
-      propsData: {
-        wifi_fields: defaultWiFiField,
-        client_fields: defaultClientField,
-      },
-      $store: new Vuex.Store({
-        modules: {
-          WIFI: {
-            namespaced: true,
-            state: {
-              apList: defaultAPList,
-              staList: defaultSTAList,
-              apSpinShow: false,
-              staSpinShow: false,
-              scanStatus: 'off',
+  let store;
+  let wrapper;
+  before(() => {
+    store = new Vuex.Store({
+      modules: {
+        WIFI: {
+          namespaced: true,
+          state: {
+            apList: defaultAPList,
+            staList: defaultSTAList,
+            apSpinShow: false,
+            staSpinShow: false,
+            scanStatus: 'off',
+          },
+          getters: {
+            apCount: state => state.apList.length,
+            staCount: state => state.staList.length,
+          },
+          actions: {
+            setScanStatus({ commit }, status) {
+              commit(SET_SCAN_STATUS, status);
             },
-            getters: {
-              apCount: state => state.apList.length,
-              staCount: state => state.staList.length,
+          },
+          mutations: {
+            [SET_SCAN_STATUS](state, status) {
+              localVue.set(state, 'scanStatus', status);
             },
           },
         },
-      }),
-    },
-    localVue,
+      },
+    });
+    wrapper = shallow(Wifi, {
+      mocks: {
+        propsData: {
+          wifi_fields: defaultWiFiField,
+          client_fields: defaultClientField,
+        },
+        $store: store,
+      },
+      localVue,
+    });
   });
+
+
   it('should render title correctly', () => {
     const defaultTitle = 'Cube Wifi Manage';
     expect(wrapper.find('.board h1').text()).to.equal(defaultTitle);
   });
+
   it('should renders wifi_fields from $store.state', () => {
     expect(wrapper.vm.wifi_fields).deep.equal(defaultWiFiField);
   });
   it('should renders client_fields from $store.state', () => {
     expect(wrapper.vm.client_fields).deep.equal(defaultClientField);
   });
+
   it('should renders apList from $store.state', () => {
     expect(wrapper.vm.apList).deep.equal(defaultAPList);
+  });
+  it('should renders staList from $store.state', () => {
+    expect(wrapper.vm.staList).deep.equal(defaultSTAList);
+  });
+
+  it('should renders Scan button before click', () => {
+    expect(wrapper.find('van-button').text()).to.equal('Scan');
+  });
+  it('should renders Stop button after click', () => {
+    wrapper.find('van-button').trigger('click');
+    expect(wrapper.find('van-button').text()).to.equal('Stop');
+  });
+  it('should renders Scan button after double click', () => {
+    wrapper.find('van-button').trigger('click');
+    expect(wrapper.find('van-button').text()).to.equal('Scan');
   });
 });

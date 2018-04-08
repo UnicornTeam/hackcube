@@ -17,8 +17,8 @@
           </Select>
         </b-col>
         <b-col cols="1">
-          <b-button size="sm" variant="primary" v-if="scanStatus==='off'" @click="onClickScan">Scan</b-button>
-          <b-button size="sm" variant="danger" v-if="scanStatus==='on'" @click="onClickScan">Stop</b-button>
+          <van-button size="small" v-if="scanStatus==='off'" @click="onClickScan">Scan</van-button>
+          <van-button size="small" variant="danger" v-if="scanStatus==='on'" @click="onClickScan">Stop</van-button>
         </b-col>
       </b-row>
     </b-container>
@@ -266,5 +266,9 @@ export default {
     padding-left: 4px;
     text-align:center;
     vertical-align:middle;
+  }
+  .van-button--small {
+    bottom: 3px;
+    right: 15px;
   }
 </style>
