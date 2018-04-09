@@ -2,9 +2,7 @@ import Vuex from 'vuex';
 import { shallow, createLocalVue } from '@vue/test-utils';
 // import bButton from 'bootstrap-vue/es/components/button/button';
 import Wifi from '@/views/Wifi/Wifi';
-// import storeConfig from '@/../store/modules/WiFi';
-// eslint-disable-next-line import/no-webpack-loader-syntax
-const storeConfig = require('inject-loader!../../../store/modules/WiFi/WiFi');
+import storeConfig from '@/../store/modules/WiFi/WiFi';
 // import { SET_SCAN_STATUS } from '../../../store/mutation-types';
 
 const localVue = createLocalVue();
@@ -61,10 +59,12 @@ describe('WiFi.vue', () => {
 
   let store;
   let wrapper;
+  // let myStoreConfig;
   before(() => {
+    // myStoreConfig = storeConfig.default;
     store = new Vuex.Store({
       modules: {
-        WIFI: storeConfig,
+        WiFi: storeConfig,
       },
     });
     wrapper = shallow(Wifi, {
@@ -108,7 +108,6 @@ describe('WiFi.vue', () => {
     wrapper.find('van-button').trigger('click');
     expect(wrapper.find('van-button').text()).to.equal('Stop');
   });
-
   it('should renders Scan button after double click', () => {
     wrapper.find('van-button').trigger('click');
     expect(wrapper.find('van-button').text()).to.equal('Scan');
