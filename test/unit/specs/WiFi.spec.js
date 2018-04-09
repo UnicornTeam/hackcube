@@ -103,10 +103,10 @@ describe('WiFi.vue', () => {
         },
       },
     });
-    // newStoreConfig = { ...storeConfig, actions };
+    newStoreConfig = { ...storeConfig, actions };
     store = new Vuex.Store({
       modules: {
-        WIFI: storeConfig,
+        WiFi: newStoreConfig,
       },
     });
     wrapper = shallow(Wifi, {
@@ -150,7 +150,6 @@ describe('WiFi.vue', () => {
     wrapper.find('van-button').trigger('click');
     expect(wrapper.find('van-button').text()).to.equal('Stop');
   });
-
   it('should renders Scan button after double click', () => {
     wrapper.find('van-button').trigger('click');
     expect(wrapper.find('van-button').text()).to.equal('Scan');
