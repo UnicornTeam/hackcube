@@ -5,12 +5,12 @@ import {
   SET_STA_ITEMS,
   SET_STA_JAM_BY_INDEX, SET_STA_SPIN_SHOW,
 } from '@/../store/mutation-types';
-import services from '@/../services';
+import services from '@/../services/WiFi';
 
 export default {
   getAPList({ state, commit }) {
       // commit(SET_AP_SPIN_SHOW, true);
-    return services.WiFi.getAPList()
+    return services.getAPList()
         .then((resp) => {
           if (resp.status !== 304) {
             const result = resp.data;
@@ -27,7 +27,7 @@ export default {
   },
   getSTAList({ state, commit }) {
       // commit(SET_STA_SPIN_SHOW, true);
-    return services.WiFi.getSTAList()
+    return services.getSTAList()
         .then((resp) => {
           if (resp.status !== 304) {
             const result = resp.data;

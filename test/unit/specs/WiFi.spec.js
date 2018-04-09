@@ -1,67 +1,109 @@
 import Vuex from 'vuex';
+import { Button } from 'vant';
 import { shallow, createLocalVue } from '@vue/test-utils';
-// import bButton from 'bootstrap-vue/es/components/button/button';
 import Wifi from '@/views/Wifi/Wifi';
-// import storeConfig from '@/../store/modules/WiFi';
+import storeConfig from '@/../store/modules/WiFi/WiFi';
+import { SET_AP_SPIN_SHOW, SET_AP_ITEMS, SET_STA_ITEMS, SET_SCAN_STATUS, SET_CHANNEL,
+  SET_STA_SPIN_SHOW, SET_AP_JAM_BY_INDEX, SET_STA_JAM_BY_INDEX } from '../../../store/mutation-types';
 // eslint-disable-next-line import/no-webpack-loader-syntax
-const storeConfig = require('inject-loader!../../../store/modules/WiFi/WiFi');
-// import { SET_SCAN_STATUS } from '../../../store/mutation-types';
+const actionInjector = require('!!vue-loader?inject!@/../store/modules/WiFi/actions');
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
-// localVue.component('b-button', bButton);
 
 describe('WiFi.vue', () => {
-  const defaultAPList = [{
-    Index: 0,
-    SSID: '360WIFI-XX',
-    BSSID: '11:22:33:44:55:66',
-    RSSI: '-80',
-    JAM: false,
-  },
-  {
-    Index: 1,
-    SSID: '360WIFI-X2',
-    BSSID: '11:22:33:44:55:66',
-    RSSI: '-94',
-    JAM: false,
-  },
-  {
-    Index: 2,
-    SSID: '360WIFI-X3',
-    BSSID: '11:22:33:44:55:66',
-    RSSI: '-81',
-    JAM: false,
-  }];
-
-  const defaultSTAList = [{
-    Index: 0,
-    NAME: 'iPhone',
-    MAC: '11:22:33:44:55:66',
-    RSSI: '522',
-    JAM: false,
-  },
-  {
-    Index: 1,
-    NAME: 'Android',
-    MAC: '11:22:33:44:55:66',
-    RSSI: '94',
-    JAM: false,
-  },
-  {
-    Index: 2,
-    NAME: 'iPhone',
-    MAC: '11:22:33:44:55:66',
-    RSSI: '101',
-    JAM: false,
-  }];
-
   const defaultWiFiField = ['SSID', 'BSSID', 'RSSI', 'JAM'];
   const defaultClientField = ['MAC', 'BSSID', 'RSSI', 'JAM'];
-
   let store;
   let wrapper;
+  // storeConfig.action = actions;
+  let newStoreConfig;
+  let actions;
+  let defaultAPList;
+  let defaultSTAList;
   before(() => {
+    defaultAPList = [{
+      Index: 0,
+      SSID: '360WIFI-XX',
+      BSSID: '11:22:33:44:55:66',
+      RSSI: '-80',
+      JAM: false,
+    },
+    {
+      Index: 1,
+      SSID: '360WIFI-X2',
+      BSSID: '11:22:33:44:55:66',
+      RSSI: '-94',
+      JAM: false,
+    },
+    {
+      Index: 2,
+      SSID: '360WIFI-X3',
+      BSSID: '11:22:33:44:55:66',
+      RSSI: '-81',
+      JAM: false,
+    }];
+
+    defaultSTAList = [{
+      Index: 0,
+      NAME: 'iPhone',
+      MAC: '11:22:33:44:55:66',
+      RSSI: '522',
+      JAM: false,
+    },
+    {
+      Index: 1,
+      NAME: 'Android',
+      MAC: '11:22:33:44:55:66',
+      RSSI: '94',
+      JAM: false,
+    },
+    {
+      Index: 2,
+      NAME: 'iPhone',
+      MAC: '11:22:33:44:55:66',
+      RSSI: '101',
+      JAM: false,
+    }];
+    actionInjector({
+      '@/../services/WiFi': {
+        getAPList: ({ commit }) => setTimeout(() => {
+          // mock apList
+          commit('setAPItems', defaultAPList);
+          commit(SET_AP_SPIN_SHOW, false);
+        }, 100),
+        getSTAList: ({ commit }) => setTimeout(() => {
+          // mock staList
+          commit('setAPItems', defaultSTAList);
+          commit(SET_AP_SPIN_SHOW, false);
+        }, 100),
+        setAPList({ commit }, apList) {
+          commit(SET_AP_ITEMS, apList);
+        },
+        setSTAList({ commit }, staList) {
+          commit(SET_STA_ITEMS, staList);
+        },
+        setScanStatus({ commit }, status) {
+          commit(SET_SCAN_STATUS, status);
+        },
+        setChannel({ commit }, channel) {
+          commit(SET_CHANNEL, channel);
+        },
+        setAPSpinShow({ commit }, status) {
+          commit(SET_AP_SPIN_SHOW, status);
+        },
+        setSTASpinShow({ commit }, status) {
+          commit(SET_STA_SPIN_SHOW, status);
+        },
+        changeSTAJAMByIndex({ commit }, index) {
+          commit(SET_STA_JAM_BY_INDEX, index);
+        },
+        changeAPJAMByIndex({ commit }, index) {
+          commit(SET_AP_JAM_BY_INDEX, index);
+        },
+      },
+    });
+    // newStoreConfig = { ...storeConfig, actions };
     store = new Vuex.Store({
       modules: {
         WIFI: storeConfig,
@@ -102,7 +144,7 @@ describe('WiFi.vue', () => {
   });
 
   it('should renders Scan button before click', () => {
-    expect(wrapper.find('van-button').text()).to.equal('Scan');
+    expect(wrapper.find(Button).text()).to.equal('Scan');
   });
   it('should renders Stop button after click', () => {
     wrapper.find('van-button').trigger('click');
