@@ -1,6 +1,4 @@
 import Vuex from 'vuex';
-import { Button } from 'vant';
-import sinon from 'sinon';
 import { shallow, createLocalVue } from '@vue/test-utils';
 import Wifi from '@/views/Wifi/Wifi';
 import storeConfig from '@/../store/modules/WiFi/WiFi';
@@ -148,9 +146,17 @@ describe('WiFi.vue', () => {
     expect(wrapper.find('van-button').text()).to.equal('Scan');
   });
   it('should renders Stop button after click', () => {
-    const button = wrapper.find('van-button');
-    button.trigger('click');
+    wrapper.find('van-button').trigger('click');
     expect(wrapper.find('van-button').text()).to.equal('Stop');
+    wrapper.find('van-button').trigger('click');
+  });
+  it('should renders default ap_list after click', () => {
+    wrapper.find('van-button').trigger('click');
+    wrapper.vm.$nextTick((done) => {
+      expect(wrapper.findAll('b-table').wrappers[0].vnode.data.attrs.items).deep.equal('bar');
+      expect(wrapper.findAll('b-table').wrappers[1].vnode.data.attrs.items).deep.equal('foo');
+      done();
+    });
   });
   it('should renders Scan button after double click', () => {
     wrapper.find('van-button').trigger('click');
