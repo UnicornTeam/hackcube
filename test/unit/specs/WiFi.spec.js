@@ -1,5 +1,6 @@
 import Vuex from 'vuex';
 import { Button } from 'vant';
+import sinon from 'sinon';
 import { shallow, createLocalVue } from '@vue/test-utils';
 import Wifi from '@/views/Wifi/Wifi';
 import storeConfig from '@/../store/modules/WiFi/WiFi';
@@ -103,7 +104,7 @@ describe('WiFi.vue', () => {
         },
       },
     });
-    newStoreConfig = { ...storeConfig, actions };
+    newStoreConfig = { ...storeConfig, ...actions };
     store = new Vuex.Store({
       modules: {
         WiFi: newStoreConfig,
@@ -144,10 +145,11 @@ describe('WiFi.vue', () => {
   });
 
   it('should renders Scan button before click', () => {
-    expect(wrapper.find(Button).text()).to.equal('Scan');
+    expect(wrapper.find('van-button').text()).to.equal('Scan');
   });
   it('should renders Stop button after click', () => {
-    wrapper.find('van-button').trigger('click');
+    const button = wrapper.find('van-button');
+    button.trigger('click');
     expect(wrapper.find('van-button').text()).to.equal('Stop');
   });
   it('should renders Scan button after double click', () => {
