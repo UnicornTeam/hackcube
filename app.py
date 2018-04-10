@@ -6,10 +6,13 @@
 # Git repository: https://github.com/peacesky/flask-file-uploader.git
 # This work based on jQuery-File-Upload which can be found at https://github.com/blueimp/jQuery-File-Upload/
 
-import os
+import os, time
 import hashlib
 import subprocess
+from threading import Thread, Lock
 from subprocess import CalledProcessError
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 
 import simplejson
 from flask import Flask, request, render_template, redirect, url_for, send_from_directory
@@ -21,6 +24,28 @@ from config.bcolor import bcolors
 from config.config import DevelopmentConfig, TestingConfig, ProductionConfig
 from getlogging import get_logging
 from lib.upload_file import uploadfile
+
+logger = get_logging('CUBE')
+
+
+class MyFileSystemEventHander(FileSystemEventHandler):
+    def __init__(self, fn, emit_func):
+        super(MyFileSystemEventHander, self).__init__()
+        self.send_socket = fn
+        self.emit_func = emit_func
+
+    def on_modified(self, event):
+        logger.info('Detect file change:%s' % event.src_path)
+        if (event.is_directory):
+            files_in_dir = [event.src_path + "/" + f for f in os.listdir(event.src_path)]
+            mod_file_path = max(files_in_dir, key=os.path.getmtime)
+            if 'AP_list_tmp' in mod_file_path:
+                logger.info('Detect WiFi source file changed: %s' % event.src_path)
+                socketio.emit('message', {'data': 'Connected', 'count': 2})
+                self.emit_func('message', {'data': 'Anderson, send wifi![Send by server]',
+                                          'namespace': 'WiFi'})
+                self.send_socket(self.emit_func)
+
 
 app = Flask(__name__)
 logger = get_logging('CUBE')
@@ -40,6 +65,56 @@ ALLOWED_EXTENSIONS = {'txt', 'gif', 'png', 'jpg', 'jpeg', 'bmp', 'rar', 'zip', '
 IGNORED_FILES = {'.gitignore'}
 
 bootstrap = Bootstrap(app)
+
+
+# @socketio.on('wifi')
+def send_wifi(emit_func):
+    logger.info('call send_wifi')
+    emit_func('message', {'data': 'Anderson, send wifi![Send by server]',
+                              'namespace': 'WiFi'})
+
+
+thread = None
+thread_lock = Lock()
+
+
+@socketio.on('start_listen')
+def test_connect():
+    emit('message', {'data': 'Connected', 'count': 0})
+    global thread
+    with thread_lock:
+        if thread is None:
+            thread = socketio.start_background_task(target=watch_file)
+    emit('message', {'data': 'Connected', 'count': 1})
+
+
+def watch_file():
+    while True:
+        socketio.sleep(10)
+        nfc_item = {'foo': 'bar'}
+        file_path = app.config['NFC_DATA_FILE']
+        with open(file_path, 'rb') as f:
+            now_md5 = hashlib.md5(file_as_bytes(f)).hexdigest()
+        if now_md5 != app.config['NFC_DATA_FILE_MD5']:
+            data = simplejson.dumps({'status': 'success',
+                                     'api': 'nfc_item',
+                                     'parameter': None,
+                                     'message': 'Get nfc_item success.But no new NFC item',
+                                     'nfc_item': nfc_item,
+                                     'data_key': 'nfc_item'
+                                     })
+            logger.debug(data)
+            socketio.emit('message', data)
+    # observer = Observer()
+    # observer.schedule(MyFileSystemEventHander(send_wifi, args), app.config['BASE_PATH'], recursive=False)
+    # observer.start()
+    # logger.info('Watching directory %s...' % app.config['BASE_PATH'])
+    # try:
+    #     while True:
+    #         socketio.sleep(10)
+    # except KeyboardInterrupt:
+    #     observer.stop()
+    # observer.join()
 
 
 def file_as_bytes(f):
@@ -131,7 +206,6 @@ init_data()
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
 
 @app.route("/nfc_item", methods=['GET'])
 def get_nfc_item():
@@ -775,8 +849,8 @@ def get_hd_info():
                                  })
         logger.error(data)
         return data, status.HTTP_500_INTERNAL_SERVER_ERROR
-    used = int(lines[0])/1024/1024
-    free = int(lines[1])/1024/1024
+    used = int(lines[0]) / 1024 / 1024
+    free = int(lines[1]) / 1024 / 1024
     total = used + free
     # get percentage
     percent = used * 100 / total
@@ -1012,4 +1086,6 @@ def index():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', threaded=True)
+    # thread = Thread(target=watch_file)
+    # thread.start()
+    socketio.run(app)

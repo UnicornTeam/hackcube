@@ -41,6 +41,7 @@ class ProductionConfig(Config):
 
 class DevelopmentConfig(Config):
     DEBUG = True
+    BASE_PATH = 'data/example_source'
     AP_LIST_FILE = 'data/example_source/AP_list_tmp'
     STA_LIST_FILE = 'data/example_source/STA_list_tmp'
     NFC_DATA_FILE = 'data/example_source/bNFC_data'
