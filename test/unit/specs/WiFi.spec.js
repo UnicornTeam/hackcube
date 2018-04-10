@@ -2,20 +2,28 @@ import Vuex from 'vuex';
 import { shallow, createLocalVue } from '@vue/test-utils';
 import Wifi from '@/views/Wifi/Wifi';
 import storeConfig from '@/../store/modules/WiFi/WiFi';
-import { SET_AP_SPIN_SHOW } from '../../../store/mutation-types';
+import originActions from '@/../store/modules/WiFi/actions';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
+// jest.mock('axios');
 
 describe('WiFi.vue', () => {
   const defaultWiFiField = ['SSID', 'BSSID', 'RSSI', 'JAM'];
   const defaultClientField = ['MAC', 'BSSID', 'RSSI', 'JAM'];
   let store;
   let wrapper;
-  // storeConfig.action = actions;
   let defaultAPList;
   let defaultSTAList;
-  before(() => {
+  let newActions;
+  let editActions;
+  let newStoreConfig;
+  beforeAll(() => {
+    editActions = {
+      getAPList: jest.fn(),
+      getSTAList: jest.fn(),
+    };
+    newActions = { ...originActions, ...editActions };
     defaultAPList = [{
       Index: 0,
       SSID: '360WIFI-XX',
@@ -59,9 +67,10 @@ describe('WiFi.vue', () => {
       RSSI: '101',
       JAM: false,
     }];
+    newStoreConfig = { ...storeConfig, actions: newActions };
     store = new Vuex.Store({
       modules: {
-        WiFi: storeConfig,
+        WiFi: newStoreConfig,
       },
     });
     wrapper = shallow(Wifi, {
@@ -79,43 +88,45 @@ describe('WiFi.vue', () => {
 
   it('should render title correctly', () => {
     const defaultTitle = 'Cube Wifi Manage';
-    expect(wrapper.find('.board h1').text()).to.equal(defaultTitle);
+    expect(wrapper.find('.board h1').text()).toBe(defaultTitle);
   });
 
   it('should renders wifi_fields to first table from $store.state', () => {
-    expect(wrapper.findAll('b-table').wrappers[0].vnode.data.attrs.fields).deep.equal(defaultWiFiField);
+    expect(wrapper.findAll('b-table').wrappers[0].vnode.data.attrs.fields).toEqual(defaultWiFiField);
   });
   it('should renders client_fields to second table from $store.state', () => {
-    expect(wrapper.findAll('b-table').wrappers[1].vnode.data.attrs.fields).deep.equal(defaultClientField);
+    expect(wrapper.findAll('b-table').wrappers[1].vnode.data.attrs.fields).toEqual(defaultClientField);
   });
 
   it('should renders apList to first table from $store.state', () => {
     expect(wrapper.findAll('b-table').wrappers[0].vnode.data.attrs.items)
-      .deep.equal([]);
+      .toEqual([]);
   });
   it('should renders staList to second table from $store.state', () => {
     expect(wrapper.findAll('b-table').wrappers[1].vnode.data.attrs.items)
-      .deep.equal([]);
+      .toEqual([]);
   });
 
   it('should renders Scan button before click', () => {
-    expect(wrapper.find('van-button').text()).to.equal('Scan');
+    expect(wrapper.find('van-button').text()).toBe('Scan');
   });
   it('should renders Stop button after click', () => {
     wrapper.find('van-button').trigger('click');
-    expect(wrapper.find('van-button').text()).to.equal('Stop');
+    expect(wrapper.find('van-button').text()).toBe('Stop');
     wrapper.find('van-button').trigger('click');
   });
   it('should renders default ap_list after click', () => {
     wrapper.find('van-button').trigger('click');
-    // wrapper.vm.$nextTick((done) => {
-    //   expect(wrapper.findAll('b-table').wrappers[0].vnode.data.attrs.items).deep.equal('bar');
-    //   expect(wrapper.findAll('b-table').wrappers[1].vnode.data.attrs.items).deep.equal('foo');
-    //   done();
-    // });
+    expect(editActions.getAPList).toHaveBeenCalled();
+    expect(editActions.getSTAList).toHaveBeenCalled();
+    wrapper.vm.$nextTick((done) => {
+      expect(wrapper.vm.value).deep.equal('bar');
+      expect(wrapper.findAll('b-table').wrappers[1].vnode.data.attrs.items).deep.equal('foo');
+      done();
+    });
   });
   it('should renders Scan button after double click', () => {
     wrapper.find('van-button').trigger('click');
-    expect(wrapper.find('van-button').text()).to.equal('Scan');
+    expect(wrapper.find('van-button').text()).toBe('Scan');
   });
 });

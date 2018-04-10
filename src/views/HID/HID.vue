@@ -1,7 +1,14 @@
 <template>
   <div class="board">
     <cube-nav/>
-
+    <div v-for="latest_crf_item in latest_crf_items" >
+      <b-alert show variant="primary" dismissible>
+        <h4 class="alert-heading">RF</h4>
+        <p>
+          In frequency {{latest_crf_item.freq}} found prot: {{latest_crf_item.prot}}, data: {{latest_crf_item.data}} signal.<u @click="clickRF">Learn More.</u>
+        </p>
+      </b-alert>
+    </div>
     <h1 class="text-center">Cube HID Manage</h1>
     <h3 class="text-center">Using Cube to simulate keyboard, mouse, HID and other devices</h3>
     <br/>
@@ -28,6 +35,7 @@
 
 <script>
     import CubeNav from '@/components/CubeNav';
+    import router from '@/router';
     import axios from 'axios';
 
     export default {
@@ -46,6 +54,7 @@
             { Index: 1, Info: 'd2f392f1', Name: 'Add User', Run: false },
             { Index: 2, Info: '9209993f', Name: 'ShellCode', Run: false },
           ],
+          latest_crf_items: [],
         };
       },
       methods: {
@@ -92,6 +101,50 @@
         onUploadFail() {
           this.$Message.error('Upload fail');
         },
+        fetchCRFItems() {
+          const api = 'crf';
+          const that = this;
+          axios
+            .get(`${process.env.BACKEND_HOST}/rf_item/${api}`, {
+              validateStatus(status) {
+                return status < 400; // Reject only if the status code is greater than or equal to 400
+              },
+            })
+            .then((response) => {
+              const result = response.data;
+              // todo: write test code
+              if (response.status === 304) {
+                return;
+              }
+              const dataKey = result.data_key;
+              if (result[dataKey].length > 0) {
+                that.$Message.success(result.message);
+              }
+              // todo: change as for item of them :display notice
+              if (dataKey === 'crf_item') {
+                that.latest_crf_items = result[dataKey];
+              }
+            })
+            .catch((err) => {
+              if (err.response) {
+                this.$Message.error(err.response.data.message);
+              } else {
+                this.$Message.error('Request fail');
+              }
+            });
+        },
+        clickRF() {
+          router.push({
+            path: '/rf',
+            name: 'RF',
+            params: {
+              latest_crf_items: this.latest_crf_items,
+            },
+          });
+        },
+      },
+      timers: {
+        fetchCRFItems: { time: 3000, autostart: true, repeat: true },
       },
     };
 </script>

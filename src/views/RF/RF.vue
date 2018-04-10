@@ -1,4 +1,4 @@
-<template>
+<template xmlns:v-finger="http://www.w3.org/1999/xhtml">
   <div class="board">
     <cube-nav/>
     <div v-for="latest_arf_item in latest_arf_items" >
@@ -158,6 +158,8 @@
   import axios from 'axios';
   import router from '@/router';
 
+  const arrayMove = require('array-move');
+
   export default {
     name: 'RF',
     components: {
@@ -268,73 +270,68 @@
             }
           });
       },
-      fetchRFItem() {
-        const dataAPIs = ['crf'];
+      fetchCRFItems() {
+        const api = 'crf';
         const that = this;
-        for (const api of dataAPIs) {
-          axios
-            .get(`${process.env.BACKEND_HOST}/rf_item/${api}`, {
-              validateStatus(status) {
-                return status < 400; // Reject only if the status code is greater than or equal to 400
-              },
-            })
-            .then((response) => {
-              const result = response.data;
-              // todo: write test code
-              if (response.status === 304) {
-                return;
-              }
-              const dataKey = result.data_key;
-              if (result[dataKey].length > 0) {
-                that.$Message.success(result.message);
-              }
-              for (const item of result[dataKey]) {
-                that.rfItems.unshift(item);
-              }
-              // todo: change as for item of them :display notice
-              if (dataKey === 'arf_item') {
-                that.latest_arf_items = result[dataKey];
-              } else if (dataKey === 'crf_item') {
-                that.latest_crf_items = result[dataKey];
-              }
-            })
-            .catch((err) => {
-              if (err.response) {
-                this.$Message.error(err.response.data.message);
-              } else {
-                this.$Message.error('Request fail');
-              }
-            });
-        }
-      },
-      fetchAllRFItems() {
-        this.spinShow = true;
-        const dataAPIs = ['crf'];
-        const that = this;
-        for (const api of dataAPIs) {
-          axios
-          .get(`${process.env.BACKEND_HOST}/all_rf_item/${api}`)
+        axios
+          .get(`${process.env.BACKEND_HOST}/rf_item/${api}`, {
+            validateStatus(status) {
+              return status < 400; // Reject only if the status code is greater than or equal to 400
+            },
+          })
           .then((response) => {
             const result = response.data;
             // todo: write test code
+            if (response.status === 304) {
+              return;
+            }
             const dataKey = result.data_key;
-            // todo: add Transition animation
-            that.$Message.success(result.message);
-            // for (const item of result[dataKey]) {
-            //   that.rfItems.add(item);
-            // }
-            that.rfItems = that.rfItems.concat(result[dataKey]);
-            this.spinShow = false;
+            if (result[dataKey].length > 0) {
+              that.$Message.success(result.message);
+            }
+            for (const item of result[dataKey]) {
+              that.rfItems.unshift(item);
+            }
+            // todo: change as for item of them :display notice
+            if (dataKey === 'crf_item') {
+              that.latest_crf_items = result[dataKey];
+            }
           })
           .catch((err) => {
-            this.spinShow = false;
             if (err.response) {
               this.$Message.error(err.response.data.message);
             } else {
               this.$Message.error('Request fail');
             }
           });
-        }
+      },
+      fetchAllRFItems() {
+        this.spinShow = true;
+        const api = 'crf';
+        const that = this;
+
+        return axios
+        .get(`${process.env.BACKEND_HOST}/all_rf_item/${api}`)
+        .then((response) => {
+          const result = response.data;
+          // todo: write test code
+          const dataKey = result.data_key;
+          // todo: add Transition animation
+          that.$Message.success(result.message);
+          // for (const item of result[dataKey]) {
+          //   that.rfItems.add(item);
+          // }
+          that.rfItems = that.rfItems.concat(result[dataKey]);
+          this.spinShow = false;
+        })
+        .catch((err) => {
+          this.spinShow = false;
+          if (err.response) {
+            this.$Message.error(err.response.data.message);
+          } else {
+            this.$Message.error('Request fail');
+          }
+        });
       },
       getAttackProgress() {
         const that = this;
@@ -362,10 +359,10 @@
         switch (switchType) {
           case 'sniffer':
             if (this.snifferSwitch) {
-              this.$timer.start('fetchRFItem');
+              this.$timer.start('fetchCRFItems');
               this.$Message.info('Start detect new RF item.');
             } else {
-              this.$timer.stop('fetchRFItem');
+              this.$timer.stop('fetchCRFItems');
               this.$Message.info('Stop detect new RF item.');
             }
             break;
@@ -422,14 +419,27 @@
       },
     },
     created() {
-      if (this.snifferSwitch) {
-        this.$timer.start('fetchRFItem');
+      if (this.$route.params.latest_crf_items) {
+        this.fetchAllRFItems().then(() => {
+          const results = this.$route.params.latest_crf_items;
+          for (const item of results) {
+            const index = this.rfItems.findIndex(x => x.data === item.data);
+            console.log('index debug', index, item.data);
+            if (index === -1) {
+              this.rfItems.unshift(item);
+            } else {
+              this.rfItems = arrayMove(this.rfItems, index, 0);
+            }
+          }
+        });
+      } else if (this.snifferSwitch) {
+        this.fetchAllRFItems();
+        this.$timer.start('fetchCRFItems');
         this.$timer.start('fetchNFCData');
       }
     },
     timers: {
-      fetchAllRFItems: { time: 0, autostart: true, repeat: false },
-      fetchRFItem: { time: 3000, autostart: false, repeat: true },
+      fetchCRFItems: { time: 3000, autostart: false, repeat: true },
       fetchNFCData: { time: 3000, autostart: false, repeat: true },
       getAttackProgress: { time: 400, autostart: false, repeat: true },
     },

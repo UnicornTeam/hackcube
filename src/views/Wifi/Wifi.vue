@@ -1,7 +1,14 @@
 <template>
   <div class="board">
     <cube-nav/>
-
+    <div v-for="latest_crf_item in latest_crf_items" >
+      <b-alert show variant="primary" dismissible>
+        <h4 class="alert-heading">RF</h4>
+        <p>
+          In frequency {{latest_crf_item.freq}} found prot: {{latest_crf_item.prot}}, data: {{latest_crf_item.data}} signal.<u @click="clickRF">Learn More.</u>
+        </p>
+      </b-alert>
+    </div>
     <h1 class="text-center">Cube Wifi Manage</h1>
     <h3 class="text-center">Security Risk Detection on 2.4Ghz 5Ghz Devices</h3>
     <br/>
@@ -72,6 +79,7 @@
 import CubeNav from '@/components/CubeNav';
 import axios from 'axios';
 import { mapState, mapGetters, mapActions } from 'vuex';
+import router from '@/router';
 import apis from '@/../services/api/WiFi';
 
 export default {
@@ -90,9 +98,7 @@ export default {
       channel: 6,
       apCurrentPage: 1,
       staCurrentPage: 1,
-      // keep a list of element which is active
-      apActiveList: new Set(),
-      staActiveList: new Set(),
+      latest_crf_items: [],
     };
   },
   methods: {
@@ -109,21 +115,11 @@ export default {
         value = this.apList[actualIndex].BSSID;
         isRunning = this.apList[actualIndex].JAM;
         this.changeAPJAMByIndex(actualIndex);
-        if (isRunning) {
-          this.apActiveList.delete(actualIndex);
-        } else {
-          this.apActiveList.add(actualIndex);
-        }
       } else if (api === apis.STA_BLOCK) {
         actualIndex = ((this.staCurrentPage - 1) * this.staPerPage) + index;
         value = this.staList[actualIndex].MAC;
         isRunning = this.staList[actualIndex].JAM;
         this.changeSTAJAMByIndex(actualIndex);
-        if (isRunning) {
-          this.staActiveList.delete(actualIndex);
-        } else {
-          this.staActiveList.add(actualIndex);
-        }
       } else {
         this.$Message.error('Please input the right api');
         return;
@@ -198,6 +194,47 @@ export default {
         }
       });
     },
+    fetchCRFItems() {
+      const api = 'crf';
+      const that = this;
+      axios
+        .get(`${process.env.BACKEND_HOST}/rf_item/${api}`, {
+          validateStatus(status) {
+            return status < 400; // Reject only if the status code is greater than or equal to 400
+          },
+        })
+        .then((response) => {
+          const result = response.data;
+          // todo: write test code
+          if (response.status === 304) {
+            return;
+          }
+          const dataKey = result.data_key;
+          if (result[dataKey].length > 0) {
+            that.$Message.success(result.message);
+          }
+          // todo: change as for item of them :display notice
+          if (dataKey === 'crf_item') {
+            that.latest_crf_items = result[dataKey];
+          }
+        })
+        .catch((err) => {
+          if (err.response) {
+            this.$Message.error(err.response.data.message);
+          } else {
+            this.$Message.error('Request fail');
+          }
+        });
+    },
+    clickRF() {
+      router.push({
+        path: '/rf',
+        name: 'RF',
+        params: {
+          latest_crf_items: this.latest_crf_items,
+        },
+      });
+    },
     getChannelList() {
       const channelList = [];
       const numList = [
@@ -227,6 +264,7 @@ export default {
   },
   timers: {
     fetchWifiList: { time: 3000, autostart: false, repeat: true },
+    fetchCRFItems: { time: 3000, autostart: true, repeat: true },
   },
   computed: {
     ...mapState(
@@ -239,20 +277,6 @@ export default {
       ]),
     ...mapGetters('WiFi', ['staCount', 'apCount']),
   },
-  // beforeRouteLeave(to, from, next) {
-  //   this.setScanStatus('off');
-  //   this.controlScan('off', this.channel);
-  //   // close all element still active
-  //   // eslint-disable-next-line no-restricted-syntax
-  //   for (const i of this.apActiveList) {
-  //     this.controlBlock(apis.AP_BLOCK, i);
-  //   }
-  //   // eslint-disable-next-line no-restricted-syntax
-  //   for (const i of this.staActiveList) {
-  //     this.controlBlock(apis.STA_BLOCK, i);
-  //   }
-  //   next();
-  // },
 };
 </script>
 
