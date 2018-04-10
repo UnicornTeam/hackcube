@@ -35,6 +35,7 @@
     "vue": "^2.5.2",
     "vue-native-websocket": "^2.0.6",
     "vue-router": "^3.0.1",
+    "vue-socket.io": "^2.1.1-b",
     "vue-timers": "^1.2.0",
     "vuex": "^3.0.1",
     "vuex-persistedstate": "^2.5.1"

@@ -10,7 +10,8 @@ import 'iview/dist/styles/iview.css';
 import iView from 'iview';
 import Vuex from 'vuex';
 import VueTimers from 'vue-timers';
-import VueNativeSock from 'vue-native-websocket';
+// import VueNativeSock from 'vue-native-websocket';
+import VueSocketio from 'vue-socket.io';
 import AlloyFinger from 'alloyfinger';
 import AlloyFingerPlugin from 'alloyfinger/vue/alloy_finger.vue';
 import App from './App';
@@ -26,13 +27,7 @@ Vue.use(Vuex);
 Vue.use(AlloyFingerPlugin, {
   AlloyFinger,
 });
-Vue.use(VueNativeSock, 'ws://0.0.0.0:9090', {
-  store,
-  format: 'json',
-  reconnection: true, // (Boolean) whether to reconnect automatically (false)
-  reconnectionAttempts: 5, // (Number) number of reconnection attempts before giving up (Infinity),
-  reconnectionDelay: 3000, // (Number) how long to initially wait before attempting a new (1000)
-});
+Vue.use(VueSocketio, 'ws://0.0.0.0:5000/', store);
 Vue.config.productionTip = false;
 
 /* eslint-disable no-new */

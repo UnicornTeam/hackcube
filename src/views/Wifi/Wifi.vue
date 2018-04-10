@@ -77,6 +77,9 @@
     </div>
     <b-pagination align="center" v-if="staCount" size="sm" :total-rows="staCount" v-model="staCurrentPage" :per-page="staPerPage">
     </b-pagination>
+    <b-button size="sm" variant="primary"
+              @click="pingServer">
+      Run</b-button>
   </div>
 </template>
 
@@ -109,9 +112,28 @@ export default {
       latest_crf_items: [],
     };
   },
+  sockets: {
+    connect() {
+      console.log('socket connected anderson');
+      this.$socket.emit('foo', 'bar');
+    },
+    disconnect() {
+      console.log('socket disconnect');
+    },
+    message(data) {
+      console.log(data);
+    },
+    emit_method(val) {
+      console.log('this method was fired by the socket server. eg: io.emit("customEmit", data)', val);
+    },
+  },
   methods: {
     ...mapActions('WiFi', ['getAPList', 'getSTAList', 'getStarted', 'setScanStatus', 'setChannel',
       'setAPSpinShow', 'setSTASpinShow', 'changeAPJAMByIndex', 'changeSTAJAMByIndex', 'setAPList', 'setSTAList']),
+    pingServer() {
+      // Send the "pingServer" event to the server.
+      this.$socket.emit('message', 'Got it![Send by client]');
+    },
     controlBlock(api, index) {
       let actualIndex;
       let value;
@@ -302,6 +324,9 @@ export default {
     // Empty apList and staList
     this.setAPList([]);
     this.setSTAList([]);
+    this.$options.sockets.event_name = (data) => {
+      console.log(data);
+    };
   },
   timers: {
     fetchWifiList: { time: 3400, autostart: false, repeat: true },

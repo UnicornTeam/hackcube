@@ -22,38 +22,28 @@ export default new Vuex.Store({
       createPersistedState(),
     ],
   state: {
-    socket: {
-      isConnected: false,
-      message: '',
-      reconnectError: false,
-    },
+    connect: false,
+    message: null,
   },
   mutations: {
-    SOCKET_ONOPEN(state) {
-      const socket = state.socket;
-      socket.isConnected = true;
-      Vue.set(state, 'socket', socket);
+    SOCKET_CONNECT: (state, status) => {
+      Vue.set(state, 'connect', true);
+      console.log(status);
+      // state.connect = true;
     },
-    SOCKET_ONCLOSE(state) {
-      const socket = state.socket;
-      socket.isConnected = false;
-      Vue.set(state, 'socket', socket);
-    },
-    SOCKET_ONERROR(state, event) {
-      console.error(state, event);
-    },
-    // default handler called for all methods
-    SOCKET_ONMESSAGE(state, message) {
+    SOCKET_MESSAGE: (state, message) => {
       Vue.set(state, 'message', message);
+      // state.message = message;
     },
-    // mutations for reconnect methods
-    SOCKET_RECONNECT(state, count) {
-      console.info(state, count);
-    },
-    SOCKET_RECONNECT_ERROR(state) {
-      const socket = state.socket;
-      socket.reconnectError = true;
-      Vue.set(state, 'socket', socket);
+  },
+  actions: {
+    otherAction: (context, type) => true,
+    socket_message: (context, message) => {
+      context.dispatch('newMessage', message);
+      context.commit('NEW_MESSAGE_RECEIVED', message);
+      if (message.is_important) {
+        context.dispatch('alertImportantMessage', message);
+      }
     },
   },
 });

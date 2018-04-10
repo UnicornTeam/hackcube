@@ -48,5 +48,11 @@ export default {
       apList[index].JAM = apList[index].JAM === false;
       Vue.set(state, 'apList', apList);
     },
+    SOCKET_CONNECT: (state, status) => {
+      Vue.set(state, 'connect', status);
+    },
+    SOCKET_MESSAGE: (state, message) => {
+      Vue.set(state, 'message', message);
+    },
   },
 };

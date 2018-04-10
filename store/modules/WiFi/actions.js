@@ -42,6 +42,14 @@ export default {
           return Promise.reject(err);
         });
   },
+  otherAction: (context, type) => true,
+  socket_message: (context, message) => {
+    context.dispatch('newMessage', message);
+    context.commit('NEW_MESSAGE_RECEIVED', message);
+    if (message.is_important) {
+      context.dispatch('alertImportantMessage', message);
+    }
+  },
   setAPList({ commit }, apList) {
     commit(SET_AP_ITEMS, apList);
   },
