@@ -33,6 +33,7 @@
     "uglify-es": "github:mishoo/UglifyJS2#harmony",
     "vant": "^1.0.2",
     "vue": "^2.5.2",
+    "vue-native-websocket": "^2.0.6",
     "vue-router": "^3.0.1",
     "vue-timers": "^1.2.0",
     "vuex": "^3.0.1",
