@@ -9,6 +9,12 @@
         </p>
       </b-alert>
     </div>
+    <b-alert :show="showNFCAlert" variant="success" dismissible>
+      <h4 class="alert-heading">NFC</h4>
+      <p>
+        Found NFC card ID: {{latest_nfc_item.ID}}, <u @click="clickNFC">Learn More.</u>
+      </p>
+    </b-alert>
     <h1 class="text-center">Cube Wifi Manage</h1>
     <h3 class="text-center">Security Risk Detection on 2.4Ghz 5Ghz Devices</h3>
     <br/>
@@ -98,6 +104,8 @@ export default {
       channel: 6,
       apCurrentPage: 1,
       staCurrentPage: 1,
+      showNFCAlert: false,
+      latest_nfc_item: '',
       latest_crf_items: [],
     };
   },
@@ -252,6 +260,39 @@ export default {
       }
       this.channelList = channelList;
     },
+    clickNFC() {
+      router.push({
+        path: '/nfc',
+        name: 'NFC',
+        params: {
+          latest_nfc_item: this.latest_nfc_item,
+        },
+      });
+    },
+    fetchNFCData() {
+      axios
+        .get(`${process.env.BACKEND_HOST}/nfc_item`, {
+          validateStatus(status) {
+            return status < 400;
+          },
+        })
+        .then((response) => {
+          const result = response.data;
+          if (response.status === 304) {
+            return;
+          }
+          this.latest_nfc_item = result[result.data_key];
+          this.showNFCAlert = true;
+          this.$Message.info(result.message);
+        })
+        .catch((err) => {
+          if (err.response) {
+            this.$Message.error(err.response.data.message);
+          } else {
+            this.$Message.error('Request fail');
+          }
+        });
+    },
   },
   created() {
     if (this.scanStatus === 'on') {
@@ -263,8 +304,9 @@ export default {
     this.setSTAList([]);
   },
   timers: {
-    fetchWifiList: { time: 3000, autostart: false, repeat: true },
-    fetchCRFItems: { time: 3000, autostart: true, repeat: true },
+    fetchWifiList: { time: 3400, autostart: false, repeat: true },
+    fetchCRFItems: { time: 3200, autostart: true, repeat: true },
+    fetchNFCData: { time: 3000, autostart: true, repeat: true },
   },
   computed: {
     ...mapState(

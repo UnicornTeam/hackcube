@@ -9,6 +9,12 @@
         </p>
       </b-alert>
     </div>
+    <b-alert :show="showNFCAlert" variant="success" dismissible>
+      <h4 class="alert-heading">NFC</h4>
+      <p>
+        Found NFC card ID: {{latest_nfc_item.ID}}, <u @click="clickNFC">Learn More.</u>
+      </p>
+    </b-alert>
     <h1 class="text-center">Cube HID Manage</h1>
     <h3 class="text-center">Using Cube to simulate keyboard, mouse, HID and other devices</h3>
     <br/>
@@ -55,6 +61,8 @@
             { Index: 2, Info: '9209993f', Name: 'ShellCode', Run: false },
           ],
           latest_crf_items: [],
+          showNFCAlert: false,
+          latest_nfc_item: '',
         };
       },
       methods: {
@@ -142,9 +150,43 @@
             },
           });
         },
+        fetchNFCData() {
+          axios
+            .get(`${process.env.BACKEND_HOST}/nfc_item`, {
+              validateStatus(status) {
+                return status < 400; // Reject only if the status code is greater than or equal to 400
+              },
+            })
+            .then((response) => {
+              const result = response.data;
+              if (response.status === 304) {
+                return;
+              }
+              this.latest_nfc_item = result[result.data_key];
+              this.showNFCAlert = true;
+              this.$Message.info(result.message);
+            })
+            .catch((err) => {
+              if (err.response) {
+                this.$Message.error(err.response.data.message);
+              } else {
+                this.$Message.error('Request fail');
+              }
+            });
+        },
+        clickNFC() {
+          router.push({
+            path: '/nfc',
+            name: 'NFC',
+            params: {
+              latest_nfc_item: this.latest_nfc_item,
+            },
+          });
+        },
       },
       timers: {
-        fetchCRFItems: { time: 3000, autostart: true, repeat: true },
+        fetchCRFItems: { time: 3400, autostart: true, repeat: true },
+        fetchNFCData: { time: 3000, autostart: true, repeat: true },
       },
     };
 </script>

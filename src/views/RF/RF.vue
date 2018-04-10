@@ -9,14 +9,14 @@
         </p>
       </b-alert>
     </div>
-  <div v-for="latest_crf_item in latest_crf_items" >
-    <b-alert show variant="primary" dismissible>
-      <h4 class="alert-heading">RF</h4>
-      <p>
-        In frequency {{latest_crf_item.freq}} found prot: {{latest_crf_item.prot}}, data: {{latest_crf_item.data}} signal.<a href="#content">Learn More.</a>
-      </p>
-    </b-alert>
-  </div>
+    <div v-for="latest_crf_item in latest_crf_items" >
+      <b-alert show variant="primary" dismissible>
+        <h4 class="alert-heading">RF</h4>
+        <p>
+          In frequency {{latest_crf_item.freq}} found prot: {{latest_crf_item.prot}}, data: {{latest_crf_item.data}} signal.<a href="#content">Learn More.</a>
+        </p>
+      </b-alert>
+    </div>
     <b-alert :show="showNFCAlert" variant="success" dismissible>
       <h4 class="alert-heading">NFC</h4>
       <p>
@@ -290,7 +290,12 @@
               that.$Message.success(result.message);
             }
             for (const item of result[dataKey]) {
-              that.rfItems.unshift(item);
+              const index = that.rfItems.findIndex(x => x.data === item.data);
+              if (index === -1) {
+                that.rfItems.unshift(item);
+              } else {
+                that.rfItems = arrayMove(that.rfItems, index, 0);
+              }
             }
             // todo: change as for item of them :display notice
             if (dataKey === 'crf_item') {
@@ -419,12 +424,13 @@
       },
     },
     created() {
+      let needFetchAll = true;
       if (this.$route.params.latest_crf_items) {
+        needFetchAll = false;
         this.fetchAllRFItems().then(() => {
           const results = this.$route.params.latest_crf_items;
           for (const item of results) {
             const index = this.rfItems.findIndex(x => x.data === item.data);
-            console.log('index debug', index, item.data);
             if (index === -1) {
               this.rfItems.unshift(item);
             } else {
@@ -432,15 +438,18 @@
             }
           }
         });
-      } else if (this.snifferSwitch) {
-        this.fetchAllRFItems();
+      }
+      if (this.snifferSwitch) {
         this.$timer.start('fetchCRFItems');
         this.$timer.start('fetchNFCData');
+      }
+      if (needFetchAll) {
+        this.fetchAllRFItems();
       }
     },
     timers: {
       fetchCRFItems: { time: 3000, autostart: false, repeat: true },
-      fetchNFCData: { time: 3000, autostart: false, repeat: true },
+      fetchNFCData: { time: 3200, autostart: false, repeat: true },
       getAttackProgress: { time: 400, autostart: false, repeat: true },
     },
   };

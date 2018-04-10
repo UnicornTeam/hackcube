@@ -9,6 +9,12 @@
         </p>
       </b-alert>
     </div>
+    <b-alert :show="showNFCAlert" variant="success" dismissible>
+      <h4 class="alert-heading">NFC</h4>
+      <p>
+        Found NFC card ID: {{latest_nfc_item.ID}}, <u @click="clickNFC">Learn More.</u>
+      </p>
+    </b-alert>
     <h1 class="text-center">Cube Status Manage</h1>
     <h3 class="text-center">Display Cube device status</h3>
     <br/>
@@ -76,6 +82,8 @@
         extraDataArdu: { type: 'INFO-Ardu' },
         uploadedFilePath: '',
         latest_crf_items: [],
+        showNFCAlert: false,
+        latest_nfc_item: '',
       };
     },
     methods: {
@@ -171,6 +179,30 @@
             }
           });
       },
+      fetchNFCData() {
+        axios
+          .get(`${process.env.BACKEND_HOST}/nfc_item`, {
+            validateStatus(status) {
+              return status < 400; // Reject only if the status code is greater than or equal to 400
+            },
+          })
+          .then((response) => {
+            const result = response.data;
+            if (response.status === 304) {
+              return;
+            }
+            this.latest_nfc_item = result[result.data_key];
+            this.showNFCAlert = true;
+            this.$Message.info(result.message);
+          })
+          .catch((err) => {
+            if (err.response) {
+              this.$Message.error(err.response.data.message);
+            } else {
+              this.$Message.error('Request fail');
+            }
+          });
+      },
       onClick() {
         if (this.uploadedFilePath) {
           this.spinShow = true;
@@ -192,6 +224,15 @@
           this.$Message.error('Please upload file before submit!');
         }
       },
+      clickNFC() {
+        router.push({
+          path: '/nfc',
+          name: 'NFC',
+          params: {
+            latest_nfc_item: this.latest_nfc_item,
+          },
+        });
+      },
       onUploadSuccess(response, file) {
         this.uploadedFilePath = `/root/user_file/INFO/arduino/${file.name}`;
         this.$Message.success(`Upload ${file.name} success`);
@@ -212,8 +253,9 @@
     timers: {
       fetchUpdateLog: { time: 1000, autostart: false, repeat: true },
       fetchStorageStatus: { time: 0, autostart: true, repeat: false },
-      getEnergyProgress: { time: 0, autostart: true, repeat: false },
-      fetchCRFItems: { time: 3000, autostart: true, repeat: true },
+      getEnergyProgress: { time: 100, autostart: true, repeat: false },
+      fetchCRFItems: { time: 3200, autostart: true, repeat: true },
+      fetchNFCData: { time: 3000, autostart: true, repeat: true },
     },
   };
 </script>
