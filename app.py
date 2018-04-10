@@ -194,6 +194,58 @@ def get_nfc_item():
         return data
 
 
+@app.route("/all_nfc_items", methods=['GET'])
+def get_all_nfc_items():
+    all_nfc_items = []
+    file_path = app.config['NFC_DATA_FILE']
+    if not os.path.exists(file_path):
+        data = simplejson.dumps({'status': 'fail',
+                                 'api': 'all_nfc_items',
+                                 'parameter': None,
+                                 'message': 'Get all_nfc_items fail.FILE NOT FOUND',
+                                 'all_nfc_items': all_nfc_items,
+                                 'data_key': 'all_nfc_items'
+                                 })
+        logger.error(data)
+        return data, status.HTTP_404_NOT_FOUND
+    with open(file_path, 'r') as f:
+        lines = f.readlines()
+    while lines[-1].strip() == '':
+        del lines[-1]
+    if not lines:
+        data = simplejson.dumps({'status': 'fail',
+                                 'api': 'all_nfc_items',
+                                 'parameter': None,
+                                 'message': 'Get all_nfc_items fail.Item NOT FOUND',
+                                 'all_nfc_items': all_nfc_items,
+                                 'data_key': 'all_nfc_items'
+                                 })
+        logger.error(data)
+        return data, status.HTTP_404_NOT_FOUND
+    else:
+        for line in lines:
+            ID = line
+            vid = '050'
+            nfc_item = {
+                'ID': ID,
+                'VID': vid,
+                'WRITE': False,
+                'SIMULATE': False
+            }
+            if nfc_item not in all_nfc_items:
+                all_nfc_items.append(nfc_item)
+        data = simplejson.dumps({'status': 'success',
+                                 'api': 'all_nfc_items',
+                                 'parameter': None,
+                                 'message': 'Get all_nfc_items success.',
+                                 'all_nfc_items': all_nfc_items,
+                                 'data_key': 'all_nfc_items'
+                                 })
+
+        logger.info(data)
+        return data
+
+
 @app.route("/all_rf_item/<string:msg_type>", methods=['GET'])
 def get_all_rf_item(msg_type):
     result_items = []
@@ -240,7 +292,8 @@ def get_all_rf_item(msg_type):
             'play': False,
             'msg_type': msg_type
         }
-        result_items.append(result_item)
+        if result_item not in result_items:
+            result_items.append(result_item)
     # remove duplicate
     result_items = [dict(t) for t in set([tuple(d.items()) for d in result_items])]
     data = simplejson.dumps({'status': 'success',
