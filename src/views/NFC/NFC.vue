@@ -199,7 +199,8 @@
               return;
             }
             const item = result[result.data_key];
-            const index = this.items.findIndex(x => x.data === item.data);
+            const index = this.items.findIndex(x => x.ID === item.ID);
+            this.latest_nfc_item = item;
             if (index === -1) {
               this.items.unshift(item);
             } else {
