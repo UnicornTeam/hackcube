@@ -132,7 +132,7 @@ export default {
       'setAPSpinShow', 'setSTASpinShow', 'changeAPJAMByIndex', 'changeSTAJAMByIndex', 'setAPList', 'setSTAList']),
     pingServer() {
       // Send the "pingServer" event to the server.
-      this.$socket.emit('message', 'Got it![Send by client]');
+      this.$socket.emit('start_listen');
     },
     controlBlock(api, index) {
       let actualIndex;
