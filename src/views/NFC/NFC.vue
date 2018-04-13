@@ -107,8 +107,8 @@
   /* eslint-disable no-restricted-syntax */
 
   import CubeNav from '@/components/CubeNav';
-  import router from '@/router';
   import axios from 'axios';
+  import AxiosMixin from '../axios-mixin';
 
   const arrayMove = require('array-move');
 
@@ -118,6 +118,7 @@
     components: {
       CubeNav,
     },
+    mixins: [AxiosMixin],
     data() {
       return {
         updateLog: '',
@@ -217,15 +218,6 @@
             }
           });
       },
-      clickNFC() {
-        router.push({
-          path: '/nfc',
-          name: 'NFC',
-          params: {
-            latest_nfc_item: this.latest_nfc_item,
-          },
-        });
-      },
       serialSend(parameter) {
         axios
           .get(`${process.env.BACKEND_HOST}/serial_send/${parameter}`)
@@ -247,38 +239,6 @@
         } else {
           this.$timer.stop('fetchNFCData');
         }
-      },
-      fetchCRFItems() {
-        const api = 'crf';
-        const that = this;
-        axios
-          .get(`${process.env.BACKEND_HOST}/rf_item/${api}`, {
-            validateStatus(status) {
-              return status < 400; // Reject only if the status code is greater than or equal to 400
-            },
-          })
-          .then((response) => {
-            const result = response.data;
-            // todo: write test code
-            if (response.status === 304) {
-              return;
-            }
-            const dataKey = result.data_key;
-            if (result[dataKey].length > 0) {
-              that.$Message.success(result.message);
-            }
-            // todo: change as for item of them :display notice
-            if (dataKey === 'crf_item') {
-              that.latest_crf_items = result[dataKey];
-            }
-          })
-          .catch((err) => {
-            if (err.response) {
-              this.$Message.error(err.response.data.message);
-            } else {
-              this.$Message.error('Request fail');
-            }
-          });
       },
       onSwitchAction(actionType, isOpen, VID, ID) {
         if (!isOpen) {
@@ -319,15 +279,6 @@
             this.$Message.error('Please input the right API');
             break;
         }
-      },
-      clickRF() {
-        router.push({
-          path: '/rf',
-          name: 'RF',
-          params: {
-            latest_crf_items: this.latest_crf_items,
-          },
-        });
       },
     },
     created() {

@@ -156,7 +156,7 @@
 
   import CubeNav from '@/components/CubeNav';
   import axios from 'axios';
-  import router from '@/router';
+  import AxiosMixin from '../axios-mixin';
 
   const arrayMove = require('array-move');
 
@@ -165,6 +165,7 @@
     components: {
       CubeNav,
     },
+    mixins: [AxiosMixin],
     data() {
       return {
         attackProgress: 0,
@@ -212,39 +213,6 @@
         const value = values[1];
         axios
           .get(`${process.env.BACKEND_HOST}/send_direction/${direction}/${value}`)
-          .catch((err) => {
-            if (err.response) {
-              this.$Message.error(err.response.data.message);
-            } else {
-              this.$Message.error('Request fail');
-            }
-          });
-      },
-      clickNFC() {
-        router.push({
-          path: '/nfc',
-          name: 'NFC',
-          params: {
-            latest_nfc_item: this.latest_nfc_item,
-          },
-        });
-      },
-      fetchNFCData() {
-        axios
-          .get(`${process.env.BACKEND_HOST}/nfc_item`, {
-            validateStatus(status) {
-              return status < 400; // Reject only if the status code is greater than or equal to 400
-            },
-          })
-          .then((response) => {
-            const result = response.data;
-            if (response.status === 304) {
-              return;
-            }
-            this.latest_nfc_item = result[result.data_key];
-            this.showNFCAlert = true;
-            this.$Message.info(result.message);
-          })
           .catch((err) => {
             if (err.response) {
               this.$Message.error(err.response.data.message);
