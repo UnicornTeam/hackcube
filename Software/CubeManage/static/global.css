@@ -1,0 +1,38 @@
+h5 {
+  margin-bottom: 10px;
+}
+
+html {
+  overflow-y: scroll;
+}
+
+:root {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+:root body {
+  position: absolute;
+}
+body {
+  width: 100vw;
+  overflow: hidden;
+}
+
+.van-switch--on {
+  background-color: #007aff;
+}
+
+div.van-switch {
+  font-size: 25px!important;
+}
+
+div.board {
+  margin-left: 10px;margin-right: 10px;
+}
+
+#aligncenter {
+  float: right;
+  position: relative;
+  left: -50%; /* or right 50% */
+  text-align: left;
+}
