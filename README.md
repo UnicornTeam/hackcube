@@ -1,6 +1,6 @@
 # Cube Manager
 
-> A Vue.js project
+> The Cube Front-End
 
 ## Build Setup
 
