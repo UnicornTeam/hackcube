@@ -2,8 +2,8 @@
 # coding=utf-8
 
 # Author: Anderson
-# Email: liuhongda@360.cn
-# Git repository: https://github.com/peacesky/flask-file-uploader.git
+# Email: liuhongda1@360.cn
+# Git repository: https://github.com/UnicornTeam/hackcube
 # This work based on jQuery-File-Upload which can be found at https://github.com/blueimp/jQuery-File-Upload/
 
 import os, time
