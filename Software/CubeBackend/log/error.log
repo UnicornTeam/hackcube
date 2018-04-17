@@ -1,0 +1,100 @@
+[2018-03-27 16:29:16 +0800] [85114] [INFO] Starting gunicorn 19.7.1
+[2018-03-27 16:29:16 +0800] [85114] [INFO] Listening at: http://127.0.0.1:8000 (85114)
+[2018-03-27 16:29:16 +0800] [85114] [INFO] Using worker: sync
+[2018-03-27 16:29:16 +0800] [85158] [INFO] Booting worker with pid: 85158
+[2018-03-27 16:29:16 +0800] [85159] [INFO] Booting worker with pid: 85159
+[2018-03-27 16:29:16 +0800] [85160] [INFO] Booting worker with pid: 85160
+[2018-03-27 16:29:17 +0800] [85161] [INFO] Booting worker with pid: 85161
+[2018-03-27 16:30:24 +0800] [85114] [INFO] Handling signal: int
+[2018-03-27 16:30:24 +0800] [85159] [INFO] Worker exiting (pid: 85159)
+[2018-03-27 16:30:24 +0800] [85158] [INFO] Worker exiting (pid: 85158)
+[2018-03-27 16:30:24 +0800] [85160] [INFO] Worker exiting (pid: 85160)
+[2018-03-27 16:30:24 +0800] [85161] [INFO] Worker exiting (pid: 85161)
+[2018-03-27 16:30:24 +0800] [85114] [INFO] Shutting down: Master
+[2018-04-06 01:22:58 +0800] [15151] [INFO] Starting gunicorn 19.7.1
+[2018-04-06 01:22:58 +0800] [15151] [INFO] Listening at: http://127.0.0.1:5000 (15151)
+[2018-04-06 01:22:58 +0800] [15151] [INFO] Using worker: sync
+[2018-04-06 01:22:58 +0800] [15195] [INFO] Booting worker with pid: 15195
+[2018-04-06 01:22:58 +0800] [15196] [INFO] Booting worker with pid: 15196
+[2018-04-06 01:22:58 +0800] [15197] [INFO] Booting worker with pid: 15197
+[2018-04-06 01:22:58 +0800] [15198] [INFO] Booting worker with pid: 15198
+[2018-04-06 01:22:58 +0800] [15197] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/Users/anderson/.pyenv/versions/2.7.14/lib/python2.7/site-packages/gunicorn/arbiter.py", line 578, in spawn_worker
+    worker.init_process()
+  File "/Users/anderson/.pyenv/versions/2.7.14/lib/python2.7/site-packages/gunicorn/workers/base.py", line 126, in init_process
+    self.load_wsgi()
+  File "/Users/anderson/.pyenv/versions/2.7.14/lib/python2.7/site-packages/gunicorn/workers/base.py", line 135, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/Users/anderson/.pyenv/versions/2.7.14/lib/python2.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/Users/anderson/.pyenv/versions/2.7.14/lib/python2.7/site-packages/gunicorn/app/wsgiapp.py", line 65, in load
+    return self.load_wsgiapp()
+  File "/Users/anderson/.pyenv/versions/2.7.14/lib/python2.7/site-packages/gunicorn/app/wsgiapp.py", line 52, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/Users/anderson/.pyenv/versions/2.7.14/lib/python2.7/site-packages/gunicorn/util.py", line 352, in import_app
+    __import__(module)
+  File "/Users/anderson/Code/flask-file-uploader/app.py", line 16, in <module>
+    from flask_api import status
+ImportError: No module named flask_api
+[2018-04-06 01:22:58 +0800] [15196] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/Users/anderson/.pyenv/versions/2.7.14/lib/python2.7/site-packages/gunicorn/arbiter.py", line 578, in spawn_worker
+    worker.init_process()
+  File "/Users/anderson/.pyenv/versions/2.7.14/lib/python2.7/site-packages/gunicorn/workers/base.py", line 126, in init_process
+    self.load_wsgi()
+  File "/Users/anderson/.pyenv/versions/2.7.14/lib/python2.7/site-packages/gunicorn/workers/base.py", line 135, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/Users/anderson/.pyenv/versions/2.7.14/lib/python2.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/Users/anderson/.pyenv/versions/2.7.14/lib/python2.7/site-packages/gunicorn/app/wsgiapp.py", line 65, in load
+    return self.load_wsgiapp()
+  File "/Users/anderson/.pyenv/versions/2.7.14/lib/python2.7/site-packages/gunicorn/app/wsgiapp.py", line 52, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/Users/anderson/.pyenv/versions/2.7.14/lib/python2.7/site-packages/gunicorn/util.py", line 352, in import_app
+    __import__(module)
+  File "/Users/anderson/Code/flask-file-uploader/app.py", line 16, in <module>
+    from flask_api import status
+ImportError: No module named flask_api
+[2018-04-06 01:22:58 +0800] [15197] [INFO] Worker exiting (pid: 15197)
+[2018-04-06 01:22:58 +0800] [15195] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/Users/anderson/.pyenv/versions/2.7.14/lib/python2.7/site-packages/gunicorn/arbiter.py", line 578, in spawn_worker
+    worker.init_process()
+  File "/Users/anderson/.pyenv/versions/2.7.14/lib/python2.7/site-packages/gunicorn/workers/base.py", line 126, in init_process
+    self.load_wsgi()
+  File "/Users/anderson/.pyenv/versions/2.7.14/lib/python2.7/site-packages/gunicorn/workers/base.py", line 135, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/Users/anderson/.pyenv/versions/2.7.14/lib/python2.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/Users/anderson/.pyenv/versions/2.7.14/lib/python2.7/site-packages/gunicorn/app/wsgiapp.py", line 65, in load
+    return self.load_wsgiapp()
+  File "/Users/anderson/.pyenv/versions/2.7.14/lib/python2.7/site-packages/gunicorn/app/wsgiapp.py", line 52, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/Users/anderson/.pyenv/versions/2.7.14/lib/python2.7/site-packages/gunicorn/util.py", line 352, in import_app
+    __import__(module)
+  File "/Users/anderson/Code/flask-file-uploader/app.py", line 16, in <module>
+    from flask_api import status
+ImportError: No module named flask_api
+[2018-04-06 01:22:58 +0800] [15196] [INFO] Worker exiting (pid: 15196)
+[2018-04-06 01:22:58 +0800] [15195] [INFO] Worker exiting (pid: 15195)
+[2018-04-06 01:22:58 +0800] [15198] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/Users/anderson/.pyenv/versions/2.7.14/lib/python2.7/site-packages/gunicorn/arbiter.py", line 578, in spawn_worker
+    worker.init_process()
+  File "/Users/anderson/.pyenv/versions/2.7.14/lib/python2.7/site-packages/gunicorn/workers/base.py", line 126, in init_process
+    self.load_wsgi()
+  File "/Users/anderson/.pyenv/versions/2.7.14/lib/python2.7/site-packages/gunicorn/workers/base.py", line 135, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/Users/anderson/.pyenv/versions/2.7.14/lib/python2.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/Users/anderson/.pyenv/versions/2.7.14/lib/python2.7/site-packages/gunicorn/app/wsgiapp.py", line 65, in load
+    return self.load_wsgiapp()
+  File "/Users/anderson/.pyenv/versions/2.7.14/lib/python2.7/site-packages/gunicorn/app/wsgiapp.py", line 52, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/Users/anderson/.pyenv/versions/2.7.14/lib/python2.7/site-packages/gunicorn/util.py", line 352, in import_app
+    __import__(module)
+  File "/Users/anderson/Code/flask-file-uploader/app.py", line 16, in <module>
+    from flask_api import status
+ImportError: No module named flask_api
+[2018-04-06 01:22:58 +0800] [15198] [INFO] Worker exiting (pid: 15198)
