@@ -6,53 +6,40 @@
 # Git repository: https://github.com/UnicornTeam/hackcube
 # This work based on jQuery-File-Upload which can be found at https://github.com/blueimp/jQuery-File-Upload/
 
-import os, time
+import os
 import hashlib
 import subprocess
-from threading import Thread, Lock
+from threading import Lock
 from subprocess import CalledProcessError
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
 
 import simplejson
 from flask import Flask, request, render_template, redirect, url_for, send_from_directory
 from flask_api import status
 from flask_bootstrap import Bootstrap
 from flask_cors import CORS
+from flask_socketio import SocketIO, emit
 
 from config.bcolor import bcolors
 from config.config import DevelopmentConfig, TestingConfig, ProductionConfig
 from getlogging import get_logging
 from lib.upload_file import uploadfile
-
-logger = get_logging('CUBE')
-
-
-class MyFileSystemEventHander(FileSystemEventHandler):
-    def __init__(self, fn, emit_func):
-        super(MyFileSystemEventHander, self).__init__()
-        self.send_socket = fn
-        self.emit_func = emit_func
-
-    def on_modified(self, event):
-        logger.info('Detect file change:%s' % event.src_path)
-        if (event.is_directory):
-            files_in_dir = [event.src_path + "/" + f for f in os.listdir(event.src_path)]
-            mod_file_path = max(files_in_dir, key=os.path.getmtime)
-            if 'AP_list_tmp' in mod_file_path:
-                logger.info('Detect WiFi source file changed: %s' % event.src_path)
-                socketio.emit('message', {'data': 'Connected', 'count': 2})
-                self.emit_func('message', {'data': 'Anderson, send wifi![Send by server]',
-                                          'namespace': 'WiFi'})
-                self.send_socket(self.emit_func)
+import argparse
 
 
 app = Flask(__name__)
+parser = argparse.ArgumentParser(description='Cube Backend.')
+parser.add_argument('--debug', action='store', dest='debug',
+                    help='Enable debug mode.', default=False)
+args = parser.parse_args()
+if args.debug:
+    app.config['DEBUG'] = True
+else:
+    app.config['DEBUG'] = False
+
 logger = get_logging('CUBE')
+
+socketio = SocketIO(app)
 CORS(app, supports_credentials=True)
-# TODO： 改为环境变量
-app.config['DEBUG'] = True
-app.config['TEST'] = False
 
 if app.config['DEBUG']:
     app.config.from_object(DevelopmentConfig)
@@ -67,7 +54,6 @@ IGNORED_FILES = {'.gitignore'}
 bootstrap = Bootstrap(app)
 
 
-# @socketio.on('wifi')
 def send_wifi(emit_func):
     logger.info('call send_wifi')
     emit_func('message', {'data': 'Anderson, send wifi![Send by server]',
@@ -105,16 +91,6 @@ def watch_file():
                                      })
             logger.debug(data)
             socketio.emit('message', data)
-    # observer = Observer()
-    # observer.schedule(MyFileSystemEventHander(send_wifi, args), app.config['BASE_PATH'], recursive=False)
-    # observer.start()
-    # logger.info('Watching directory %s...' % app.config['BASE_PATH'])
-    # try:
-    #     while True:
-    #         socketio.sleep(10)
-    # except KeyboardInterrupt:
-    #     observer.stop()
-    # observer.join()
 
 
 def file_as_bytes(f):
@@ -206,6 +182,14 @@ init_data()
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+@socketio.on('message')
+def message(message):
+    logger.info(message)
+    emit('message', {'data': 'Anderson, got it![Send by server , namespace: foo]',
+                     'namespace': True})
+
 
 @app.route("/nfc_item", methods=['GET'])
 def get_nfc_item():

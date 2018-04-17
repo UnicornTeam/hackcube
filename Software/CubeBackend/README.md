@@ -16,8 +16,13 @@ Cube Backend
 $ pip install -r requirements.txt
 ```
 
-- Run it:
+You can run it under debug mode:
+```
+python app.py --debug True
+```
+And the program will use file under `./data` as mock data.
 
+Or just run it using product config by default:
 ```
 $ python app.py
 ```
