@@ -2,39 +2,25 @@
 ![](https://github.com/UnicornTeam/hackcube/blob/master/Image/Cube.jpg?raw=true)
 
 ## Hardware
-> ### Arduino Micro Pro 3.3V
-
-> CC1101 433MHz
-
-> CC1101 315MHz
-
-> nRF24L01+ PA  (2.4Ghz)
-
-> EM4095 (125Khz)
-
-> 32U4 HID 
+### Arduino Micro Pro 3.3V
+* CC1101 433MHz
+* CC1101 315MHz
+* nRF24L01+ PA  (2.4Ghz)
+* EM4095 (125Khz)
+* 32U4 HID 
 
 ---------
-> ### Raspberry Pi Zero W
-
-> USB2514B 4*USB HUB
-
-> RTL8822BU (2.4Ghz/5Ghz ac) (Bluetooth 4.1)
-
-> PN532 (13.56 Mhz)
-
-> BCM43438 (2.4Ghz) (Bluetooth 4.1)
+### Raspberry Pi Zero W
+* USB2514B 4*USB HUB
+* RTL8822BU (2.4Ghz/5Ghz ac) (Bluetooth 4.1)
+* PN532 (13.56 Mhz)
+* BCM43438 (2.4Ghz) (Bluetooth 4.1)
 
 -------------
-> #### other
-
-> 8*8 RGB LED
-
-> TI BQ25895 Supports Max Charge (QC3.0)
-
-> TI TPS61088 
-
-
+### other
+* 8*8 RGB LED
+* TI BQ25895 Supports Max Charge (QC3.0)
+* TI TPS61088 
 
 -----------
 
