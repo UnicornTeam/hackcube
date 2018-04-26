@@ -1,0 +1,16 @@
+ freq:2.42Ghz;protocol:rf24l01;modulation:fsk;data:401FF4015DCFBA
+ freq:2.42Ghz;protocol:rf24l01;modulation:fsk;data:401FFFFFF5DCFBA
+ freq:2.42Ghz;protocol:rf24l01;modulation:fsk;data:401FFFFFF5DCFBD
+ freq:2.42Ghz;protocol:rf24l01;modulation:fsk;data:401FFFFFF5DCFBF
+ freq:2.42Ghz;protocol:rf24l01;modulation:fsk;data:401FFFFFF5DCFBFE
+ freq:2.42Ghz;protocol:rf24l01;modulation:fsk;data:401FFFFFF5DCFBFGG
+ freq:2.42Ghz;protocol:rf24l01;modulation:fsk;data:401FFFFFF5DCFBFF
+ freq:2.42Ghz;protocol:rf24l01;modulation:fsk;data:401FFFFFF5DCF012356779
+ freq:2.42Ghz;protocol:rf24l01;modulation:fsk;data:401FFFFFF5DCF123457799
+ freq:2.42Ghz;protocol:rf24l01;modulation:fsk;data:401FFFFFF5DCFBFFFGG
+ freq:2.42Ghz;protocol:rf24l01;modulation:fsk;data:401FFFFFF5DCFBFFFFHHHG
+ freq:2.42Ghz;protocol:rf24l01;modulation:fsk;data:401FFFFFF5DCFBFFFFHHHFg
+ freq:2.42Ghz;protocol:rf24l01;modulation:fsk;data:401FFFFFF5DCFBFFFFHHg
+q freq:2.42Ghz;protocol:rf24l01;modulation:fsk;data:401FF4015DCFBA
+
+q
